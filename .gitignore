@@ -13,3 +13,4 @@ backend/dist/
 pgdata/
 *.pem
 infra/nginx/ssl/
+*.tsbuildinfo

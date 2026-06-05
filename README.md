@@ -15,18 +15,50 @@ ERP/CRM para o terreiro de Umbanda afroindígena Casa da Paz (Conselheiro Lafaie
 - **Mensageria:** Chatwoot + N8N
 - **Infra:** Docker, Nginx, Hetzner, Cloudflare
 
-## Início rápido
+## Início rápido (PowerShell — Windows)
 
-```bash
-# Banco + serviços
-cd infra && docker compose up -d db
+> **Pré-requisitos:** Docker Desktop + Node.js LTS.
+> Se `npm` não for reconhecido: `winget install OpenJS.NodeJS.LTS` e **feche/reabra o terminal**.
+> Postgres do projeto: porta **5433** (evita conflito com PostgreSQL local na 5432).
 
-# Backend
-cd backend && cp .env.example .env && npm install
-npx prisma db push && npm run db:seed && npm run dev
+### Opção A — Scripts (recomendado)
 
-# Frontend
-cd frontend && npm install && npm run dev
+```powershell
+Set-Location "C:\Users\carlo\OneDrive\Área de Trabalho\Projetos DEV\Casa da Paz"
+
+# Terminal 1 — Backend + banco
+.\scripts\start-backend.ps1
+
+# Terminal 2 — Frontend (abra outro PowerShell)
+Set-Location "C:\Users\carlo\OneDrive\Área de Trabalho\Projetos DEV\Casa da Paz"
+.\scripts\start-frontend.ps1
+```
+
+### Opção B — Manual (com PATH corrigido)
+
+```powershell
+Set-Location "C:\Users\carlo\OneDrive\Área de Trabalho\Projetos DEV\Casa da Paz"
+. .\scripts\setup-path.ps1
+
+Set-Location infra
+docker compose up -d db
+
+Set-Location ..\backend
+Copy-Item .env.example .env -ErrorAction SilentlyContinue
+npm install
+npx prisma db push
+npm run db:seed
+npm run dev
+```
+
+Em **outro terminal**, repita `setup-path.ps1` e depois:
+
+```powershell
+Set-Location "C:\Users\carlo\OneDrive\Área de Trabalho\Projetos DEV\Casa da Paz"
+. .\scripts\setup-path.ps1
+Set-Location frontend
+npm install
+npm run dev
 ```
 
 - API: http://localhost:3000
@@ -46,6 +78,6 @@ cd frontend && npm install && npm run dev
 
 ## Push dual
 
-```bash
-git push origin main && git push gitlab main
+```powershell
+git push origin main; git push gitlab main
 ```
