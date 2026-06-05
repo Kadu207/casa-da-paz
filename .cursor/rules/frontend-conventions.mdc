@@ -1,0 +1,14 @@
+---
+description: Padrões frontend React Tailwind responsivo
+globs: frontend/**
+alwaysApply: false
+---
+
+# Frontend Conventions
+
+- Mobile-first Tailwind; breakpoints: sm/md/lg/xl
+- Design tokens: `src/styles/tokens.css` (navy #0F172A, gold #D4AF37)
+- Route guards por `setor_acesso` em `src/guards/RequireRole.tsx`
+- Portal público em `src/pages/public/` — sem JWT
+- API client: `src/lib/api.ts` com interceptors JWT
+- Recharts para dashboards financeiros

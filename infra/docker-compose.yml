@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: casadapaz_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin_casadapaz
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DB: casadapaz_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - rede_casadapaz
+
+  redis:
+    image: redis:7-alpine
+    container_name: casadapaz_redis
+    restart: unless-stopped
+    networks:
+      - rede_casadapaz
+
+  backend:
+    build: ../backend
+    container_name: casadapaz_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://admin_casadapaz:${DB_PASSWORD:-changeme}@db:5432/casadapaz_db
+      JWT_SECRET: ${JWT_SECRET:-dev-secret}
+      PORT: 3000
+      CORS_ORIGIN: http://localhost:5173
+      AI_SERVICE_URL: http://ai-service:8000
+      N8N_URL: http://n8n:5678
+      CHATWOOT_URL: http://chatwoot:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - rede_casadapaz
+
+  ai-service:
+    build: ../ai-service
+    container_name: casadapaz_ai
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    networks:
+      - rede_casadapaz
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: casadapaz_n8n
+    restart: unless-stopped
+    environment:
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD:-changeme}
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - rede_casadapaz
+
+  chatwoot:
+    image: chatwoot/chatwoot:latest
+    container_name: casadapaz_chatwoot
+    restart: unless-stopped
+    environment:
+      SECRET_KEY_BASE: ${CHATWOOT_SECRET:-replace-me-in-production}
+      REDIS_URL: redis://redis:6379
+      POSTGRES_HOST: db
+      POSTGRES_USERNAME: admin_casadapaz
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DATABASE: chatwoot_db
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - rede_casadapaz
+
+  frontend:
+    image: nginx:alpine
+    container_name: casadapaz_frontend
+    restart: unless-stopped
+    volumes:
+      - ../frontend/dist:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - rede_casadapaz
+
+volumes:
+  pgdata:
+  n8n_data:
+
+networks:
+  rede_casadapaz:
+    driver: bridge

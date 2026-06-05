@@ -1,0 +1,13 @@
+---
+description: Ritual operação contínua pós-projeto
+globs: docs/memory/**
+alwaysApply: false
+---
+
+# Modo Operação
+
+1. Consultar runbook/playbook em `docs/memory/`
+2. Executar com agente de domínio correto
+3. Passar V1 → V2 se mudança de código
+4. Atualizar `project-memory.md` e `CHANGELOG.md`
+5. Deploy: acionar usuário — nunca automático

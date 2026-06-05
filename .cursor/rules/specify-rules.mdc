@@ -1,0 +1,32 @@
+---
+description: Regras SDD Casa da Paz — RBAC, transações, tokens, deploy gate
+alwaysApply: true
+---
+
+# Casa da Paz — Regras do Projeto
+
+## Antes de agir
+1. Ler `.specify/memory/project-memory.md` e `AGENTS.md`
+2. Consultar `docs/analise-requisitos-consolidada.md` para escopo
+3. Features em `specs/<feature>/` seguem ciclo SDD
+
+## RBAC
+- Autorização no backend sempre; frontend só oculta UI
+- MEDIUM: filtrar por `pessoa_id` do usuário logado
+- Matriz canônica: `docs/contracts/rbac-matrix.md`
+
+## Dados
+- Import Excel: transação atômica, rollback total em erro
+- Adimplência: derivada (ADR-003), não duplicar status
+
+## Tokens
+- Ler apenas arquivos do domínio + `docs/contracts/`
+- Validadores usam checklists, não re-leitura completa
+
+## Deploy
+- VPS Hetzner: **parar e acionar usuário**
+- DNS: `casadapaz.inovatitech.com.br`
+
+## Git
+- Push dual: `git push origin main && git push gitlab main`
+- Sem secrets no repositório

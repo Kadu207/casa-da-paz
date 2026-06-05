@@ -1,0 +1,73 @@
+openapi: 3.0.3
+info:
+  title: Casa da Paz API
+  version: 0.1.0
+servers:
+  - url: /api
+paths:
+  /health:
+    get:
+      summary: Health check
+  /auth/login:
+    post:
+      summary: Login JWT
+  /auth/me:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Usuário atual
+  /auth/usuarios:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Listar usuários (DIRETORIA)
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Criar usuário
+  /pessoas:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Listar pessoas
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Criar pessoa
+  /financeiro:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Transações com adimplência
+  /financeiro/dashboard:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Agregados receita/despesa
+  /financeiro/atrasados:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Para N8N lembretes
+  /eventos:
+    get:
+      security: [{ bearerAuth: [] }]
+  /eventos/{id}/checkin:
+    post:
+      security: [{ bearerAuth: [] }]
+  /livraria/produtos:
+    get:
+      security: [{ bearerAuth: [] }]
+  /livraria/venda:
+    post:
+      security: [{ bearerAuth: [] }]
+  /public/eventos:
+    get:
+      summary: Eventos abertos (sem auth)
+  /public/agendamentos:
+    post:
+      summary: Agendar consulta (rate limit)
+  /webhooks/pix:
+    post:
+      summary: Conciliação PIX (stub)
+  /webhooks/n8n/trigger:
+    post:
+      security: [{ bearerAuth: [] }]
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

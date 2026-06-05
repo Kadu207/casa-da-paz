@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoPerfil {
+  CONSULENTE
+  MEDIUM
+  DIRETORIA
+  FUNCIONARIO
+}
+
+enum SetorAcesso {
+  DIRETORIA
+  FINANCEIRO
+  RECEPCAO
+  LIVRARIA
+  MEDIUM
+  SUPORTE
+}
+
+enum TipoTransacao {
+  RECEITA
+  DESPESA
+}
+
+enum CategoriaReceita {
+  MENSALIDADE
+  LIVRARIA
+  DOACAO
+  MANUTENCAO
+  EVENTOS
+  OFICINAS
+}
+
+enum CategoriaDespesa {
+  ESTRUTURA_MANUTENCAO
+  INSUMOS_TERREIRO
+  CUSTOS_OPERACIONAIS
+}
+
+enum StatusTransacao {
+  PENDENTE
+  CONCLUIDO
+}
+
+enum StatusEvento {
+  ABERTO
+  ENCERRADO
+}
+
+enum TipoPresenca {
+  MEDIUM
+  CONSULENTE
+}
+
+enum TipoProduto {
+  LIVRO
+  ERVA
+  ARTIGO
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+}
+
+enum StatusAgendamento {
+  PENDENTE
+  CONFIRMADO
+  CANCELADO
+}
+
+enum CanalAlerta {
+  WHATSAPP
+  EMAIL
+  SISTEMA
+}
+
+model Pessoa {
+  id            Int       @id @default(autoincrement())
+  nomeCompleto  String    @map("nome_completo") @db.VarChar(150)
+  telefone      String?   @db.VarChar(20)
+  maiorDeIdade  Boolean   @default(true) @map("maior_de_idade")
+  tipoPerfil    TipoPerfil @map("tipo_perfil")
+  dataCadastro  DateTime  @default(now()) @map("data_cadastro")
+  usuario       Usuario?
+  transacoes    FinanceiroTransacao[]
+  presencas     Presenca[]
+  inscricoes    Inscricao[]
+
+  @@map("pessoas")
+}
+
+model Usuario {
+  id           Int         @id @default(autoincrement())
+  pessoaId     Int         @unique @map("pessoa_id")
+  email        String      @unique @db.VarChar(100)
+  senhaHash    String      @map("senha_hash") @db.VarChar(255)
+  setorAcesso  SetorAcesso @map("setor_acesso")
+  pessoa       Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+
+  @@map("usuarios")
+}
+
+model FinanceiroTransacao {
+  id              Int              @id @default(autoincrement())
+  pessoaId        Int?             @map("pessoa_id")
+  tipo            TipoTransacao
+  categoria       String           @db.VarChar(50)
+  valor           Decimal          @db.Decimal(10, 2)
+  dataTransacao   DateTime         @map("data_transacao") @db.Date
+  vencimento      DateTime?        @db.Date
+  status          StatusTransacao
+  observacoes     String?
+  pessoa          Pessoa?          @relation(fields: [pessoaId], references: [id])
+
+  @@map("financeiro_transacoes")
+}
+
+model Evento {
+  id            Int           @id @default(autoincrement())
+  nomeEvento    String        @map("nome_evento") @db.VarChar(100)
+  dataEvento    DateTime      @map("data_evento") @db.Date
+  status        StatusEvento  @default(ABERTO)
+  capacidadeMax Int?          @map("capacidade_max")
+  presencas     Presenca[]
+  inscricoes    Inscricao[]
+
+  @@map("eventos")
+}
+
+model Presenca {
+  id               Int          @id @default(autoincrement())
+  eventoId         Int          @map("evento_id")
+  pessoaId         Int          @map("pessoa_id")
+  tipoPresenca     TipoPresenca @map("tipo_presenca")
+  nomeResponsavel  String?      @map("nome_responsavel") @db.VarChar(150)
+  horarioChegada   DateTime     @default(now()) @map("horario_chegada")
+  evento           Evento       @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  pessoa           Pessoa       @relation(fields: [pessoaId], references: [id])
+
+  @@map("presencas")
+}
+
+model Produto {
+  id            Int                  @id @default(autoincrement())
+  nome          String               @db.VarChar(150)
+  tipo          TipoProduto
+  preco         Decimal              @db.Decimal(10, 2)
+  estoqueAtual  Int                  @default(0) @map("estoque_atual")
+  movimentacoes EstoqueMovimentacao[]
+
+  @@map("produtos")
+}
+
+model EstoqueMovimentacao {
+  id           Int            @id @default(autoincrement())
+  produtoId    Int            @map("produto_id")
+  tipo         TipoMovimentacao
+  quantidade   Int
+  transacaoId  Int?           @map("transacao_id")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  produto      Produto        @relation(fields: [produtoId], references: [id])
+
+  @@map("estoque_movimentacoes")
+}
+
+model Inscricao {
+  id              Int             @id @default(autoincrement())
+  eventoId        Int             @map("evento_id")
+  pessoaId        Int             @map("pessoa_id")
+  valor           Decimal         @db.Decimal(10, 2)
+  statusPagamento StatusTransacao @map("status_pagamento")
+  vencimento      DateTime?       @db.Date
+  evento          Evento          @relation(fields: [eventoId], references: [id])
+  pessoa          Pessoa          @relation(fields: [pessoaId], references: [id])
+
+  @@map("inscricoes")
+}
+
+model AgendamentoPublico {
+  id              Int               @id @default(autoincrement())
+  nome            String            @db.VarChar(150)
+  telefone        String            @db.VarChar(20)
+  dataPreferida   DateTime?         @map("data_preferida") @db.Date
+  observacao      String?
+  status          StatusAgendamento @default(PENDENTE)
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  @@map("agendamentos_publicos")
+}
+
+model Alerta {
+  id          Int         @id @default(autoincrement())
+  tipo        String      @db.VarChar(50)
+  mensagem    String
+  pessoaId    Int?        @map("pessoa_id")
+  canal       CanalAlerta
+  disparado   Boolean     @default(false)
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  @@map("alertas")
+}

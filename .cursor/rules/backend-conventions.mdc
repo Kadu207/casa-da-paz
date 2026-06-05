@@ -1,0 +1,14 @@
+---
+description: Padrões backend Express Prisma JWT
+globs: backend/**
+alwaysApply: false
+---
+
+# Backend Conventions
+
+- TypeScript strict, Zod para validação de entrada
+- Rotas em `src/routes/`, lógica em `src/services/`
+- Policies RBAC em `src/policies/` — usar antes de handlers
+- Prisma client singleton em `src/lib/prisma.ts`
+- Erros: `{ error: string, code?: string }` com HTTP semântico
+- Transações: `prisma.$transaction()` para operações em lote
