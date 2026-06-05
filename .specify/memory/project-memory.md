@@ -6,10 +6,12 @@
 
 | Item | Status |
 |------|--------|
-| Fase | Build — Epic 1 em andamento |
+| Fase | Build concluído — MVP scaffold |
 | Versão | 0.1.0-alpha |
 | Produção | Não deployado |
 | DNS | `casadapaz.inovatitech.com.br` (pendente VPS) |
+| GitHub | https://github.com/Kadu207/casa-da-paz (push OK) |
+| GitLab | https://gitlab.com/kadu207/casa-da-paz (criar + push — ver docs/gitlab-setup.md) |
 
 ## Módulos
 
