@@ -5,22 +5,44 @@ import { authenticate, authorize } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/produtos', authenticate, authorize('estoque', 'read'), async (_req, res) => {
-  const produtos = await prisma.produto.findMany({ orderBy: { nome: 'asc' } });
+const produtoBodySchema = z.object({
+  nome: z.string().min(1).max(150),
+  tipo: z.enum(['LIVRO', 'ERVA', 'ARTIGO']),
+  preco: z.number().positive(),
+  estoqueAtual: z.number().int().min(0).default(0),
+  publicadoEcommerce: z.boolean().optional(),
+  descricaoEcommerce: z.string().max(2000).optional(),
+});
+
+const produtoPatchSchema = z.object({
+  nome: z.string().min(1).max(150).optional(),
+  tipo: z.enum(['LIVRO', 'ERVA', 'ARTIGO']).optional(),
+  preco: z.number().positive().optional(),
+  estoqueAtual: z.number().int().min(0).optional(),
+  publicadoEcommerce: z.boolean().optional(),
+  descricaoEcommerce: z.string().max(2000).optional().nullable(),
+});
+
+const conteudoSchema = z.object({
+  tipo: z.enum(['NOVIDADE', 'DICA']),
+  titulo: z.string().min(3).max(150),
+  texto: z.string().min(10).max(5000),
+  produtoId: z.number().int().positive().optional().nullable(),
+  ordem: z.number().int().min(0).default(0),
+  publicado: z.boolean().default(true),
+});
+
+router.get('/produtos', authenticate, authorize('estoque', 'read'), async (req, res) => {
+  const tipo = req.query.tipo as string | undefined;
+  const produtos = await prisma.produto.findMany({
+    where: tipo && ['LIVRO', 'ERVA', 'ARTIGO'].includes(tipo) ? { tipo: tipo as 'LIVRO' | 'ERVA' | 'ARTIGO' } : undefined,
+    orderBy: [{ tipo: 'asc' }, { nome: 'asc' }],
+  });
   res.json(produtos);
 });
 
 router.post('/produtos', authenticate, authorize('estoque', 'write'), async (req, res) => {
-  const body = z
-    .object({
-      nome: z.string().min(1),
-      tipo: z.enum(['LIVRO', 'ERVA', 'ARTIGO']),
-      preco: z.number().positive(),
-      estoqueAtual: z.number().int().min(0).default(0),
-      publicadoEcommerce: z.boolean().optional(),
-      descricaoEcommerce: z.string().max(500).optional(),
-    })
-    .safeParse(req.body);
+  const body = produtoBodySchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: body.error.flatten() });
     return;
@@ -31,21 +53,77 @@ router.post('/produtos', authenticate, authorize('estoque', 'write'), async (req
 
 router.put('/produtos/:id', authenticate, authorize('estoque', 'write'), async (req, res) => {
   const id = Number(req.params.id);
-  const body = z
-    .object({
-      nome: z.string().min(1).optional(),
-      tipo: z.enum(['LIVRO', 'ERVA', 'ARTIGO']).optional(),
-      preco: z.number().positive().optional(),
-      publicadoEcommerce: z.boolean().optional(),
-      descricaoEcommerce: z.string().max(500).optional(),
-    })
-    .safeParse(req.body);
+  const body = produtoPatchSchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: body.error.flatten() });
     return;
   }
   const produto = await prisma.produto.update({ where: { id }, data: body.data });
   res.json(produto);
+});
+
+router.delete('/produtos/:id', authenticate, authorize('estoque', 'write'), async (req, res) => {
+  const id = Number(req.params.id);
+  const [itens, movs] = await Promise.all([
+    prisma.ecommerceItemPedido.count({ where: { produtoId: id } }),
+    prisma.estoqueMovimentacao.count({ where: { produtoId: id } }),
+  ]);
+  if (itens > 0 || movs > 0) {
+    res.status(409).json({
+      error: 'Produto com histórico de vendas ou movimentações — despublique na loja em vez de excluir',
+    });
+    return;
+  }
+  await prisma.livrariaConteudo.updateMany({ where: { produtoId: id }, data: { produtoId: null } });
+  await prisma.produto.delete({ where: { id } });
+  res.status(204).send();
+});
+
+router.get('/conteudos', authenticate, authorize('livraria', 'read'), async (_req, res) => {
+  const conteudos = await prisma.livrariaConteudo.findMany({
+    include: { produto: { select: { id: true, nome: true, tipo: true } } },
+    orderBy: [{ tipo: 'asc' }, { ordem: 'asc' }, { createdAt: 'desc' }],
+  });
+  res.json(conteudos);
+});
+
+router.post('/conteudos', authenticate, authorize('livraria', 'write'), async (req, res) => {
+  const body = conteudoSchema.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.flatten() });
+    return;
+  }
+  const conteudo = await prisma.livrariaConteudo.create({
+    data: {
+      ...body.data,
+      produtoId: body.data.produtoId ?? null,
+    },
+    include: { produto: { select: { id: true, nome: true } } },
+  });
+  res.status(201).json(conteudo);
+});
+
+router.put('/conteudos/:id', authenticate, authorize('livraria', 'write'), async (req, res) => {
+  const body = conteudoSchema.partial().safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.flatten() });
+    return;
+  }
+  const data = { ...body.data };
+  if ('produtoId' in data) {
+    data.produtoId = data.produtoId ?? null;
+  }
+  const conteudo = await prisma.livrariaConteudo.update({
+    where: { id: Number(req.params.id) },
+    data,
+    include: { produto: { select: { id: true, nome: true } } },
+  });
+  res.json(conteudo);
+});
+
+router.delete('/conteudos/:id', authenticate, authorize('livraria', 'write'), async (req, res) => {
+  await prisma.livrariaConteudo.delete({ where: { id: Number(req.params.id) } });
+  res.status(204).send();
 });
 
 router.post('/entrada', authenticate, authorize('estoque', 'write'), async (req, res) => {

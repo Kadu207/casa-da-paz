@@ -12,6 +12,7 @@ backend/dist/
 .vscode/
 pgdata/
 *.pem
+.env.production
 infra/nginx/ssl/
 *.tsbuildinfo
 

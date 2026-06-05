@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { PublicLayout } from '../../components/public/PublicLayout';
 import { SafeImage } from '../../components/public/SafeImage';
 import { CheckoutForm, type CheckoutFormData } from '../../components/ecommerce/CheckoutForm';
@@ -16,18 +16,33 @@ interface Produto {
   descricaoEcommerce: string | null;
 }
 
+interface ConteudoPublico {
+  id: number;
+  tipo: 'NOVIDADE' | 'DICA';
+  titulo: string;
+  texto: string;
+  produto?: { id: number; nome: string; preco: string } | null;
+}
+
 export default function PublicLivraria() {
   const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [conteudos, setConteudos] = useState<ConteudoPublico[]>([]);
   const [loading, setLoading] = useState(true);
   const [comprando, setComprando] = useState<Produto | null>(null);
   const [quantidade, setQuantidade] = useState(1);
   const [sucesso, setSucesso] = useState<{ protocolo: string } | null>(null);
 
   useEffect(() => {
-    publicApi<Produto[]>('/public/livraria/produtos')
-      .then(setProdutos)
+    Promise.all([
+      publicApi<Produto[]>('/public/livraria/produtos'),
+      publicApi<ConteudoPublico[]>('/public/livraria/conteudos'),
+    ])
+      .then(([p, c]) => {
+        setProdutos(p);
+        setConteudos(c);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -53,6 +68,12 @@ export default function PublicLivraria() {
   };
 
   const pago = searchParams.get('pago');
+  const novidades = conteudos.filter((c) => c.tipo === 'NOVIDADE');
+  const dicas = conteudos.filter((c) => c.tipo === 'DICA');
+
+  const scrollToProduto = (id: number) => {
+    document.getElementById(`produto-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
 
   return (
     <PublicLayout>
@@ -91,6 +112,55 @@ export default function PublicLivraria() {
           </div>
         )}
 
+        {(novidades.length > 0 || dicas.length > 0) && (
+          <div className="mb-10 space-y-8">
+            {novidades.length > 0 && (
+              <section>
+                <h2 className="font-serif text-2xl text-primary mb-4">{t('shop.news.title')}</h2>
+                <ul className="space-y-4">
+                  {novidades.map((c) => (
+                    <li key={c.id} className="rounded-2xl border border-border/60 bg-card/80 p-5">
+                      <h3 className="font-medium text-primary">{c.titulo}</h3>
+                      <p className="text-sm text-foreground/80 mt-2 whitespace-pre-wrap leading-relaxed">{c.texto}</p>
+                      {c.produto && (
+                        <button
+                          type="button"
+                          onClick={() => scrollToProduto(c.produto!.id)}
+                          className="mt-3 text-sm text-primary underline underline-offset-2"
+                        >
+                          {t('shop.linkedBook')}: {c.produto.nome}
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            {dicas.length > 0 && (
+              <section>
+                <h2 className="font-serif text-2xl text-primary mb-4">{t('shop.tips.title')}</h2>
+                <ul className="space-y-4">
+                  {dicas.map((c) => (
+                    <li key={c.id} className="rounded-2xl border border-primary/20 bg-card/60 p-5">
+                      <h3 className="font-medium text-primary">{c.titulo}</h3>
+                      <p className="text-sm text-foreground/80 mt-2 whitespace-pre-wrap leading-relaxed">{c.texto}</p>
+                      {c.produto && (
+                        <button
+                          type="button"
+                          onClick={() => scrollToProduto(c.produto!.id)}
+                          className="mt-3 text-sm text-primary underline underline-offset-2"
+                        >
+                          {t('shop.linkedBook')}: {c.produto.nome}
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </div>
+        )}
+
         {loading && <p className="text-foreground/60">{t('shop.loading')}</p>}
         {!loading && produtos.length === 0 && (
           <p className="text-foreground/60">{t('shop.empty')}</p>
@@ -100,6 +170,7 @@ export default function PublicLivraria() {
           {produtos.map((p) => (
             <li
               key={p.id}
+              id={`produto-${p.id}`}
               className="rounded-2xl border border-border/60 bg-card p-5 shadow-lg flex flex-col"
             >
               <span className="text-xs uppercase text-primary/70">{p.tipo}</span>

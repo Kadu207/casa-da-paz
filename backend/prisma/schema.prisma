@@ -64,6 +64,11 @@ enum TipoProduto {
   ARTIGO
 }
 
+enum TipoLivrariaConteudo {
+  NOVIDADE
+  DICA
+}
+
 enum TipoMovimentacao {
   ENTRADA
   SAIDA
@@ -172,8 +177,25 @@ model Produto {
   descricaoEcommerce String?              @map("descricao_ecommerce")
   movimentacoes      EstoqueMovimentacao[]
   itensPedido        EcommerceItemPedido[]
+  conteudos          LivrariaConteudo[]
 
   @@map("produtos")
+}
+
+model LivrariaConteudo {
+  id        Int                  @id @default(autoincrement())
+  tipo      TipoLivrariaConteudo
+  titulo    String               @db.VarChar(150)
+  texto     String
+  produtoId Int?                 @map("produto_id")
+  ordem     Int                  @default(0)
+  publicado Boolean              @default(true)
+  createdAt DateTime             @default(now()) @map("created_at")
+  updatedAt DateTime             @updatedAt @map("updated_at")
+  produto   Produto?             @relation(fields: [produtoId], references: [id], onDelete: SetNull)
+
+  @@index([tipo, publicado, ordem])
+  @@map("livraria_conteudos")
 }
 
 model EstoqueMovimentacao {

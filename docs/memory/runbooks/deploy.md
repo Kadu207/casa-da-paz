@@ -1,5 +1,7 @@
 # Runbook — Deploy VPS Hetzner
 
+> **Guia detalhado:** [deploy-vps-passo-a-passo.md](./deploy-vps-passo-a-passo.md)
+
 ## Pré-requisitos
 - [ ] Usuário confirmou deploy explicitamente
 - [ ] SSH na VPS Hetzner

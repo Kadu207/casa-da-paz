@@ -125,12 +125,47 @@ async function main() {
   });
 
   await prisma.estoqueMovimentacao.deleteMany({});
+  await prisma.livrariaConteudo.deleteMany({});
   await prisma.produto.deleteMany({});
-  await prisma.produto.createMany({
+  const produtos = await prisma.$transaction([
+    prisma.produto.create({
+      data: {
+        nome: 'Livro Orixás e Arquétipos',
+        tipo: 'LIVRO',
+        preco: 45,
+        estoqueAtual: 10,
+        descricaoEcommerce: 'Estudo respeitoso dos arquétipos dos Orixás na tradição afro-indígena.',
+      },
+    }),
+    prisma.produto.create({
+      data: { nome: 'Erva Arruda', tipo: 'ERVA', preco: 8.5, estoqueAtual: 25 },
+    }),
+    prisma.produto.create({
+      data: {
+        nome: 'Guia de Pontos Cantados',
+        tipo: 'LIVRO',
+        preco: 35,
+        estoqueAtual: 5,
+        descricaoEcommerce: 'Pontos cantados com contexto litúrgico para estudo em casa.',
+      },
+    }),
+  ]);
+
+  await prisma.livrariaConteudo.createMany({
     data: [
-      { nome: 'Livro Orixás e Arquétipos', tipo: 'LIVRO', preco: 45, estoqueAtual: 10 },
-      { nome: 'Erva Arruda', tipo: 'ERVA', preco: 8.5, estoqueAtual: 25 },
-      { nome: 'Guia de Pontos Cantados', tipo: 'LIVRO', preco: 35, estoqueAtual: 5 },
+      {
+        tipo: 'NOVIDADE',
+        titulo: 'Novidade: Orixás e Arquétipos',
+        texto: 'Lançamento da Casa da Paz — leitura recomendada para quem está iniciando o estudo dos Orixás com profundidade e respeito.',
+        produtoId: produtos[0].id,
+        ordem: 0,
+      },
+      {
+        tipo: 'DICA',
+        titulo: 'Como escolher um livro espiritual',
+        texto: 'Leia com calma, anote suas impressões e traga dúvidas para a gira ou consulta. A espiritualidade se aprofunda na prática e no diálogo com os mais velhos.',
+        ordem: 0,
+      },
     ],
   });
 

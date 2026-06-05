@@ -17,9 +17,15 @@ const checkoutLimiter = rateLimit({
   message: { error: 'Limite de pedidos atingido. Tente mais tarde.' },
 });
 
-router.get('/livraria/produtos', async (_req, res) => {
+router.get('/livraria/produtos', async (req, res) => {
+  const tipo = req.query.tipo as string | undefined;
+  const where = {
+    publicadoEcommerce: true,
+    estoqueAtual: { gt: 0 },
+    ...(tipo && ['LIVRO', 'ERVA', 'ARTIGO'].includes(tipo) ? { tipo: tipo as 'LIVRO' | 'ERVA' | 'ARTIGO' } : {}),
+  };
   const produtos = await prisma.produto.findMany({
-    where: { publicadoEcommerce: true, estoqueAtual: { gt: 0 } },
+    where,
     select: {
       id: true,
       nome: true,
@@ -28,9 +34,27 @@ router.get('/livraria/produtos', async (_req, res) => {
       estoqueAtual: true,
       descricaoEcommerce: true,
     },
-    orderBy: { nome: 'asc' },
+    orderBy: [{ tipo: 'asc' }, { nome: 'asc' }],
   });
   res.json(produtos);
+});
+
+router.get('/livraria/conteudos', async (_req, res) => {
+  const conteudos = await prisma.livrariaConteudo.findMany({
+    where: { publicado: true },
+    select: {
+      id: true,
+      tipo: true,
+      titulo: true,
+      texto: true,
+      ordem: true,
+      produto: {
+        select: { id: true, nome: true, preco: true, tipo: true, descricaoEcommerce: true },
+      },
+    },
+    orderBy: [{ tipo: 'asc' }, { ordem: 'asc' }, { createdAt: 'desc' }],
+  });
+  res.json(conteudos);
 });
 
 router.post('/livraria/pedidos', checkoutLimiter, async (req, res) => {
