@@ -1,19 +1,21 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { SolidScreenLayout } from '../components/SolidScreenLayout';
+import { portalAssets } from '../lib/portal-assets';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [login, setLogin] = useState('');
   const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login: doLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     try {
-      await login(email, senha);
+      await doLogin(login.trim(), senha);
       navigate('/app/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao entrar');
@@ -21,16 +23,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm bg-[var(--color-surface)] p-8 rounded-xl space-y-4">
-        <h1 className="text-2xl font-serif text-[var(--color-accent)] text-center">Casa da Paz</h1>
-        <p className="text-sm text-center text-white/70">Área interna</p>
+    <SolidScreenLayout
+      title="Casa da Paz"
+      subtitle="Área interna"
+      imageSrc={portalAssets.hero}
+      imageAlt="Casa da Paz — tradição Umbanda"
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[var(--color-surface)] p-6 sm:p-8 rounded-xl space-y-4 shadow-xl border border-white/10"
+      >
         {error && <p className="text-[var(--color-danger)] text-sm">{error}</p>}
         <input
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Usuário"
+          value={login}
+          onChange={(e) => setLogin(e.target.value)}
+          autoComplete="username"
           className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
           required
         />
@@ -39,6 +48,7 @@ export default function LoginPage() {
           placeholder="Senha"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
+          autoComplete="current-password"
           className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
           required
         />
@@ -49,6 +59,6 @@ export default function LoginPage() {
           Portal público →
         </Link>
       </form>
-    </div>
+    </SolidScreenLayout>
   );
 }

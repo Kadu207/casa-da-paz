@@ -1,0 +1,22 @@
+{
+  "name": "Casa da Paz - Agendamento Cancelado",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "casadapaz-agendamento-cancelado",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "d1-webhook-cancel",
+      "name": "Webhook Cancelado",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "casadapaz-agendamento-cancelado"
+    }
+  ],
+  "connections": {},
+  "active": true,
+  "settings": { "executionOrder": "v1" }
+}

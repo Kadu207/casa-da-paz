@@ -1,0 +1,87 @@
+# N8N + Chatwoot — stack de mensageria (dev local)
+# Uso: docker compose -f docker-compose.yml -f docker-compose.messaging.yml -f docker-compose.override.yml up -d
+# Ou: .\scripts\start-messaging.ps1
+# Nota: override por último (portas locais 5437, 3002 neste PC)
+
+services:
+  redis:
+    container_name: casadapaz_redis
+    ports: !override
+      - "6380:6379"
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: casadapaz_n8n
+    restart: unless-stopped
+    environment:
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD:-changeme}
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://localhost:5678/
+      GENERIC_TIMEZONE: America/Sao_Paulo
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - rede_casadapaz
+
+  chatwoot:
+    image: chatwoot/chatwoot:latest
+    container_name: casadapaz_chatwoot
+    depends_on:
+      - db
+      - redis
+    environment:
+      INSTALLATION_ENV: docker
+      RAILS_ENV: production
+      NODE_ENV: production
+      SECRET_KEY_BASE: ${CHATWOOT_SECRET:-dev-chatwoot-secret-change-in-prod-min-32-chars}
+      FRONTEND_URL: http://localhost:3001
+      REDIS_URL: redis://redis:6379
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USERNAME: admin_casadapaz
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DATABASE: chatwoot_db
+      ACTIVE_STORAGE_SERVICE: local
+    ports:
+      - "3001:3000"
+    volumes:
+      - chatwoot_storage:/app/storage
+    entrypoint: docker/entrypoints/rails.sh
+    command: ["bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+    networks:
+      - rede_casadapaz
+
+  chatwoot-sidekiq:
+    image: chatwoot/chatwoot:latest
+    container_name: casadapaz_chatwoot_sidekiq
+    depends_on:
+      - db
+      - redis
+      - chatwoot
+    environment:
+      INSTALLATION_ENV: docker
+      RAILS_ENV: production
+      NODE_ENV: production
+      SECRET_KEY_BASE: ${CHATWOOT_SECRET:-dev-chatwoot-secret-change-in-prod-min-32-chars}
+      FRONTEND_URL: http://localhost:3001
+      REDIS_URL: redis://redis:6379
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USERNAME: admin_casadapaz
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DATABASE: chatwoot_db
+      ACTIVE_STORAGE_SERVICE: local
+    volumes:
+      - chatwoot_storage:/app/storage
+    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
+    networks:
+      - rede_casadapaz
+
+volumes:
+  chatwoot_storage:

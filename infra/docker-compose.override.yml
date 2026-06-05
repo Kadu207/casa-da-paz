@@ -1,0 +1,6 @@
+# Override local — apenas Postgres (start-backend.ps1)
+# Chatwoot/N8N: ver docker-compose.messaging.override.yml + start-messaging.ps1
+services:
+  db:
+    ports: !override
+      - "5437:5432"

@@ -11,14 +11,14 @@ export type SetorAcesso =
 
 interface User {
   id: number;
-  email: string;
+  login: string;
   setorAcesso: SetorAcesso;
   pessoa: { id: number; nomeCompleto: string };
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, senha: string) => Promise<void>;
+  login: (login: string, senha: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }
@@ -40,10 +40,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = async (email: string, senha: string) => {
+  const login = async (loginName: string, senha: string) => {
     const data = await api<{ token: string; user: User }>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, senha }),
+      body: JSON.stringify({ login: loginName, senha }),
     });
     localStorage.setItem('token', data.token);
     setUser(data.user);

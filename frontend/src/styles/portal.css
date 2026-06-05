@@ -1,0 +1,92 @@
+:root {
+  --radius: 0.625rem;
+  /* Tokens alinhados ao export Lovable (oklch) */
+  --background: oklch(0.205 0.04 265);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.278 0.035 264);
+  --card-foreground: oklch(1 0 0);
+  --primary: oklch(0.78 0.13 86);
+  --primary-foreground: oklch(0.205 0.04 265);
+  --muted: oklch(0.32 0.03 264);
+  --muted-foreground: oklch(0.78 0.02 260);
+  --destructive: oklch(0.64 0.22 25);
+  --success: oklch(0.72 0.18 145);
+  --border: oklch(1 0 0 / 12%);
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  --color-bg: var(--background);
+  --color-accent: var(--primary);
+  --color-surface: var(--card);
+  --color-success: var(--success);
+  --color-danger: var(--destructive);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+}
+
+.portal-root {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+.portal-root h1,
+.portal-root h2,
+.portal-root h3,
+.portal-root h4,
+.portal-root .font-serif {
+  font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.portal-root img.cover-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.portal-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.625rem 0.875rem;
+  background: color-mix(in oklab, var(--background) 60%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  color: var(--foreground);
+  font: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.portal-input::placeholder {
+  color: color-mix(in oklab, var(--foreground) 40%, transparent);
+}
+
+.portal-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 25%, transparent);
+}

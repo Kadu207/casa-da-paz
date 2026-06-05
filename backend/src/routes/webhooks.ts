@@ -1,12 +1,15 @@
+import type { Request } from 'express';
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, authorize } from '../middleware/auth.js';
+import { dispararN8n, type N8nWorkflow } from '../lib/n8n.js';
 
 const router = Router();
 
-function validateSecret(req: { headers: { 'x-webhook-secret'?: string } }, secret: string): boolean {
-  return req.headers['x-webhook-secret'] === secret;
+function validateSecret(req: Request, secret: string): boolean {
+  const header = req.headers['x-webhook-secret'];
+  return typeof header === 'string' && header === secret;
 }
 
 router.post('/pix', async (req, res) => {
@@ -35,7 +38,14 @@ router.post('/pix', async (req, res) => {
 router.post('/n8n/trigger', authenticate, authorize('webhooks', 'write'), async (req, res) => {
   const body = z
     .object({
-      workflow: z.enum(['lembrete_atraso', 'recibo_pago', 'novo_agendamento', 'ingresso_oficina']),
+      workflow: z.enum([
+        'lembrete_atraso',
+        'recibo_pago',
+        'novo_agendamento',
+        'agendamento_confirmado',
+        'agendamento_cancelado',
+        'ingresso_oficina',
+      ]),
       payload: z.record(z.unknown()),
     })
     .safeParse(req.body);
@@ -43,10 +53,11 @@ router.post('/n8n/trigger', authenticate, authorize('webhooks', 'write'), async 
     res.status(400).json({ error: body.error.flatten() });
     return;
   }
+  const n8n = await dispararN8n(body.data.workflow as N8nWorkflow, body.data.payload);
   res.json({
     ok: true,
-    message: 'Webhook encaminhado para N8N (configure N8N_URL em produção)',
     workflow: body.data.workflow,
+    n8n,
   });
 });
 

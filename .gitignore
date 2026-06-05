@@ -14,3 +14,11 @@ pgdata/
 *.pem
 infra/nginx/ssl/
 *.tsbuildinfo
+
+# Cópias locais / máquina (não versionar)
+*-DESKTOP-*
+*-Carlos.*
+README-Carlos.md
+-Carlos.gitignore
+backend/.env-*.example
+backend/-*.env

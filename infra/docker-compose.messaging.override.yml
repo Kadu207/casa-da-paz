@@ -1,0 +1,11 @@
+# Override local — portas Chatwoot (usar com start-messaging.ps1)
+services:
+  chatwoot:
+    ports: !override
+      - "3002:3000"
+    environment:
+      FRONTEND_URL: http://localhost:3002
+
+  chatwoot-sidekiq:
+    environment:
+      FRONTEND_URL: http://localhost:3002

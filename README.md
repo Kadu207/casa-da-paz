@@ -46,7 +46,7 @@ docker compose up -d db
 Set-Location ..\backend
 Copy-Item .env.example .env -ErrorAction SilentlyContinue
 npm install
-npx prisma db push
+npx prisma migrate deploy
 npm run db:seed
 npm run dev
 ```
@@ -64,7 +64,7 @@ npm run dev
 - API: http://localhost:3000
 - App: http://localhost:5173
 - Portal público: http://localhost:5173/public
-- Admin seed: `admin@casadapaz.local` / `admin123`
+- Admin seed: `admin` / `admin123` (trocar em produção via **Alterar senha** ou **Usuários**)
 
 ## Documentação
 

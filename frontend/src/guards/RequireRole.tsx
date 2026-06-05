@@ -5,8 +5,12 @@ const routeRoles: Record<string, SetorAcesso[]> = {
   '/app/dashboard': ['DIRETORIA', 'FINANCEIRO', 'MEDIUM'],
   '/app/financeiro': ['DIRETORIA', 'FINANCEIRO'],
   '/app/recepcao': ['DIRETORIA', 'RECEPCAO'],
+  '/app/eventos': ['DIRETORIA', 'RECEPCAO'],
+  '/app/pessoas': ['DIRETORIA', 'RECEPCAO', 'FINANCEIRO', 'LIVRARIA', 'SUPORTE'],
   '/app/livraria': ['DIRETORIA', 'LIVRARIA'],
+  '/app/ecommerce': ['DIRETORIA', 'LIVRARIA'],
   '/app/usuarios': ['DIRETORIA'],
+  '/app/auditoria': ['DIRETORIA', 'SUPORTE'],
 };
 
 export function RequireRole({ children, path }: { children: React.ReactNode; path: string }) {

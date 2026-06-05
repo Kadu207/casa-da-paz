@@ -4,7 +4,7 @@ export interface JwtPayload {
   userId: number;
   pessoaId: number;
   setorAcesso: SetorAcesso;
-  email: string;
+  login: string;
 }
 
 declare global {

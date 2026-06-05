@@ -1,0 +1,22 @@
+{
+  "name": "Casa da Paz - Agendamento Confirmado",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "casadapaz-agendamento-confirmado",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "c1-webhook-conf",
+      "name": "Webhook Confirmado",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "casadapaz-agendamento-confirmado"
+    }
+  ],
+  "connections": {},
+  "active": true,
+  "settings": { "executionOrder": "v1" }
+}

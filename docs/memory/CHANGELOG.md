@@ -8,5 +8,7 @@
 - Pipeline SDD: Spec Kit, memória permanente, 8 agentes Cursor
 - Monorepo: frontend, backend, ai-service, infra
 - Epic 1: auth-rbac, pessoas-core, infra-base
+- Epic 2: financeiro ADR-003, recepção check-in, migrations Prisma formais
+- Epic 2b: inscrições ADR-004, livraria PDV/estoque
 - Portal público e WhatsApp no escopo MVP (Sprint 3)
 - Repositórios GitHub e GitLab `kadu207/casa-da-paz`

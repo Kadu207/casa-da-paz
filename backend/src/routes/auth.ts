@@ -6,16 +6,27 @@ import { authenticate, authorize, signToken } from '../middleware/auth.js';
 
 const router = Router();
 
+const loginFieldSchema = z
+  .string()
+  .min(3, 'Usuário deve ter pelo menos 3 caracteres')
+  .max(50)
+  .regex(/^[a-zA-Z0-9._-]+$/, 'Use apenas letras, números, ponto, hífen ou underscore');
+
 const loginSchema = z.object({
-  email: z.string().email(),
+  login: loginFieldSchema,
   senha: z.string().min(6),
 });
 
 const usuarioSchema = z.object({
-  email: z.string().email(),
+  login: loginFieldSchema,
   senha: z.string().min(6),
   setorAcesso: z.enum(['DIRETORIA', 'FINANCEIRO', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE']),
   pessoaId: z.number().int().positive(),
+});
+
+const alterarSenhaSchema = z.object({
+  senhaAtual: z.string().min(1),
+  senhaNova: z.string().min(6),
 });
 
 router.post('/login', async (req, res) => {
@@ -24,9 +35,9 @@ router.post('/login', async (req, res) => {
     res.status(400).json({ error: parsed.error.flatten() });
     return;
   }
-  const { email, senha } = parsed.data;
+  const { login, senha } = parsed.data;
   const usuario = await prisma.usuario.findUnique({
-    where: { email },
+    where: { login },
     include: { pessoa: true },
   });
   if (!usuario || !(await bcrypt.compare(senha, usuario.senhaHash))) {
@@ -37,13 +48,13 @@ router.post('/login', async (req, res) => {
     userId: usuario.id,
     pessoaId: usuario.pessoaId,
     setorAcesso: usuario.setorAcesso,
-    email: usuario.email,
+    login: usuario.login,
   });
   res.json({
     token,
     user: {
       id: usuario.id,
-      email: usuario.email,
+      login: usuario.login,
       setorAcesso: usuario.setorAcesso,
       pessoa: usuario.pessoa,
     },
@@ -61,10 +72,33 @@ router.get('/me', authenticate, async (req, res) => {
   }
   res.json({
     id: usuario.id,
-    email: usuario.email,
+    login: usuario.login,
     setorAcesso: usuario.setorAcesso,
     pessoa: usuario.pessoa,
   });
+});
+
+router.put('/me/senha', authenticate, async (req, res) => {
+  const parsed = alterarSenhaSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
+    return;
+  }
+  const usuario = await prisma.usuario.findUnique({ where: { id: req.user!.userId } });
+  if (!usuario) {
+    res.status(404).json({ error: 'Usuário não encontrado' });
+    return;
+  }
+  const ok = await bcrypt.compare(parsed.data.senhaAtual, usuario.senhaHash);
+  if (!ok) {
+    res.status(401).json({ error: 'Senha atual incorreta' });
+    return;
+  }
+  await prisma.usuario.update({
+    where: { id: usuario.id },
+    data: { senhaHash: await bcrypt.hash(parsed.data.senhaNova, 10) },
+  });
+  res.json({ ok: true });
 });
 
 router.get('/usuarios', authenticate, authorize('usuarios', 'read'), async (_req, res) => {
@@ -80,10 +114,10 @@ router.post('/usuarios', authenticate, authorize('usuarios', 'write'), async (re
     res.status(400).json({ error: parsed.error.flatten() });
     return;
   }
-  const { email, senha, setorAcesso, pessoaId } = parsed.data;
+  const { login, senha, setorAcesso, pessoaId } = parsed.data;
   const senhaHash = await bcrypt.hash(senha, 10);
   const usuario = await prisma.usuario.create({
-    data: { email, senhaHash, setorAcesso, pessoaId },
+    data: { login, senhaHash, setorAcesso, pessoaId },
     include: { pessoa: true },
   });
   res.status(201).json({ ...usuario, senhaHash: undefined });
@@ -93,7 +127,7 @@ router.put('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async 
   const id = Number(req.params.id);
   const body = z
     .object({
-      email: z.string().email().optional(),
+      login: loginFieldSchema.optional(),
       senha: z.string().min(6).optional(),
       setorAcesso: z
         .enum(['DIRETORIA', 'FINANCEIRO', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'])
@@ -105,7 +139,7 @@ router.put('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async 
     return;
   }
   const data: Record<string, unknown> = {};
-  if (body.data.email) data.email = body.data.email;
+  if (body.data.login) data.login = body.data.login;
   if (body.data.setorAcesso) data.setorAcesso = body.data.setorAcesso;
   if (body.data.senha) data.senhaHash = await bcrypt.hash(body.data.senha, 10);
   const usuario = await prisma.usuario.update({

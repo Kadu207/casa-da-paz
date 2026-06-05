@@ -17,15 +17,15 @@
 
 | Módulo | Status | Notas |
 |--------|--------|-------|
-| Auth + RBAC | Em build | JWT, CRUD usuários |
-| Pessoas | Em build | CRUD + deduplicação |
-| Financeiro | Planejado | ADR-003 adimplência |
-| Recepção/Check-in | Planejado | — |
-| Eventos/Presenças | Planejado | + inscrições ADR-004 |
-| Livraria/PDV | Planejado | + estoque |
-| Portal público | Planejado | Sprint 3 ADR-005 |
-| Chatwoot + N8N | Planejado | Sprint 3 ADR-006 |
-| Dashboards | Planejado | Recharts |
+| Auth + RBAC | Concluído | JWT, CRUD usuários + UI |
+| Pessoas | Concluído | CRUD + deduplicação fuzzy + PessoasPage |
+| Financeiro | Concluído | ADR-003 adimplência derivada + UI |
+| Recepção/Check-in | Concluído | Eventos + check-in completo |
+| Eventos/Inscrições | Concluído | ADR-004 lotação + pagamento |
+| Livraria/PDV | Concluído | PDV atômico + estoque |
+| Portal público | Concluído | UI Lovable integrada + i18n + PWA |
+| Chatwoot + N8N | Em build | Outbound N8N OK; widget prod pendente |
+| Dashboards | Parcial | Métricas eventos + financeiro Recharts |
 | Import Excel + IA | Planejado | Python service |
 | PIX webhook | Stub | — |
 
@@ -41,8 +41,6 @@
 
 ## Próximos passos
 
-1. Concluir Epic 1 (auth, pessoas, infra)
-2. Epic 2 módulos operacionais
-3. Sprint 3 portal + Chatwoot/N8N
-4. CI/CD dual push
-5. Preparar deploy → acionar usuário
+1. Lovable — portal público (ver `docs/lovable-gate.md`)
+2. Chatwoot widget produção + workflows N8N no Docker
+3. Import Excel + IA

@@ -81,6 +81,18 @@ enum CanalAlerta {
   SISTEMA
 }
 
+enum StatusPedidoEcommerce {
+  PENDENTE_PAGAMENTO
+  PAGO
+  CANCELADO
+  EXPIRADO
+}
+
+enum TipoClienteEcommerce {
+  PF
+  PJ
+}
+
 model Pessoa {
   id            Int       @id @default(autoincrement())
   nomeCompleto  String    @map("nome_completo") @db.VarChar(150)
@@ -92,6 +104,7 @@ model Pessoa {
   transacoes    FinanceiroTransacao[]
   presencas     Presenca[]
   inscricoes    Inscricao[]
+  agendamentos  AgendamentoPublico[]
 
   @@map("pessoas")
 }
@@ -99,7 +112,7 @@ model Pessoa {
 model Usuario {
   id           Int         @id @default(autoincrement())
   pessoaId     Int         @unique @map("pessoa_id")
-  email        String      @unique @db.VarChar(100)
+  login        String      @unique @db.VarChar(50)
   senhaHash    String      @map("senha_hash") @db.VarChar(255)
   setorAcesso  SetorAcesso @map("setor_acesso")
   pessoa       Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
@@ -128,6 +141,7 @@ model Evento {
   dataEvento    DateTime      @map("data_evento") @db.Date
   status        StatusEvento  @default(ABERTO)
   capacidadeMax Int?          @map("capacidade_max")
+  visualizacoes Int           @default(0)
   presencas     Presenca[]
   inscricoes    Inscricao[]
 
@@ -144,16 +158,20 @@ model Presenca {
   evento           Evento       @relation(fields: [eventoId], references: [id], onDelete: Cascade)
   pessoa           Pessoa       @relation(fields: [pessoaId], references: [id])
 
+  @@unique([eventoId, pessoaId])
   @@map("presencas")
 }
 
 model Produto {
-  id            Int                  @id @default(autoincrement())
-  nome          String               @db.VarChar(150)
-  tipo          TipoProduto
-  preco         Decimal              @db.Decimal(10, 2)
-  estoqueAtual  Int                  @default(0) @map("estoque_atual")
-  movimentacoes EstoqueMovimentacao[]
+  id                 Int                  @id @default(autoincrement())
+  nome               String               @db.VarChar(150)
+  tipo               TipoProduto
+  preco              Decimal              @db.Decimal(10, 2)
+  estoqueAtual       Int                  @default(0) @map("estoque_atual")
+  publicadoEcommerce Boolean              @default(true) @map("publicado_ecommerce")
+  descricaoEcommerce String?              @map("descricao_ecommerce")
+  movimentacoes      EstoqueMovimentacao[]
+  itensPedido        EcommerceItemPedido[]
 
   @@map("produtos")
 }
@@ -180,19 +198,48 @@ model Inscricao {
   evento          Evento          @relation(fields: [eventoId], references: [id])
   pessoa          Pessoa          @relation(fields: [pessoaId], references: [id])
 
+  @@unique([eventoId, pessoaId])
   @@map("inscricoes")
 }
 
 model AgendamentoPublico {
   id              Int               @id @default(autoincrement())
+  protocolo       String            @unique @db.VarChar(32)
   nome            String            @db.VarChar(150)
   telefone        String            @db.VarChar(20)
   dataPreferida   DateTime?         @map("data_preferida") @db.Date
   observacao      String?
   status          StatusAgendamento @default(PENDENTE)
+  pessoaId        Int?              @map("pessoa_id")
   createdAt       DateTime          @default(now()) @map("created_at")
+  pessoa          Pessoa?           @relation(fields: [pessoaId], references: [id])
 
   @@map("agendamentos_publicos")
+}
+
+model NewsletterInscrito {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique @db.VarChar(150)
+  nome      String?  @db.VarChar(150)
+  locale    String   @default("pt-BR") @db.VarChar(10)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("newsletter_inscritos")
+}
+
+model AdminAuditLog {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int?     @map("usuario_id")
+  setor     String?  @db.VarChar(50)
+  rota      String   @db.VarChar(120)
+  motivo    String?
+  ip        String?  @db.VarChar(45)
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("admin_audit_log")
 }
 
 model Alerta {
@@ -205,4 +252,56 @@ model Alerta {
   createdAt   DateTime    @default(now()) @map("created_at")
 
   @@map("alertas")
+}
+
+model EcommerceCliente {
+  id            Int                   @id @default(autoincrement())
+  tipo          TipoClienteEcommerce
+  nomeCompleto  String                @map("nome_completo") @db.VarChar(150)
+  cpf           String?               @unique @db.VarChar(14)
+  cnpj          String?               @unique @db.VarChar(18)
+  email         String                @db.VarChar(150)
+  telefone      String?               @db.VarChar(20)
+  cep           String                @db.VarChar(9)
+  logradouro    String                @db.VarChar(200)
+  numero        String                @db.VarChar(20)
+  complemento   String?               @db.VarChar(100)
+  bairro        String                @db.VarChar(100)
+  cidade        String                @db.VarChar(100)
+  estado        String                @db.VarChar(2)
+  createdAt     DateTime              @default(now()) @map("created_at")
+  updatedAt     DateTime              @updatedAt @map("updated_at")
+  pedidos       EcommercePedido[]
+
+  @@map("ecommerce_clientes")
+}
+
+model EcommercePedido {
+  id                    Int                    @id @default(autoincrement())
+  protocolo             String                 @unique @db.VarChar(32)
+  clienteId             Int                    @map("cliente_id")
+  status                StatusPedidoEcommerce  @default(PENDENTE_PAGAMENTO)
+  valorTotal            Decimal                @map("valor_total") @db.Decimal(10, 2)
+  stripeSessionId       String?                @map("stripe_session_id") @db.VarChar(120)
+  stripePaymentIntentId String?                @map("stripe_payment_intent_id") @db.VarChar(120)
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  cliente               EcommerceCliente       @relation(fields: [clienteId], references: [id])
+  itens                 EcommerceItemPedido[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("ecommerce_pedidos")
+}
+
+model EcommerceItemPedido {
+  id            Int             @id @default(autoincrement())
+  pedidoId      Int             @map("pedido_id")
+  produtoId     Int             @map("produto_id")
+  quantidade    Int
+  precoUnitario Decimal         @map("preco_unitario") @db.Decimal(10, 2)
+  pedido        EcommercePedido @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  produto       Produto         @relation(fields: [produtoId], references: [id])
+
+  @@map("ecommerce_itens_pedido")
 }

@@ -12,7 +12,8 @@ type Resource =
   | 'dashboard'
   | 'agendamentos'
   | 'logs'
-  | 'webhooks';
+  | 'webhooks'
+  | 'ecommerce';
 
 const matrix: Record<SetorAcesso, Partial<Record<Resource, 'read' | 'write' | 'own'>>> = {
   DIRETORIA: {
@@ -28,6 +29,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, 'read' | 'write' | 'o
     agendamentos: 'write',
     logs: 'read',
     webhooks: 'write',
+    ecommerce: 'write',
   },
   FINANCEIRO: {
     pessoas: 'read',
@@ -45,6 +47,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, 'read' | 'write' | 'o
     pessoas: 'read',
     livraria: 'write',
     estoque: 'write',
+    ecommerce: 'write',
   },
   MEDIUM: {
     financeiro: 'own',
