@@ -15,6 +15,9 @@ fi
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$(dirname "$0")/.."
 
+chmod +x scripts/verify-frontend-dist.sh 2>/dev/null || true
+./scripts/verify-frontend-dist.sh
+
 if [ ! -f "../frontend/dist/index.html" ]; then
   echo "ERRO: frontend/dist ausente. Rode: cd frontend && npm ci && npm run build"
   exit 1

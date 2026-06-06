@@ -91,16 +91,29 @@ Ver também: `infra/cloudflare-dns.md`
 
 ---
 
-## 5. Build do frontend (na VPS ou local + rsync)
+## 5. Build do frontend (obrigatório — evita nginx 500)
+
+O `frontend/dist` **não vai no Git**. Sem build, `/login` retorna **500 Internal Server Error**.
+
+**Na VPS:**
 
 ```bash
 cd ~/casadapaz/frontend
 npm ci
 npm run build
-# gera frontend/dist/
+ls -la dist/index.html
+grep -o "Casa da Paz" dist/index.html | head -1
+cd ../infra
+./scripts/verify-frontend-dist.sh
+./scripts/compose-prod.sh restart frontend
+curl -sI http://127.0.0.1:9080/login | head -3
 ```
 
-No Windows (antes de enviar): `.\scripts\prepare-deploy.ps1`
+**No Windows** (após `npm run build` local):
+
+```powershell
+.\scripts\sync-frontend-vps.ps1
+```
 
 ---
 

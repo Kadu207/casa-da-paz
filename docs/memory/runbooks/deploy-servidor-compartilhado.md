@@ -30,10 +30,13 @@ HOST_HTTP_PORT=9080
 
 ```bash
 cd ~/casadapaz
+git checkout -- infra/scripts/deploy.sh   # descarta edição local que bloqueia pull
 git pull origin main
-cd infra
+cd frontend && npm ci && npm run build && cd ../infra
 chmod +x scripts/*.sh
+./scripts/verify-frontend-dist.sh
 CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh
+sudo ./scripts/install-host-nginx.sh
 ```
 
 Teste local:
