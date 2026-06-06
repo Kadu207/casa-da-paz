@@ -1,0 +1,2 @@
+# Copie para vps.local.ps1 (gitignored) e ajuste se o IP/usuário mudar
+$script:VpsRemoteHost = "gestaoti@128.140.77.31"

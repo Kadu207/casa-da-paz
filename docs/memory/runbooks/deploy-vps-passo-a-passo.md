@@ -4,6 +4,8 @@
 > **Repositório:** `kadu207/casa-da-paz` (main)  
 > Execute na VPS via SSH (Ubuntu/Debian recomendado).
 
+**Servidor compartilhado** (erro `port is already allocated` ou `curl localhost` mostra outro site): use [deploy-servidor-compartilhado.md](./deploy-servidor-compartilhado.md) — porta **9080** + vhost nginx no host.
+
 ---
 
 ## 1. Pré-requisitos na VPS
@@ -33,10 +35,37 @@ cd ~/casadapaz && git pull origin main
 
 ## 3. Secrets de produção
 
+**Opção A — editar na VPS:**
+
 ```bash
 cd ~/casadapaz/infra
 cp .env.production.example .env.production
-nano .env.production   # preencher DB_PASSWORD e JWT_SECRET (openssl rand -hex 32)
+nano .env.production
+```
+
+**Opção B — editar no PC e enviar (recomendado):**
+
+No Windows, na pasta do projeto:
+
+```powershell
+# Edite infra\.env.production localmente, depois:
+.\scripts\sync-env-vps.ps1
+```
+
+Ou manualmente:
+
+```powershell
+scp "infra\.env.production" gestaoti@128.140.77.31:~/casadapaz/infra/.env.production
+```
+
+Variáveis obrigatórias para servidor compartilhado (porta 80 ocupada):
+
+```env
+DB_PASSWORD=...
+JWT_SECRET=...
+NGINX_CONF=prod-internal.conf
+HOST_BIND=127.0.0.1
+HOST_HTTP_PORT=9080
 ```
 
 **Nunca** commitar `.env.production`.
@@ -79,9 +108,13 @@ No Windows (antes de enviar): `.\scripts\prepare-deploy.ps1`
 
 ```bash
 cd ~/casadapaz/infra
-export $(grep -v '^#' .env.production | xargs)
+chmod +x scripts/*.sh
 CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh
 ```
+
+O script usa `./scripts/compose-prod.sh`, que carrega `.env.production` automaticamente (sem avisos de `DB_PASSWORD` vazio).
+
+Porta padrão em servidor compartilhado: **9080** em `127.0.0.1` (não conflita com a 80).
 
 O backend roda `prisma migrate deploy` automaticamente no container.
 
@@ -90,7 +123,8 @@ O backend roda `prisma migrate deploy` automaticamente no container.
 ## 7. Seed inicial (apenas 1ª vez)
 
 ```bash
-docker compose -f docker-compose.prod.yml exec backend npx prisma db seed
+cd ~/casadapaz/infra
+./scripts/compose-prod.sh exec backend npx prisma db seed
 ```
 
 Credenciais padrão: `admin` / `admin123` — **troque em seguida** em `/app/minha-senha`.
@@ -100,6 +134,10 @@ Credenciais padrão: `admin` / `admin123` — **troque em seguida** em `/app/min
 ## 8. Smoke tests
 
 ```bash
+# Local (porta 9080 — Casa da Paz)
+curl -s http://127.0.0.1:9080/health
+
+# Público (após vhost nginx no host — ver deploy-servidor-compartilhado.md)
 curl -s https://casadapaz.inovatitech.com.br/health
 curl -sI https://casadapaz.inovatitech.com.br/public
 curl -s https://casadapaz.inovatitech.com.br/api/public/eventos
@@ -120,7 +158,7 @@ No browser:
 | Livraria | Cadastrar livros em `/app/livraria` → aba Catálogo |
 | Novidades/dicas | `/app/livraria` → aba Novidades & dicas |
 | Stripe | Fase 2 — após VPS estável |
-| Backup DB | `docker compose -f docker-compose.prod.yml exec db pg_dump -U admin_casadapaz casadapaz_db > backup.sql` |
+| Backup DB | `./scripts/compose-prod.sh exec db pg_dump -U admin_casadapaz casadapaz_db > backup.sql` |
 
 ---
 
@@ -128,7 +166,7 @@ No browser:
 
 ```bash
 cd ~/casadapaz/infra
-docker compose -f docker-compose.prod.yml down
+./scripts/compose-prod.sh down
 # Restaurar pgdata de backup se necessário
 ```
 

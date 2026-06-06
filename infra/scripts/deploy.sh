@@ -35,8 +35,17 @@ elif [ -z "${DB_PASSWORD:-}" ] || [ -z "${JWT_SECRET:-}" ]; then
   exit 1
 fi
 
-docker compose -f docker-compose.prod.yml up -d --build
+chmod +x scripts/compose-prod.sh 2>/dev/null || true
+./scripts/compose-prod.sh up -d --build
+PORT="${HOST_HTTP_PORT:-9080}"
 echo ""
 echo "Deploy concluído."
-echo "  Health: curl -s https://casadapaz.inovatitech.com.br/health"
-echo "  Seed (1ª vez): docker compose -f docker-compose.prod.yml exec backend npx prisma db seed"
+echo "  Porta HTTP interna: ${PORT} (127.0.0.1 — não usa 80/443 do host)"
+echo "  Health local: curl -s http://127.0.0.1:${PORT}/health"
+echo "  Health público: curl -s https://casadapaz.inovatitech.com.br/health"
+echo "  Seed (1ª vez): ./scripts/compose-prod.sh exec backend npx prisma db seed"
+if [ "${NGINX_CONF:-prod.conf}" = "prod-internal.conf" ]; then
+  echo ""
+  echo "  Modo servidor compartilhado (porta ${PORT}). Configure proxy no nginx do host:"
+  echo "  docs/memory/runbooks/deploy-servidor-compartilhado.md"
+fi
