@@ -51,20 +51,38 @@ Salvar. O Cloudflare ajusta o DNS do subdomínio.
 
 ---
 
-## 3. Instalar cloudflared na VPS
+## 3. Instalar cloudflared na VPS (Linux)
+
+> **Não use `cloudflared.exe`** — isso é Windows. Na VPS Debian use `cloudflared`.
 
 ```bash
 curl -fsSL https://pkg.cloudflare.com/cloudflare-public-v4.gpg | sudo tee /usr/share/keyrings/cloudflare-public-v4.gpg >/dev/null
 echo 'deb [signed-by=/usr/share/keyrings/cloudflare-public-v4.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
 sudo apt update && sudo apt install -y cloudflared
+cloudflared --version
+```
 
-# Cole o comando copiado do painel Cloudflare:
-sudo cloudflared service install SEU_TOKEN_AQUI
+No painel Cloudflare, copie o comando **completo**. Exemplo:
 
+```bash
+sudo cloudflared service install eyJhIjoiXXXXXXXX...
+```
+
+- Substitua pelo **token JWT inteiro** (começa com `eyJ...`) — **não** digite a palavra `Token`
+
+```bash
 sudo systemctl enable cloudflared
 sudo systemctl start cloudflared
 sudo systemctl status cloudflared --no-pager
+sudo journalctl -u cloudflared -n 30 --no-pager
 ```
+
+### DNS (importante)
+
+Cloudflare → **DNS** → `casadapaz`:
+
+- Com Tunnel: **CNAME** para `….cfargotunnel.com` (criado pelo painel)
+- Remova registro **A** antigo para o IP da VPS se o tráfego ainda cair no Excellence Dental
 
 ---
 
