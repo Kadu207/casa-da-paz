@@ -1,47 +1,72 @@
 # Cloudflare Tunnel — casadapaz (servidor compartilhado)
 
-Use quando **Docker ocupa 80/443** (ex.: Excellence Dental) e o admin não pode alterar o proxy existente.
+Use quando **Docker ocupa 80** (`excellence_dental_prod-nginx-1`) e o nginx do sistema não está ativo.
 
-O túnel encaminha `casadapaz.inovatitech.com.br` → `http://127.0.0.1:9080` **sem** conflito de porta.
+O túnel encaminha `casadapaz.inovatitech.com.br` → Casa da Paz na porta **9080**.
 
 ## Pré-requisito
 
-- Casa da Paz rodando: `curl -s http://127.0.0.1:9080/health` → `{"status":"ok",...}`
-- Conta Cloudflare com domínio `inovatitech.com.br`
+```bash
+curl -s http://127.0.0.1:9080/health
+# {"status":"ok","service":"casadapaz-backend"}
+```
 
-## 1. Criar túnel no Cloudflare
+---
 
-1. [Cloudflare Zero Trust](https://one.dash.cloudflare.com/) → **Networks** → **Tunnels**
+## 1. Criar túnel
+
+1. [Cloudflare Zero Trust](https://one.dash.cloudflare.com/) → **Redes** → **Tunnels**
 2. **Create a tunnel** → nome: `casadapaz-vps`
-3. Instalar conector → **Debian 64-bit** → copie o comando `cloudflared service install ...` (contém token)
+3. Escolha **Cloudflared** → **Debian 64-bit**
+4. Copie o comando `cloudflared service install ...` (instalar depois)
 
-## 2. Public hostname
+---
 
-Na mesma tela do túnel → **Public Hostname**:
+## 2. Public Hostname (corrigir "URL do serviço não é válida")
+
+Na aba **Published applications** / **Public Hostname** do túnel:
 
 | Campo | Valor |
 |-------|--------|
 | Subdomain | `casadapaz` |
 | Domain | `inovatitech.com.br` |
-| Type | HTTP |
-| URL | `127.0.0.1:9080` |
+| Path | *(vazio)* |
 
-Salvar. Cloudflare cria/atualiza o DNS automaticamente.
+**Service** (origem):
 
-## 3. Instalar na VPS
+| Campo | Valor |
+|-------|--------|
+| Type | **HTTP** (não HTTPS) |
+| URL | **`http://127.0.0.1:9080`** |
+
+Regras importantes:
+
+- Inclua **`http://`** no início
+- **Sem** barra no final (`/`)
+- **Sem** path (`/health`, `/public`)
+- Se a UI tiver campos separados: Host **`127.0.0.1`** + Port **`9080`**
+- Se `127.0.0.1` falhar, tente **`http://localhost:9080`**
+
+Salvar. O Cloudflare ajusta o DNS do subdomínio.
+
+---
+
+## 3. Instalar cloudflared na VPS
 
 ```bash
-# Instalar cloudflared (Debian)
 curl -fsSL https://pkg.cloudflare.com/cloudflare-public-v4.gpg | sudo tee /usr/share/keyrings/cloudflare-public-v4.gpg >/dev/null
 echo 'deb [signed-by=/usr/share/keyrings/cloudflare-public-v4.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
 sudo apt update && sudo apt install -y cloudflared
 
-# Cole o comando do painel Cloudflare, ex.:
-# sudo cloudflared service install eyJhIjoi...
+# Cole o comando copiado do painel Cloudflare:
+sudo cloudflared service install SEU_TOKEN_AQUI
+
 sudo systemctl enable cloudflared
 sudo systemctl start cloudflared
-sudo systemctl status cloudflared
+sudo systemctl status cloudflared --no-pager
 ```
+
+---
 
 ## 4. Testes
 
@@ -52,29 +77,49 @@ curl -sI https://casadapaz.inovatitech.com.br/public | head -5
 
 Browser: https://casadapaz.inovatitech.com.br/login
 
-## Alternativa (admin do servidor)
+---
 
-Se houver nginx **dentro do Docker** na porta 80, adicionar vhost:
+## Alternativa B — proxy no nginx do Excellence (sem Tunnel)
 
-```nginx
-server {
-    listen 80;
-    server_name casadapaz.inovatitech.com.br;
-    location / {
-        proxy_pass http://172.17.0.1:9080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+> **Não cole blocos nginx no terminal bash.** Use o script abaixo.
+
+O container na porta 80 é: `excellence_dental_prod-nginx-1`
+
+### Passo 1 — expor 9080 para outros containers Docker
+
+Em `infra/.env.production` na VPS:
+
+```env
+HOST_BIND=0.0.0.0
+HOST_HTTP_PORT=9080
 ```
 
-Descobrir container na 80:
+Redeploy:
 
 ```bash
-docker ps --format 'table {{.Names}}\t{{.Ports}}' | grep 80
+cd ~/casadapaz/infra
+CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh
+curl -s http://172.17.0.1:9080/health
 ```
 
-## Acesso imediato (sem túnel público)
+### Passo 2 — adicionar vhost no Excellence
+
+```bash
+cd ~/casadapaz/infra
+chmod +x scripts/excellence-nginx-casadapaz.sh
+./scripts/excellence-nginx-casadapaz.sh
+```
+
+Teste:
+
+```bash
+curl -s -H "Host: casadapaz.inovatitech.com.br" http://127.0.0.1/health
+curl -s https://casadapaz.inovatitech.com.br/health
+```
+
+---
+
+## Acesso imediato (túnel SSH)
 
 No PC:
 
@@ -82,4 +127,4 @@ No PC:
 ssh -L 9080:127.0.0.1:9080 gestaoti@128.140.77.31
 ```
 
-Browser: http://localhost:9080/login
+Browser: **http://localhost:9080/login** (`admin` / `admin123`)
