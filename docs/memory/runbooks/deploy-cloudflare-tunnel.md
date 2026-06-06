@@ -13,7 +13,40 @@ curl -s http://127.0.0.1:9080/health
 
 ---
 
-## 1. Criar túnel
+## ⚠️ Servidor já tem cloudflared? (inovati-server)
+
+Se `sudo systemctl status cloudflared` mostra **active (running)** há dias:
+
+- **Não** rode `cloudflared service install` de novo
+- **Não** crie um segundo túnel só para Casa da Paz
+- **Não** use `cloudflared.exe` nem a palavra literal `TOKEN`
+
+O Cloudflare permite **vários hostnames no mesmo túnel**. Faça:
+
+1. Zero Trust → **Tunnels** → abra o túnel **HEALTHY / Connected** (o que já roda na VPS)
+2. **Published applications** → **Add a public hostname**:
+   - `casadapaz.inovatitech.com.br` → **`http://127.0.0.1:9080`**
+3. Na VPS:
+
+```bash
+sudo systemctl restart cloudflared
+sleep 5
+curl -s https://casadapaz.inovatitech.com.br/health
+```
+
+Confirme que o túnel recebeu a rota nos logs:
+
+```bash
+sudo journalctl -u cloudflared -n 20 --no-pager | grep casadapaz
+```
+
+Deve aparecer algo como `"hostname":"casadapaz.inovatitech.com.br","service":"http://127.0.0.1:9080"`.
+
+**DNS:** registro `casadapaz` → CNAME do **mesmo** túnel conectado (não registro A para IP da VPS).
+
+---
+
+## 1. Criar túnel (só se NÃO existir cloudflared na VPS)
 
 1. [Cloudflare Zero Trust](https://one.dash.cloudflare.com/) → **Redes** → **Tunnels**
 2. **Create a tunnel** → nome: `casadapaz-vps`
