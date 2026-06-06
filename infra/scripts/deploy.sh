@@ -46,6 +46,7 @@ echo "  Health público: curl -s https://casadapaz.inovatitech.com.br/health"
 echo "  Seed (1ª vez): ./scripts/compose-prod.sh exec backend npx prisma db seed"
 if [ "${NGINX_CONF:-prod.conf}" = "prod-internal.conf" ]; then
   echo ""
-  echo "  Modo servidor compartilhado (porta ${PORT}). Configure proxy no nginx do host:"
+  echo "  Modo servidor compartilhado (porta ${PORT}). Instale o proxy no nginx do host:"
+  echo "  sudo ./scripts/install-host-nginx.sh"
   echo "  docs/memory/runbooks/deploy-servidor-compartilhado.md"
 fi

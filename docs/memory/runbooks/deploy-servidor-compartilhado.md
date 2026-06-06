@@ -42,50 +42,38 @@ Teste local:
 curl -s http://127.0.0.1:9080/health
 ```
 
-## 3. Certificados no HOST
+## 3. Proxy nginx no HOST (obrigatório para HTTPS público)
+
+Sem este passo, `casadapaz.inovatitech.com.br` cai no site padrão da VPS (ex.: Excellence Dental).
 
 ```bash
-sudo mkdir -p /etc/nginx/ssl/casadapaz
-sudo cp ~/casadapaz/infra/nginx/ssl/origin.pem /etc/nginx/ssl/casadapaz/
-sudo cp ~/casadapaz/infra/nginx/ssl/origin-key.pem /etc/nginx/ssl/casadapaz/
-sudo chmod 600 /etc/nginx/ssl/casadapaz/*
+cd ~/casadapaz
+git pull origin main
+cd infra
+chmod +x scripts/*.sh
+sudo ./scripts/install-host-nginx.sh
 ```
 
-## 4. Bloco nginx no host
-
-Crie `/etc/nginx/sites-available/casadapaz`:
-
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name casadapaz.inovatitech.com.br;
-
-    ssl_certificate     /etc/nginx/ssl/casadapaz/origin.pem;
-    ssl_certificate_key /etc/nginx/ssl/casadapaz/origin-key.pem;
-
-    location / {
-        proxy_pass http://127.0.0.1:9080;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-
-server {
-    listen 80;
-    server_name casadapaz.inovatitech.com.br;
-    return 301 https://$host$request_uri;
-}
-```
-
-Ativar:
+Testes:
 
 ```bash
-sudo ln -sf /etc/nginx/sites-available/casadapaz /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
+curl -s -H "Host: casadapaz.inovatitech.com.br" http://127.0.0.1/health
+curl -s https://casadapaz.inovatitech.com.br/health
+curl -sI https://casadapaz.inovatitech.com.br/public | head -5
 ```
+
+## 4. Acesso temporário (trocar senha antes do vhost)
+
+A porta **9080** só escuta em `127.0.0.1` — não abre no navegador externo (`ERR_CONNECTION_REFUSED` é esperado).
+
+No **Windows** (PowerShell), túnel SSH:
+
+```powershell
+ssh -L 9080:127.0.0.1:9080 gestaoti@128.140.77.31
+```
+
+Deixe a janela aberta e acesse no browser: **http://localhost:9080/login**  
+Login: `admin` / `admin123` → `/app/minha-senha`
 
 ## 5. Cloudflare
 
