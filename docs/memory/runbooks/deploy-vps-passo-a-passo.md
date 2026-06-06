@@ -4,7 +4,8 @@
 > **Repositório:** `kadu207/casa-da-paz` (main)  
 > Execute na VPS via SSH (Ubuntu/Debian recomendado).
 
-**Servidor compartilhado** (erro `port is already allocated` ou `curl localhost` mostra outro site): use [deploy-servidor-compartilhado.md](./deploy-servidor-compartilhado.md) — porta **9080** + vhost nginx no host.
+**Servidor compartilhado** (Docker na 80, Excellence Dental no domínio):  
+→ [deploy-cloudflare-tunnel.md](./deploy-cloudflare-tunnel.md) (recomendado) ou [deploy-servidor-compartilhado.md](./deploy-servidor-compartilhado.md)
 
 ---
 
