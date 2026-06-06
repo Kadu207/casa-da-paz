@@ -33,17 +33,12 @@ Por isso `http://127.0.0.1:9080` pode ser **rejeitado no painel** ou **não func
 ### Solução recomendada — conectar Casa da Paz à rede Docker do túnel
 
 ```bash
-# 1) Descobrir rede do WordPress (mesma do cloudflared)
-docker inspect wordpress --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+# Descobrir rede do cloudflared (Swarm nesta VPS)
+docker ps --format '{{.Names}}' | grep -i cloudflared
+docker inspect $(docker ps --format '{{.Names}}' | grep -i cloudflared | head -1) --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}'
 
-# Exemplo de saída: inovati_default  → use esse nome abaixo
-NETWORK="inovati_default"   # ajuste conforme saída acima
-
-# 2) Conectar nginx do Casa da Paz à rede
-docker network connect "$NETWORK" infra-frontend-1
-
-# 3) Testar de outro container na mesma rede
-docker run --rm --network "$NETWORK" curlimages/curl:latest -s http://infra-frontend-1/health
+# Ou use o script:
+cd ~/casadapaz/infra && ./scripts/connect-frontend-tunnel-network.sh
 ```
 
 No Cloudflare → túnel **conectado** (com wf, app, chat…) → **Add public hostname**:
