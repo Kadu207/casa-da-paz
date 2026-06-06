@@ -1,4 +1,4 @@
-# Envia frontend/dist para a VPS (build local antes: cd frontend && npm run build)
+# Envia frontend/dist para a VPS (build local antes: cd frontend; npm run build)
 param(
     [string]$RemoteHost = "",
     [string]$RemotePath = "~/casadapaz/frontend/dist"
@@ -15,14 +15,16 @@ if (-not $RemoteHost) {
 }
 
 if (-not (Test-Path (Join-Path $localDist "index.html"))) {
-    throw "frontend\dist\index.html ausente. Rode: cd frontend && npm ci && npm run build"
+    throw "frontend\dist\index.html ausente. Rode: cd frontend; npm ci; npm run build"
 }
 
-Write-Host "Enviando frontend/dist para ${RemoteHost}:${RemotePath}" -ForegroundColor Cyan
-scp -r $localDist "${RemoteHost}:${RemotePath}"
+Write-Host "Enviando frontend/dist para ${RemoteHost}" -ForegroundColor Cyan
+ssh $RemoteHost "mkdir -p $RemotePath"
+scp -r "$localDist\*" "${RemoteHost}:${RemotePath}/"
+ssh $RemoteHost "chmod -R a+rX $RemotePath"
 
 Write-Host ""
-Write-Host "OK — Na VPS:" -ForegroundColor Green
+Write-Host "OK - Na VPS reinicie o frontend:" -ForegroundColor Green
 Write-Host ('  ssh ' + $RemoteHost)
-Write-Host "  cd ~/casadapaz/infra && ./scripts/compose-prod.sh restart frontend"
-Write-Host "  curl -sI http://127.0.0.1:9080/login | head -3"
+Write-Host '  cd ~/casadapaz/infra'
+Write-Host '  ./scripts/compose-prod.sh restart frontend'
