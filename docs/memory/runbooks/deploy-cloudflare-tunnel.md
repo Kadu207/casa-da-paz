@@ -17,32 +17,59 @@ curl -s http://127.0.0.1:9080/health
 
 Se `sudo systemctl status cloudflared` mostra **active (running)** há dias:
 
-- **Não** rode `cloudflared service install` de novo
-- **Não** crie um segundo túnel só para Casa da Paz
-- **Não** use `cloudflared.exe` nem a palavra literal `TOKEN`
+- **Não** crie um túnel novo — adicione rota no túnel **já conectado**
+- **Não** use `cloudflared service install` de novo
 
-O Cloudflare permite **vários hostnames no mesmo túnel**. Faça:
+Neste servidor, as rotas existentes usam **nomes Docker**, não IP:
 
-1. Zero Trust → **Tunnels** → abra o túnel **HEALTHY / Connected** (o que já roda na VPS)
-2. **Published applications** → **Add a public hostname**:
-   - `casadapaz.inovatitech.com.br` → **`http://127.0.0.1:9080`**
-3. Na VPS:
+```text
+http://wordpress:80
+http://n8n_editor:5678
+...
+```
+
+Por isso `http://127.0.0.1:9080` pode ser **rejeitado no painel** ou **não funcionar** se o conector estiver na rede Docker.
+
+### Solução recomendada — conectar Casa da Paz à rede Docker do túnel
+
+```bash
+# 1) Descobrir rede do WordPress (mesma do cloudflared)
+docker inspect wordpress --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+
+# Exemplo de saída: inovati_default  → use esse nome abaixo
+NETWORK="inovati_default"   # ajuste conforme saída acima
+
+# 2) Conectar nginx do Casa da Paz à rede
+docker network connect "$NETWORK" infra-frontend-1
+
+# 3) Testar de outro container na mesma rede
+docker run --rm --network "$NETWORK" curlimages/curl:latest -s http://infra-frontend-1/health
+```
+
+No Cloudflare → túnel **conectado** (com wf, app, chat…) → **Add public hostname**:
+
+| Campo | Valor |
+|-------|--------|
+| Hostname | `casadapaz.inovatitech.com.br` |
+| Type | HTTP |
+| URL | **`http://infra-frontend-1:80`** |
+
+(O painel aceita esse formato — igual aos outros serviços.)
 
 ```bash
 sudo systemctl restart cloudflared
 sleep 5
+sudo journalctl -u cloudflared -n 5 --no-pager | grep casadapaz
 curl -s https://casadapaz.inovatitech.com.br/health
 ```
 
-Confirme que o túnel recebeu a rota nos logs:
+### Alternativa — IP do host (se não quiser conectar rede)
 
-```bash
-sudo journalctl -u cloudflared -n 20 --no-pager | grep casadapaz
-```
+1. Em `infra/.env.production`: `HOST_BIND=0.0.0.0`
+2. Redeploy Casa da Paz
+3. No painel, URL: **`http://172.17.0.1:9080`** (não `127.0.0.1`)
 
-Deve aparecer algo como `"hostname":"casadapaz.inovatitech.com.br","service":"http://127.0.0.1:9080"`.
-
-**DNS:** registro `casadapaz` → CNAME do **mesmo** túnel conectado (não registro A para IP da VPS).
+**DNS:** `casadapaz` → CNAME do túnel conectado (não registro A para IP da VPS).
 
 ---
 
