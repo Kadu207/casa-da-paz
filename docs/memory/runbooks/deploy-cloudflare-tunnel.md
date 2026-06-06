@@ -13,58 +13,54 @@ curl -s http://127.0.0.1:9080/health
 
 ---
 
-## ⚠️ Servidor já tem cloudflared? (inovati-server)
+## ⚠️ inovati-server (cloudflared Swarm + rede `network_public`)
 
-Se `sudo systemctl status cloudflared` mostra **active (running)** há dias:
+A rede `network_public` **não permite** `docker network connect`.  
+O cloudflared **não alcança** `127.0.0.1:9080` nem aceita esse URL no painel.
 
-- **Não** crie um túnel novo — adicione rota no túnel **já conectado**
-- **Não** use `cloudflared service install` de novo
+### Passo a passo (copie na ordem)
 
-Neste servidor, as rotas existentes usam **nomes Docker**, não IP:
-
-```text
-http://wordpress:80
-http://n8n_editor:5678
-...
-```
-
-Por isso `http://127.0.0.1:9080` pode ser **rejeitado no painel** ou **não funcionar** se o conector estiver na rede Docker.
-
-### Solução recomendada — conectar Casa da Paz à rede Docker do túnel
+**1. Expor porta no host**
 
 ```bash
-# Descobrir rede do cloudflared (Swarm nesta VPS)
-docker ps --format '{{.Names}}' | grep -i cloudflared
-docker inspect $(docker ps --format '{{.Names}}' | grep -i cloudflared | head -1) --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}'
+cd ~/casadapaz/infra
+nano .env.production
+# HOST_BIND=0.0.0.0
+# HOST_HTTP_PORT=9080
 
-# Ou use o script:
-cd ~/casadapaz/infra && ./scripts/connect-frontend-tunnel-network.sh
+chmod +x scripts/*.sh
+CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh
+curl -s http://127.0.0.1:9080/health
 ```
 
-No Cloudflare → túnel **conectado** (com wf, app, chat…) → **Add public hostname**:
+**2. Descobrir URL que o cloudflared alcança**
+
+```bash
+chmod +x scripts/discover-tunnel-origin-url.sh
+./scripts/discover-tunnel-origin-url.sh
+```
+
+Anote a URL exibida (ex.: `http://172.17.0.1:9080`).
+
+**3. Cloudflare** → Tunnels → túnel **Connected** → **Add public hostname**:
 
 | Campo | Valor |
 |-------|--------|
 | Hostname | `casadapaz.inovatitech.com.br` |
 | Type | HTTP |
-| URL | **`http://infra-frontend-1:80`** |
+| URL | **URL do passo 2** (ex. `http://172.17.0.1:9080`) |
 
-(O painel aceita esse formato — igual aos outros serviços.)
+**4. Reiniciar e testar**
 
 ```bash
 sudo systemctl restart cloudflared
-sleep 5
-sudo journalctl -u cloudflared -n 5 --no-pager | grep casadapaz
+docker service update --force cloudflared_cloudflared 2>/dev/null || true
+sleep 10
+sudo journalctl -u cloudflared -n 30 --no-pager | grep casadapaz
 curl -s https://casadapaz.inovatitech.com.br/health
 ```
 
-### Alternativa — IP do host (se não quiser conectar rede)
-
-1. Em `infra/.env.production`: `HOST_BIND=0.0.0.0`
-2. Redeploy Casa da Paz
-3. No painel, URL: **`http://172.17.0.1:9080`** (não `127.0.0.1`)
-
-**DNS:** `casadapaz` → CNAME do túnel conectado (não registro A para IP da VPS).
+**DNS:** `casadapaz` → CNAME do túnel (sem registro A para IP da VPS).
 
 ---
 
