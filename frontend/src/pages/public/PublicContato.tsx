@@ -2,13 +2,16 @@ import { PublicLayout } from '../../components/public/PublicLayout';
 import { SafeImage } from '../../components/public/SafeImage';
 import { ADDRESS, WHATSAPP_NUMBER, portalAssets } from '../../lib/portal-assets';
 import { useI18n } from '../../i18n/I18nContext';
+import { DPO_EMAIL, DATA_PROTECTION_CONTACTS, formatContactList, whatsappDsarUrl } from '../../lib/lgpd-contact';
+import { Link } from 'react-router-dom';
 
 const CHATWOOT_WEBSITE_TOKEN = import.meta.env.VITE_CHATWOOT_WEBSITE_TOKEN;
 
 export default function PublicContato() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const whatsapp = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('contact.whatsapp.prefill'))}`;
+  const waDsar = whatsappDsarUrl(locale);
 
   return (
     <PublicLayout>
@@ -63,8 +66,34 @@ export default function PublicContato() {
           className="block rounded-2xl bg-card border border-border/60 p-5 sm:p-6 hover:border-primary/40 transition-colors"
         >
           <p className="font-serif text-lg text-primary">E-mail</p>
-          <p className="text-foreground/80">terreirocasadapaz@gmail.com</p>
+          <p className="text-foreground/80">{DPO_EMAIL}</p>
         </a>
+
+        <div className="rounded-2xl bg-card border border-primary/30 p-5 sm:p-6 space-y-3">
+          <p className="font-serif text-lg text-primary">{t('contact.privacy.title')}</p>
+          <p className="text-sm text-foreground/80 leading-relaxed">{t('contact.privacy.body')}</p>
+          <p className="text-sm text-foreground/70">
+            <span className="font-medium text-foreground/85">
+              {formatContactList(DATA_PROTECTION_CONTACTS, locale)}
+            </span>
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <a
+              href={`mailto:${DPO_EMAIL}?subject=${encodeURIComponent(locale === 'en' ? 'LGPD request' : 'Solicitação LGPD')}`}
+              className="text-sm text-primary hover:underline"
+            >
+              {DPO_EMAIL}
+            </a>
+            <span className="text-foreground/40">·</span>
+            <a href={waDsar} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+              {t('contact.privacy.whatsapp')}
+            </a>
+            <span className="text-foreground/40">·</span>
+            <Link to="/public/termos" className="text-sm text-primary hover:underline">
+              {t('terms.privacyLink')}
+            </Link>
+          </div>
+        </div>
 
         <div className="rounded-2xl bg-card border border-border/60 p-5 sm:p-6">
           <p className="font-serif text-lg text-primary mb-2">{t('contact.where')}</p>

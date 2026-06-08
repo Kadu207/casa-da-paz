@@ -128,6 +128,12 @@ export const ptBR = {
   'terms.version': 'Versão {version}',
   'terms.link': 'Termos de uso',
   'terms.privacyLink': 'Política de Privacidade',
+  'terms.dpo.email': 'E-mail do encarregado',
+  'terms.dpo.whatsapp': 'WhatsApp (Privacidade/LGPD)',
+  'contact.privacy.title': 'Privacidade e LGPD',
+  'contact.privacy.body':
+    'Para acessar, corrigir ou excluir seus dados, revogar consentimento ou tirar dúvidas sobre esta política, fale com nosso Encarregado de Dados. Prazo de resposta: até 15 dias.',
+  'contact.privacy.whatsapp': 'WhatsApp LGPD',
   'lgpd.consentPrefix': 'Li e concordo com a',
   'lgpd.consentSuffix': ' e autorizo o tratamento dos meus dados para as finalidades descritas.',
   'lgpd.consentRequired': 'Aceite a Política de Privacidade para continuar.',

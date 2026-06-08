@@ -130,6 +130,12 @@ export const en: Record<PortalTranslationKey, string> = {
   'terms.version': 'Version {version}',
   'terms.link': 'Terms of use',
   'terms.privacyLink': 'Privacy Policy',
+  'terms.dpo.email': 'DPO email',
+  'terms.dpo.whatsapp': 'WhatsApp (Privacy/LGPD)',
+  'contact.privacy.title': 'Privacy and LGPD',
+  'contact.privacy.body':
+    'To access, correct or delete your data, withdraw consent or ask about this policy, contact our Data Protection Officer. Response time: up to 15 days.',
+  'contact.privacy.whatsapp': 'LGPD WhatsApp',
   'lgpd.consentPrefix': 'I have read and agree to the',
   'lgpd.consentSuffix': ' and authorize processing of my data for the purposes described.',
   'lgpd.consentRequired': 'Accept the Privacy Policy to continue.',
