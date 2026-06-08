@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import AgendamentosFila from '../components/AgendamentosFila';
+import { useI18n } from '../i18n/I18nContext';
+import { labelEnum } from '../i18n/helpers';
 
 interface Pessoa {
   id: number;
@@ -29,6 +31,7 @@ interface Evento {
 }
 
 export default function RecepcaoPage() {
+  const { t, dateLocale } = useI18n();
   const [aba, setAba] = useState<'checkin' | 'agendamentos'>('agendamentos');
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [eventoId, setEventoId] = useState<number | null>(null);
@@ -79,19 +82,19 @@ export default function RecepcaoPage() {
           nomeResponsavel: nomeResponsavel.trim() || undefined,
         }),
       });
-      setMsg(`Check-in: ${selecionada.nomeCompleto}`);
+      setMsg(t('erp.recepcao.checkinSuccess', { name: selecionada.nomeCompleto }));
       setSelecionada(null);
       setTelefone('');
       setPessoas([]);
       setNomeResponsavel('');
       await carregarEventos();
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro no check-in');
+      setErro(err instanceof Error ? err.message : t('erp.recepcao.checkinError'));
     }
   };
 
   const encerrarEvento = async () => {
-    if (!eventoId || !confirm('Encerrar este evento?')) return;
+    if (!eventoId || !confirm(t('erp.recepcao.closeEventConfirm'))) return;
     await api(`/eventos/${eventoId}/encerrar`, { method: 'PATCH' });
     setEventoId(null);
     await carregarEventos();
@@ -114,7 +117,7 @@ export default function RecepcaoPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-serif text-[var(--color-accent)]">Recepção</h2>
+      <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.recepcao.title')}</h2>
 
       <div className="flex gap-2 border-b border-white/10 pb-2">
         <button
@@ -123,7 +126,7 @@ export default function RecepcaoPage() {
             aba === 'agendamentos' ? 'bg-[var(--color-accent)] text-black' : 'text-white/70 hover:bg-white/10'
           }`}
         >
-          Agendamentos
+          {t('erp.recepcao.tabAppointments')}
         </button>
         <button
           onClick={() => setAba('checkin')}
@@ -131,7 +134,7 @@ export default function RecepcaoPage() {
             aba === 'checkin' ? 'bg-[var(--color-accent)] text-black' : 'text-white/70 hover:bg-white/10'
           }`}
         >
-          Check-in
+          {t('erp.recepcao.tabCheckin')}
         </button>
       </div>
 
@@ -141,12 +144,12 @@ export default function RecepcaoPage() {
         <>
       <section className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="font-medium">Evento ativo</h3>
+          <h3 className="font-medium">{t('erp.recepcao.activeEvent')}</h3>
           <button
             onClick={() => setMostrarNovoEvento(true)}
             className="text-sm px-3 py-1 bg-[var(--color-accent)] text-black rounded"
           >
-            Novo evento
+            {t('erp.recepcao.newEvent')}
           </button>
         </div>
         {mostrarNovoEvento && (
@@ -154,7 +157,7 @@ export default function RecepcaoPage() {
             <input
               value={novoEvento.nomeEvento}
               onChange={(e) => setNovoEvento({ ...novoEvento, nomeEvento: e.target.value })}
-              placeholder="Nome do evento"
+              placeholder={t('erp.recepcao.eventName')}
               className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
               required
             />
@@ -169,11 +172,11 @@ export default function RecepcaoPage() {
               type="number"
               value={novoEvento.capacidadeMax}
               onChange={(e) => setNovoEvento({ ...novoEvento, capacidadeMax: e.target.value })}
-              placeholder="Capacidade máx. (opcional)"
+              placeholder={t('erp.recepcao.maxCapacity')}
               className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
             />
             <button type="submit" className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm">
-              Criar
+              {t('erp.recepcao.create')}
             </button>
           </form>
         )}
@@ -182,35 +185,37 @@ export default function RecepcaoPage() {
           onChange={(e) => setEventoId(Number(e.target.value))}
           className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
         >
-          {eventos.length === 0 && <option value="">Nenhum evento aberto</option>}
+          {eventos.length === 0 && <option value="">{t('erp.recepcao.noOpenEvent')}</option>}
           {eventos.map((ev) => (
             <option key={ev.id} value={ev.id}>
-              {ev.nomeEvento} — {ev._count.presencas} presentes
+              {ev.nomeEvento} — {t('erp.recepcao.presentCount', { count: ev._count.presencas })}
               {ev.capacidadeMax ? ` / ${ev.capacidadeMax}` : ''}
             </option>
           ))}
         </select>
         {eventoAtual && (
           <div className="flex gap-2 flex-wrap text-sm text-white/70">
-            <span>Status: {eventoAtual.status}</span>
+            <span>
+              {t('erp.recepcao.status', { status: labelEnum(t, 'evento', eventoAtual.status) })}
+            </span>
             <button onClick={encerrarEvento} className="text-[var(--color-danger)] hover:underline">
-              Encerrar evento
+              {t('erp.recepcao.closeEvent')}
             </button>
           </div>
         )}
       </section>
 
       <section className="space-y-3">
-        <h3 className="font-medium">Buscar pessoa</h3>
+        <h3 className="font-medium">{t('erp.recepcao.searchPerson')}</h3>
         <div className="flex gap-2 flex-wrap">
           <input
             value={telefone}
             onChange={(e) => setTelefone(e.target.value)}
-            placeholder="Telefone"
+            placeholder={t('erp.common.phone')}
             className="px-3 py-2 rounded bg-black/30 border border-white/20 flex-1 min-w-[200px]"
           />
           <button onClick={buscar} className="px-4 py-2 bg-[var(--color-accent)] text-black rounded">
-            Buscar
+            {t('erp.common.search')}
           </button>
         </div>
         <ul className="space-y-2">
@@ -224,7 +229,9 @@ export default function RecepcaoPage() {
             >
               <span>{p.nomeCompleto}</span>
               <span className="text-white/60 text-sm ml-2">{p.telefone}</span>
-              {!p.maiorDeIdade && <span className="text-amber-400 text-xs ml-2">menor</span>}
+              {!p.maiorDeIdade && (
+                <span className="text-amber-400 text-xs ml-2">{t('erp.recepcao.minor')}</span>
+              )}
             </li>
           ))}
         </ul>
@@ -232,7 +239,7 @@ export default function RecepcaoPage() {
 
       {selecionada && eventoId && (
         <section className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
-          <h3 className="font-medium">Check-in: {selecionada.nomeCompleto}</h3>
+          <h3 className="font-medium">{t('erp.recepcao.checkinTitle', { name: selecionada.nomeCompleto })}</h3>
           {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
           {msg && <p className="text-[var(--color-success)] text-sm">{msg}</p>}
           <select
@@ -240,33 +247,36 @@ export default function RecepcaoPage() {
             onChange={(e) => setTipoPresenca(e.target.value as 'CONSULENTE' | 'MEDIUM')}
             className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
           >
-            <option value="CONSULENTE">Consulente</option>
-            <option value="MEDIUM">Médium</option>
+            <option value="CONSULENTE">{labelEnum(t, 'presenca', 'CONSULENTE')}</option>
+            <option value="MEDIUM">{labelEnum(t, 'presenca', 'MEDIUM')}</option>
           </select>
           {!selecionada.maiorDeIdade && (
             <input
               value={nomeResponsavel}
               onChange={(e) => setNomeResponsavel(e.target.value)}
-              placeholder="Nome do responsável"
+              placeholder={t('erp.recepcao.responsibleName')}
               className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
               required
             />
           )}
           <button onClick={checkin} className="px-4 py-2 bg-[var(--color-accent)] text-black rounded">
-            Confirmar check-in
+            {t('erp.recepcao.confirmCheckin')}
           </button>
         </section>
       )}
 
       {eventoAtual?.presencas && eventoAtual.presencas.length > 0 && (
         <section>
-          <h3 className="font-medium mb-2">Presentes ({eventoAtual.presencas.length})</h3>
+          <h3 className="font-medium mb-2">
+            {t('erp.recepcao.present', { count: eventoAtual.presencas.length })}
+          </h3>
           <ul className="space-y-1 text-sm">
             {eventoAtual.presencas.map((pr) => (
               <li key={pr.id} className="flex justify-between bg-[var(--color-surface)] p-2 rounded">
                 <span>{pr.pessoa.nomeCompleto}</span>
                 <span className="text-white/60">
-                  {pr.tipoPresenca} — {new Date(pr.horarioChegada).toLocaleTimeString('pt-BR')}
+                  {labelEnum(t, 'presenca', pr.tipoPresenca)} —{' '}
+                  {new Date(pr.horarioChegada).toLocaleTimeString(dateLocale)}
                 </span>
               </li>
             ))}

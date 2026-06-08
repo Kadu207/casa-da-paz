@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { maskCnpj, maskCpf, maskCep, maskTelefone } from '../lib/masks';
 import { CheckoutForm, emptyCheckoutForm, type CheckoutFormData } from '../components/ecommerce/CheckoutForm';
+import { useI18n } from '../i18n/I18nContext';
+import { formatMoney, labelEnum } from '../i18n/helpers';
 
 interface Cliente {
   id: number;
@@ -31,6 +33,8 @@ interface Pedido {
   itens: { quantidade: number; produto: { nome: string } }[];
 }
 
+const PEDIDO_STATUS = ['PENDENTE_PAGAMENTO', 'PAGO', 'CANCELADO', 'EXPIRADO'] as const;
+
 function clienteToForm(c: Cliente): CheckoutFormData {
   return {
     tipo: c.tipo,
@@ -50,6 +54,7 @@ function clienteToForm(c: Cliente): CheckoutFormData {
 }
 
 export default function EcommerceAdminPage() {
+  const { t, locale } = useI18n();
   const [aba, setAba] = useState<'pedidos' | 'clientes'>('pedidos');
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -88,13 +93,13 @@ export default function EcommerceAdminPage() {
   };
 
   const excluirCliente = async (id: number) => {
-    if (!confirm('Excluir este cliente?')) return;
+    if (!confirm(t('erp.ecommerce.deleteClientConfirm'))) return;
     setErro('');
     try {
       await api(`/ecommerce/clientes/${id}`, { method: 'DELETE' });
       await carregar();
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao excluir');
+      setErro(err instanceof Error ? err.message : t('erp.ecommerce.deleteError'));
     }
   };
 
@@ -108,22 +113,20 @@ export default function EcommerceAdminPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-serif text-[var(--color-accent)]">E-commerce</h2>
-      <p className="text-sm text-white/60">
-        Pedidos do portal público (Stripe pendente). Dados em tabelas dedicadas no banco.
-      </p>
+      <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.ecommerce.title')}</h2>
+      <p className="text-sm text-white/60">{t('erp.ecommerce.description')}</p>
 
       <div className="flex gap-2">
-        {(['pedidos', 'clientes'] as const).map((t) => (
+        {(['pedidos', 'clientes'] as const).map((tab) => (
           <button
-            key={t}
+            key={tab}
             type="button"
-            onClick={() => setAba(t)}
+            onClick={() => setAba(tab)}
             className={`px-4 py-2 rounded text-sm ${
-              aba === t ? 'bg-[var(--color-accent)] text-black' : 'bg-white/10'
+              aba === tab ? 'bg-[var(--color-accent)] text-black' : 'bg-white/10'
             }`}
           >
-            {t === 'pedidos' ? 'Pedidos' : 'Clientes'}
+            {tab === 'pedidos' ? t('erp.ecommerce.tabOrders') : t('erp.ecommerce.tabClients')}
           </button>
         ))}
       </div>
@@ -135,11 +138,11 @@ export default function EcommerceAdminPage() {
           <table className="w-full text-sm min-w-[640px]">
             <thead>
               <tr className="text-left border-b border-white/20">
-                <th className="p-2">Protocolo</th>
-                <th className="p-2">Cliente</th>
-                <th className="p-2">Total</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Itens</th>
+                <th className="p-2">{t('erp.ecommerce.colProtocol')}</th>
+                <th className="p-2">{t('erp.ecommerce.colClient')}</th>
+                <th className="p-2">{t('erp.ecommerce.colTotal')}</th>
+                <th className="p-2">{t('erp.common.status')}</th>
+                <th className="p-2">{t('erp.ecommerce.colItems')}</th>
               </tr>
             </thead>
             <tbody>
@@ -151,17 +154,18 @@ export default function EcommerceAdminPage() {
                     <br />
                     <span className="text-white/50 text-xs">{p.cliente.email}</span>
                   </td>
-                  <td className="p-2">R$ {Number(p.valorTotal).toFixed(2)}</td>
+                  <td className="p-2">{formatMoney(locale, Number(p.valorTotal))}</td>
                   <td className="p-2">
                     <select
                       value={p.status}
                       onChange={(e) => atualizarStatus(p.id, e.target.value)}
                       className="bg-black/30 border border-white/20 rounded px-2 py-1 text-xs"
                     >
-                      <option value="PENDENTE_PAGAMENTO">Pendente</option>
-                      <option value="PAGO">Pago</option>
-                      <option value="CANCELADO">Cancelado</option>
-                      <option value="EXPIRADO">Expirado</option>
+                      {PEDIDO_STATUS.map((s) => (
+                        <option key={s} value={s}>
+                          {labelEnum(t, 'pedido', s)}
+                        </option>
+                      ))}
                     </select>
                   </td>
                   <td className="p-2 text-xs text-white/70">
@@ -171,7 +175,9 @@ export default function EcommerceAdminPage() {
               ))}
             </tbody>
           </table>
-          {pedidos.length === 0 && <p className="text-white/50 text-sm mt-4">Nenhum pedido ainda.</p>}
+          {pedidos.length === 0 && (
+            <p className="text-white/50 text-sm mt-4">{t('erp.ecommerce.emptyOrders')}</p>
+          )}
         </div>
       )}
 
@@ -185,19 +191,19 @@ export default function EcommerceAdminPage() {
             }}
             className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm"
           >
-            Novo cliente
+            {t('erp.ecommerce.newClient')}
           </button>
 
           {(novoCliente || editando) && (
             <div className="bg-[var(--color-surface)] p-4 rounded-xl max-w-lg">
               <h3 className="font-medium text-[var(--color-accent)] mb-3">
-                {editando ? 'Editar cliente' : 'Cadastrar cliente'}
+                {editando ? t('erp.ecommerce.editClient') : t('erp.ecommerce.registerClient')}
               </h3>
               <CheckoutForm
                 key={editando?.id ?? 'novo'}
                 initial={editando ? clienteToForm(editando) : emptyCheckoutForm}
                 onSubmit={salvarCliente}
-                submitLabel="Salvar cliente"
+                submitLabel={t('erp.ecommerce.saveClient')}
               />
               <button
                 type="button"
@@ -207,7 +213,7 @@ export default function EcommerceAdminPage() {
                 }}
                 className="mt-2 text-sm text-white/60 hover:text-white"
               >
-                Cancelar
+                {t('erp.common.cancel')}
               </button>
             </div>
           )}
@@ -215,18 +221,18 @@ export default function EcommerceAdminPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left border-b border-white/20">
-                <th className="p-2">Nome</th>
-                <th className="p-2">Doc.</th>
-                <th className="p-2">E-mail</th>
-                <th className="p-2">Pedidos</th>
-                <th className="p-2">Ações</th>
+                <th className="p-2">{t('erp.common.name')}</th>
+                <th className="p-2">{t('erp.ecommerce.colDoc')}</th>
+                <th className="p-2">{t('erp.common.email')}</th>
+                <th className="p-2">{t('erp.ecommerce.colOrders')}</th>
+                <th className="p-2">{t('erp.common.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {clientes.map((c) => (
                 <tr key={c.id} className="border-b border-white/10">
                   <td className="p-2">{c.nomeCompleto}</td>
-                  <td className="p-2 text-xs">{c.cpf ?? c.cnpj ?? '—'}</td>
+                  <td className="p-2 text-xs">{c.cpf ?? c.cnpj ?? t('erp.common.emptyDash')}</td>
                   <td className="p-2">{c.email}</td>
                   <td className="p-2">{c._count?.pedidos ?? 0}</td>
                   <td className="p-2 space-x-2">
@@ -238,14 +244,14 @@ export default function EcommerceAdminPage() {
                       }}
                       className="text-xs px-2 py-1 rounded bg-white/10"
                     >
-                      Editar
+                      {t('erp.common.edit')}
                     </button>
                     <button
                       type="button"
                       onClick={() => excluirCliente(c.id)}
                       className="text-xs px-2 py-1 rounded bg-white/10 text-[var(--color-danger)]"
                     >
-                      Excluir
+                      {t('erp.common.delete')}
                     </button>
                   </td>
                 </tr>

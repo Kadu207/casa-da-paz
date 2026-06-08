@@ -61,4 +61,5 @@ export const pedidoItemSchema = z.object({
 export const checkoutSchema = z.object({
   cliente: clienteCheckoutSchema,
   itens: z.array(pedidoItemSchema).min(1),
+  aceiteLgpd: z.literal(true),
 });

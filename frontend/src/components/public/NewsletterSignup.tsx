@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../../i18n/I18nContext';
 import { TurnstileWidget, turnstileConfigured } from './TurnstileWidget';
+import { LgpdConsentCheckbox } from './LgpdConsentCheckbox';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 
@@ -9,6 +10,7 @@ export function NewsletterSignup() {
   const { t, locale } = useI18n();
   const [email, setEmail] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
+  const [aceiteLgpd, setAceiteLgpd] = useState(false);
   const [ok, setOk] = useState(false);
   const [err, setErr] = useState('');
 
@@ -16,21 +18,30 @@ export function NewsletterSignup() {
     e.preventDefault();
     setErr('');
     if (turnstileConfigured() && !turnstileToken) {
-      setErr(locale === 'en' ? 'Complete the security check.' : 'Complete a verificação de segurança.');
+      setErr(t('newsletter.error.turnstile'));
+      return;
+    }
+    if (!aceiteLgpd) {
+      setErr(t('lgpd.consentRequired'));
       return;
     }
     try {
       const res = await fetch(`${API_BASE}/public/newsletter`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, locale, turnstileToken: turnstileToken || undefined }),
+        body: JSON.stringify({
+          email,
+          locale,
+          turnstileToken: turnstileToken || undefined,
+          aceiteLgpd: true,
+        }),
       });
       if (!res.ok) throw new Error('fail');
       setOk(true);
       setEmail('');
       setTurnstileToken('');
     } catch {
-      setErr(locale === 'en' ? 'Could not subscribe.' : 'Não foi possível inscrever.');
+      setErr(t('newsletter.error.generic'));
     }
   };
 
@@ -57,6 +68,7 @@ export function NewsletterSignup() {
         </button>
       </div>
       <TurnstileWidget onToken={setTurnstileToken} onExpire={() => setTurnstileToken('')} />
+      <LgpdConsentCheckbox checked={aceiteLgpd} onChange={setAceiteLgpd} id="newsletter-lgpd" />
       {err && <p className="text-destructive text-xs">{err}</p>}
       <p className="text-xs text-foreground/60">
         <Link to="/public/termos" className="hover:text-primary underline">

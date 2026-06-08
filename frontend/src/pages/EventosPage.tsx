@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { MediaUploadPanel } from '../components/MediaUploadPanel';
+import { useI18n } from '../i18n/I18nContext';
+import { formatMoney, labelEnum } from '../i18n/helpers';
 
 interface Pessoa {
   id: number;
@@ -27,6 +29,7 @@ interface Evento {
 }
 
 export default function EventosPage() {
+  const { t, locale, dateLocale } = useI18n();
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [eventoId, setEventoId] = useState<number | null>(null);
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
@@ -66,7 +69,7 @@ export default function EventosPage() {
       setForm({ pessoaId: '', valor: '', vencimento: '' });
       await carregar();
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao inscrever');
+      setErro(err instanceof Error ? err.message : t('erp.eventos.registerError'));
     }
   };
 
@@ -86,7 +89,7 @@ export default function EventosPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-serif text-[var(--color-accent)]">Eventos — Inscrições</h2>
+      <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.eventos.title')}</h2>
       <MediaUploadPanel />
 
       <select
@@ -96,7 +99,7 @@ export default function EventosPage() {
       >
         {eventos.map((ev) => (
           <option key={ev.id} value={ev.id}>
-            {ev.nomeEvento} — {ev._count.inscricoes} inscritos
+            {ev.nomeEvento} — {t('erp.eventos.registeredCount', { count: ev._count.inscricoes })}
             {ev.capacidadeMax ? ` / ${ev.capacidadeMax}` : ''}
           </option>
         ))}
@@ -104,12 +107,14 @@ export default function EventosPage() {
 
       {evento && (
         <p className="text-sm text-white/70">
-          {vagasRestantes != null ? `${vagasRestantes} vaga(s) restante(s)` : 'Sem limite de lotação'}
+          {vagasRestantes != null
+            ? t('erp.eventos.spotsLeft', { count: vagasRestantes })
+            : t('erp.eventos.noCapacityLimit')}
         </p>
       )}
 
       <form onSubmit={inscrever} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3 max-w-md">
-        <h3 className="font-medium text-[var(--color-accent)]">Nova inscrição</h3>
+        <h3 className="font-medium text-[var(--color-accent)]">{t('erp.eventos.newRegistration')}</h3>
         {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
         <select
           value={form.pessoaId}
@@ -117,7 +122,7 @@ export default function EventosPage() {
           className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
           required
         >
-          <option value="">Pessoa</option>
+          <option value="">{t('erp.common.person')}</option>
           {pessoas.map((p) => (
             <option key={p.id} value={p.id}>
               {p.nomeCompleto}
@@ -130,7 +135,7 @@ export default function EventosPage() {
           min="0.01"
           value={form.valor}
           onChange={(e) => setForm({ ...form, valor: e.target.value })}
-          placeholder="Valor"
+          placeholder={t('erp.common.value')}
           className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
           required
         />
@@ -142,7 +147,7 @@ export default function EventosPage() {
           required
         />
         <button type="submit" className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm">
-          Inscrever
+          {t('erp.eventos.register')}
         </button>
       </form>
 
@@ -150,29 +155,31 @@ export default function EventosPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left border-b border-white/20">
-              <th className="p-2">Pessoa</th>
-              <th className="p-2">Valor</th>
-              <th className="p-2">Vencimento</th>
-              <th className="p-2">Adimplência</th>
-              <th className="p-2">Ações</th>
+              <th className="p-2">{t('erp.common.person')}</th>
+              <th className="p-2">{t('erp.common.value')}</th>
+              <th className="p-2">{t('erp.common.dueDate')}</th>
+              <th className="p-2">{t('erp.financeiro.colCompliance')}</th>
+              <th className="p-2">{t('erp.common.actions')}</th>
             </tr>
           </thead>
           <tbody>
             {(evento?.inscricoes ?? []).map((i) => (
               <tr key={i.id} className="border-b border-white/10">
                 <td className="p-2">{i.pessoa.nomeCompleto}</td>
-                <td className="p-2">R$ {Number(i.valor).toFixed(2)}</td>
+                <td className="p-2">{formatMoney(locale, Number(i.valor))}</td>
                 <td className="p-2">
-                  {i.vencimento ? new Date(i.vencimento).toLocaleDateString('pt-BR') : '—'}
+                  {i.vencimento
+                    ? new Date(i.vencimento).toLocaleDateString(dateLocale)
+                    : t('erp.common.emptyDash')}
                 </td>
-                <td className="p-2">{i.adimplencia}</td>
+                <td className="p-2">{labelEnum(t, 'adimplencia', i.adimplencia)}</td>
                 <td className="p-2">
                   {i.statusPagamento === 'PENDENTE' && (
                     <button
                       onClick={() => confirmarPagamento(i.id)}
                       className="text-[var(--color-accent)] hover:underline text-xs"
                     >
-                      Confirmar pagamento
+                      {t('erp.eventos.confirmPayment')}
                     </button>
                   )}
                 </td>
@@ -181,7 +188,7 @@ export default function EventosPage() {
             {(evento?.inscricoes?.length ?? 0) === 0 && (
               <tr>
                 <td colSpan={5} className="p-4 text-center text-white/50">
-                  Nenhuma inscrição
+                  {t('erp.eventos.empty')}
                 </td>
               </tr>
             )}

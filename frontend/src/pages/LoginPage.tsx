@@ -3,8 +3,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { SolidScreenLayout } from '../components/SolidScreenLayout';
 import { portalAssets } from '../lib/portal-assets';
+import { useI18n } from '../i18n/I18nContext';
 
 export default function LoginPage() {
+  const { t } = useI18n();
   const [login, setLogin] = useState('');
   const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
@@ -18,16 +20,16 @@ export default function LoginPage() {
       await doLogin(login.trim(), senha);
       navigate('/app/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao entrar');
+      setError(err instanceof Error ? err.message : t('erp.login.error'));
     }
   };
 
   return (
     <SolidScreenLayout
-      title="Casa da Paz"
-      subtitle="Área interna"
+      title={t('home.title')}
+      subtitle={t('erp.login.subtitle')}
       imageSrc={portalAssets.hero}
-      imageAlt="Casa da Paz — tradição Umbanda"
+      imageAlt={t('erp.login.imageAlt')}
     >
       <form
         onSubmit={handleSubmit}
@@ -36,7 +38,7 @@ export default function LoginPage() {
         {error && <p className="text-[var(--color-danger)] text-sm">{error}</p>}
         <input
           type="text"
-          placeholder="Usuário"
+          placeholder={t('erp.login.user')}
           value={login}
           onChange={(e) => setLogin(e.target.value)}
           autoComplete="username"
@@ -45,7 +47,7 @@ export default function LoginPage() {
         />
         <input
           type="password"
-          placeholder="Senha"
+          placeholder={t('erp.login.password')}
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           autoComplete="current-password"
@@ -53,10 +55,10 @@ export default function LoginPage() {
           required
         />
         <button type="submit" className="w-full py-2 bg-[var(--color-accent)] text-black font-medium rounded">
-          Entrar
+          {t('erp.login.submit')}
         </button>
         <Link to="/public" className="block text-center text-sm text-white/60 hover:text-white">
-          Portal público →
+          {t('erp.login.publicPortal')}
         </Link>
       </form>
     </SolidScreenLayout>

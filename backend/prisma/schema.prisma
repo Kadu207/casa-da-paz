@@ -233,6 +233,8 @@ model AgendamentoPublico {
   observacao      String?
   status          StatusAgendamento @default(PENDENTE)
   pessoaId        Int?              @map("pessoa_id")
+  aceiteLgpdEm    DateTime?         @map("aceite_lgpd_em")
+  aceiteLgpdVersao String?          @map("aceite_lgpd_versao") @db.VarChar(20)
   createdAt       DateTime          @default(now()) @map("created_at")
   pessoa          Pessoa?           @relation(fields: [pessoaId], references: [id])
 
@@ -245,6 +247,8 @@ model NewsletterInscrito {
   nome      String?  @db.VarChar(150)
   locale    String   @default("pt-BR") @db.VarChar(10)
   ativo     Boolean  @default(true)
+  aceiteLgpdEm     DateTime? @map("aceite_lgpd_em")
+  aceiteLgpdVersao String?   @map("aceite_lgpd_versao") @db.VarChar(20)
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("newsletter_inscritos")
@@ -306,6 +310,8 @@ model EcommercePedido {
   valorTotal            Decimal                @map("valor_total") @db.Decimal(10, 2)
   stripeSessionId       String?                @map("stripe_session_id") @db.VarChar(120)
   stripePaymentIntentId String?                @map("stripe_payment_intent_id") @db.VarChar(120)
+  aceiteLgpdEm          DateTime?              @map("aceite_lgpd_em")
+  aceiteLgpdVersao      String?                @map("aceite_lgpd_versao") @db.VarChar(20)
   createdAt             DateTime               @default(now()) @map("created_at")
   updatedAt             DateTime               @updatedAt @map("updated_at")
   cliente               EcommerceCliente       @relation(fields: [clienteId], references: [id])

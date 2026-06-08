@@ -6,6 +6,7 @@ import { dispararN8n } from '../lib/n8n.js';
 import { protocoloAgendamento } from '../lib/protocolo.js';
 import { registrarAuditoria } from '../lib/auditoria.js';
 import { clientIp, turnstileEnabled, verifyTurnstile } from '../lib/turnstile.js';
+import { LGPD_POLICY_VERSION, assertLgpdConsent } from '../lib/lgpd.js';
 
 const router = Router();
 
@@ -112,10 +113,16 @@ router.post('/newsletter', newsletterLimiter, async (req, res) => {
       nome: z.string().max(150).optional(),
       locale: z.enum(['pt-BR', 'en']).optional(),
       turnstileToken: z.string().optional(),
+      aceiteLgpd: z.literal(true),
     })
     .safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: body.error.flatten() });
+    return;
+  }
+  const lgpdErr = assertLgpdConsent(body.data.aceiteLgpd);
+  if (lgpdErr) {
+    res.status(400).json({ error: lgpdErr });
     return;
   }
   if (!(await verifyTurnstile(body.data.turnstileToken, clientIp(req)))) {
@@ -128,8 +135,16 @@ router.post('/newsletter', newsletterLimiter, async (req, res) => {
       email: body.data.email.toLowerCase(),
       nome: body.data.nome,
       locale: body.data.locale ?? 'pt-BR',
+      aceiteLgpdEm: new Date(),
+      aceiteLgpdVersao: LGPD_POLICY_VERSION,
     },
-    update: { nome: body.data.nome, ativo: true, locale: body.data.locale ?? 'pt-BR' },
+    update: {
+      nome: body.data.nome,
+      ativo: true,
+      locale: body.data.locale ?? 'pt-BR',
+      aceiteLgpdEm: new Date(),
+      aceiteLgpdVersao: LGPD_POLICY_VERSION,
+    },
   });
   await registrarAuditoria(req, {
     rota: 'portal.newsletter.subscribe',
@@ -147,10 +162,16 @@ router.post('/agendamentos', agendamentoLimiter, async (req, res) => {
       observacao: z.string().max(500).optional(),
       website: z.string().max(0).optional(),
       turnstileToken: z.string().optional(),
+      aceiteLgpd: z.literal(true),
     })
     .safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: body.error.flatten() });
+    return;
+  }
+  const lgpdErr = assertLgpdConsent(body.data.aceiteLgpd);
+  if (lgpdErr) {
+    res.status(400).json({ error: lgpdErr });
     return;
   }
   if (body.data.website) {
@@ -171,6 +192,8 @@ router.post('/agendamentos', agendamentoLimiter, async (req, res) => {
         telefone: body.data!.telefone,
         dataPreferida: body.data!.dataPreferida ? new Date(body.data!.dataPreferida) : null,
         observacao: body.data!.observacao,
+        aceiteLgpdEm: new Date(),
+        aceiteLgpdVersao: LGPD_POLICY_VERSION,
       },
     });
     const protocolo = protocoloAgendamento(row.id, row.createdAt);

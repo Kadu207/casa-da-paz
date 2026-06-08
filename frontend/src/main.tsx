@@ -4,7 +4,10 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import { I18nProvider } from './i18n/I18nContext';
+import { enforceProductionHttps } from './lib/force-https';
 import './styles/tokens.css';
+
+enforceProductionHttps();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

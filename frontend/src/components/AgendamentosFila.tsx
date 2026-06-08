@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { useI18n } from '../i18n/I18nContext';
+import { labelEnum } from '../i18n/helpers';
 
 interface Agendamento {
   id: number;
@@ -13,6 +15,7 @@ interface Agendamento {
 }
 
 export default function AgendamentosFila() {
+  const { t, dateLocale } = useI18n();
   const [fila, setFila] = useState<Agendamento[]>([]);
   const [erro, setErro] = useState('');
   const [msg, setMsg] = useState('');
@@ -34,15 +37,15 @@ export default function AgendamentosFila() {
         `/agendamentos/${id}/confirmar`,
         { method: 'PATCH', body: JSON.stringify({ criarPessoa: true }) }
       );
-      setMsg(`Confirmado: ${res.pessoa?.nomeCompleto ?? 'OK'}`);
+      setMsg(t('erp.agendamentos.confirmed', { name: res.pessoa?.nomeCompleto ?? 'OK' }));
       await carregar();
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao confirmar');
+      setErro(err instanceof Error ? err.message : t('erp.agendamentos.confirmError'));
     }
   };
 
   const cancelar = async (id: number) => {
-    const motivo = prompt('Motivo do cancelamento (opcional):');
+    const motivo = prompt(t('erp.agendamentos.cancelPrompt'));
     if (motivo === null) return;
     setErro('');
     try {
@@ -52,16 +55,16 @@ export default function AgendamentosFila() {
       });
       await carregar();
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao cancelar');
+      setErro(err instanceof Error ? err.message : t('erp.agendamentos.cancelError'));
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-medium">Fila de agendamentos ({fila.length})</h3>
+        <h3 className="font-medium">{t('erp.agendamentos.queue', { count: fila.length })}</h3>
         <button onClick={() => carregar()} className="text-sm text-white/60 hover:text-white">
-          Atualizar
+          {t('erp.agendamentos.refresh')}
         </button>
       </div>
       {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
@@ -74,36 +77,42 @@ export default function AgendamentosFila() {
                 <p className="font-medium">{a.nome}</p>
                 <p className="text-sm text-white/60">{a.telefone}</p>
               </div>
-              <span className="text-xs px-2 py-1 bg-amber-500/20 text-amber-300 rounded">{a.status}</span>
+              <span className="text-xs px-2 py-1 bg-amber-500/20 text-amber-300 rounded">
+                {labelEnum(t, 'pedido', a.status) !== a.status ? labelEnum(t, 'pedido', a.status) : a.status}
+              </span>
             </div>
             {a.dataPreferida && (
               <p className="text-sm text-white/70">
-                Preferência: {new Date(a.dataPreferida).toLocaleDateString('pt-BR')}
+                {t('erp.agendamentos.preference', {
+                  date: new Date(a.dataPreferida).toLocaleDateString(dateLocale),
+                })}
               </p>
             )}
             {a.observacao && <p className="text-sm text-white/50">{a.observacao}</p>}
             <p className="text-xs text-white/40">
-              Solicitado em {new Date(a.createdAt).toLocaleString('pt-BR')}
+              {t('erp.agendamentos.requestedAt', {
+                date: new Date(a.createdAt).toLocaleString(dateLocale),
+              })}
             </p>
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => confirmar(a.id)}
                 className="px-3 py-1.5 bg-[var(--color-accent)] text-black rounded text-sm"
               >
-                Confirmar e vincular pessoa
+                {t('erp.agendamentos.confirmLink')}
               </button>
               <button
                 onClick={() => cancelar(a.id)}
                 className="px-3 py-1.5 bg-white/10 rounded text-sm text-[var(--color-danger)]"
               >
-                Cancelar
+                {t('erp.agendamentos.cancel')}
               </button>
             </div>
           </li>
         ))}
       </ul>
       {fila.length === 0 && (
-        <p className="text-white/50 text-sm text-center py-6">Nenhum agendamento pendente</p>
+        <p className="text-white/50 text-sm text-center py-6">{t('erp.agendamentos.empty')}</p>
       )}
     </div>
   );

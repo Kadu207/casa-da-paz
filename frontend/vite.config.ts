@@ -9,19 +9,20 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['portal/logo.svg'],
+      includeAssets: ['portal/logo.png', 'portal/logo.svg'],
       manifest: {
-        name: 'Casa da Paz',
+        name: 'Bem vindo a Casa da Paz',
         short_name: 'Casa da Paz',
-        description: 'Terreiro de Umbanda — Conselheiro Lafaiete, MG',
-        theme_color: '#0f172a',
+        description: 'Comunidade de Terreiro Afro-Indígena — Umbanda em Conselheiro Lafaiete, MG',
+        theme_color: '#84cc16',
         background_color: '#0f172a',
         display: 'standalone',
         lang: 'pt-BR',
         start_url: '/public',
         icons: [
-          { src: '/portal/logo.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-          { src: '/portal/logo.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'maskable' },
+          { src: '/portal/logo.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/portal/logo.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/portal/logo.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {

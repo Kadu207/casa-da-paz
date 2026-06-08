@@ -36,6 +36,7 @@ body:has(.app-shell) {
   color: #fff;
   font-family: 'Inter', system-ui, sans-serif;
   overflow-x: clip;
+  overscroll-behavior-y: none;
 }
 
 .app-shell {
@@ -45,10 +46,28 @@ body:has(.app-shell) {
   overflow-x: clip;
 }
 
-.app-main {
-  flex: 1 1 auto;
-  min-width: 0;
-  width: 100%;
+/* Mobile: shell fixo em dvh; scroll só em .app-main (drawer + overlay no AppLayout) */
+@media (max-width: 767px) {
+  .app-shell {
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+  }
+
+  .app-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+  }
 }
 
 .chart-panel {

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { maskCep, maskCnpj, maskCpf, maskTelefone, UFS } from '../../lib/masks';
 import { fetchViaCep } from '../../lib/viacep';
+import { useI18n } from '../../i18n/I18nContext';
+import { LgpdConsentCheckbox } from '../public/LgpdConsentCheckbox';
 
 export interface CheckoutFormData {
   tipo: 'PF' | 'PJ';
@@ -40,11 +42,13 @@ interface CheckoutFormProps {
   initial?: Partial<CheckoutFormData>;
 }
 
-export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initial }: CheckoutFormProps) {
+export function CheckoutForm({ onSubmit, submitLabel, initial }: CheckoutFormProps) {
+  const { t } = useI18n();
   const [form, setForm] = useState<CheckoutFormData>({ ...empty, ...initial });
   const [erro, setErro] = useState('');
   const [buscandoCep, setBuscandoCep] = useState(false);
   const [salvando, setSalvando] = useState(false);
+  const [aceiteLgpd, setAceiteLgpd] = useState(false);
 
   const set = (patch: Partial<CheckoutFormData>) => setForm((f) => ({ ...f, ...patch }));
 
@@ -72,11 +76,15 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro('');
+    if (!aceiteLgpd) {
+      setErro(t('lgpd.consentRequired'));
+      return;
+    }
     setSalvando(true);
     try {
       await onSubmit(form);
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao enviar');
+      setErro(err instanceof Error ? err.message : t('checkout.error.submit'));
     } finally {
       setSalvando(false);
     }
@@ -85,32 +93,34 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
   const inputClass =
     'w-full px-3 py-2.5 rounded-lg bg-black/30 border border-white/20 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50';
 
+  const label = submitLabel ?? t('shop.submitOrder');
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
       {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-medium text-primary mb-1">Identificação</legend>
+        <legend className="text-sm font-medium text-primary mb-1">{t('checkout.identification')}</legend>
         <div className="flex gap-2">
-          {(['PF', 'PJ'] as const).map((t) => (
+          {(['PF', 'PJ'] as const).map((tipo) => (
             <button
-              key={t}
+              key={tipo}
               type="button"
-              onClick={() => set({ tipo: t })}
+              onClick={() => set({ tipo })}
               className={`flex-1 py-2 rounded-lg text-sm border ${
-                form.tipo === t
+                form.tipo === tipo
                   ? 'bg-primary text-primary-foreground border-primary'
                   : 'border-border hover:bg-card'
               }`}
             >
-              {t === 'PF' ? 'Pessoa física (CPF)' : 'Pessoa jurídica (CNPJ)'}
+              {tipo === 'PF' ? t('checkout.pf') : t('checkout.pj')}
             </button>
           ))}
         </div>
         <input
           value={form.nomeCompleto}
           onChange={(e) => set({ nomeCompleto: e.target.value })}
-          placeholder="Nome completo / Razão social"
+          placeholder={t('checkout.namePlaceholder')}
           className={inputClass}
           required
         />
@@ -118,7 +128,7 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
           <input
             value={form.cpf}
             onChange={(e) => set({ cpf: maskCpf(e.target.value) })}
-            placeholder="CPF"
+            placeholder={t('checkout.cpf')}
             inputMode="numeric"
             className={inputClass}
             required
@@ -127,7 +137,7 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
           <input
             value={form.cnpj}
             onChange={(e) => set({ cnpj: maskCnpj(e.target.value) })}
-            placeholder="CNPJ"
+            placeholder={t('checkout.cnpj')}
             inputMode="numeric"
             className={inputClass}
             required
@@ -137,27 +147,27 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
           type="email"
           value={form.email}
           onChange={(e) => set({ email: e.target.value })}
-          placeholder="E-mail"
+          placeholder={t('checkout.email')}
           className={inputClass}
           required
         />
         <input
           value={form.telefone}
           onChange={(e) => set({ telefone: maskTelefone(e.target.value) })}
-          placeholder="Telefone / WhatsApp"
+          placeholder={t('checkout.phone')}
           inputMode="tel"
           className={inputClass}
         />
       </fieldset>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-medium text-primary mb-1">Endereço de entrega</legend>
+        <legend className="text-sm font-medium text-primary mb-1">{t('checkout.address')}</legend>
         <div className="flex gap-2">
           <input
             value={form.cep}
             onChange={(e) => buscarCep(e.target.value)}
             onBlur={() => buscarCep(form.cep)}
-            placeholder="CEP"
+            placeholder={t('checkout.cep')}
             inputMode="numeric"
             className={inputClass + ' flex-1'}
             required
@@ -167,7 +177,7 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
         <input
           value={form.logradouro}
           onChange={(e) => set({ logradouro: e.target.value })}
-          placeholder="Logradouro"
+          placeholder={t('checkout.street')}
           className={inputClass}
           required
         />
@@ -175,21 +185,21 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
           <input
             value={form.numero}
             onChange={(e) => set({ numero: e.target.value })}
-            placeholder="Número"
+            placeholder={t('checkout.number')}
             className={inputClass}
             required
           />
           <input
             value={form.complemento}
             onChange={(e) => set({ complemento: e.target.value })}
-            placeholder="Complemento"
+            placeholder={t('checkout.complement')}
             className={inputClass}
           />
         </div>
         <input
           value={form.bairro}
           onChange={(e) => set({ bairro: e.target.value })}
-          placeholder="Bairro"
+          placeholder={t('checkout.neighborhood')}
           className={inputClass}
           required
         />
@@ -197,7 +207,7 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
           <input
             value={form.cidade}
             onChange={(e) => set({ cidade: e.target.value })}
-            placeholder="Cidade"
+            placeholder={t('checkout.city')}
             className={inputClass}
             required
           />
@@ -206,6 +216,7 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
             onChange={(e) => set({ estado: e.target.value })}
             className={inputClass}
             required
+            aria-label={t('checkout.state')}
           >
             {UFS.map((uf) => (
               <option key={uf} value={uf}>
@@ -216,16 +227,16 @@ export function CheckoutForm({ onSubmit, submitLabel = 'Finalizar pedido', initi
         </div>
       </fieldset>
 
-      <p className="text-xs text-white/50">
-        Pagamento via Stripe em breve. Seu pedido ficará registrado com status pendente até a confirmação.
-      </p>
+      <p className="text-xs text-white/50">{t('checkout.stripeNote')}</p>
+
+      <LgpdConsentCheckbox checked={aceiteLgpd} onChange={setAceiteLgpd} id="checkout-lgpd" className="text-white/70" />
 
       <button
         type="submit"
         disabled={salvando}
         className="w-full min-h-12 py-3 bg-primary text-primary-foreground font-medium rounded-xl disabled:opacity-60"
       >
-        {salvando ? 'Processando…' : submitLabel}
+        {salvando ? t('checkout.processing') : label}
       </button>
     </form>
   );

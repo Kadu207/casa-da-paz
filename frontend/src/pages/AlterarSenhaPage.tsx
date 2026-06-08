@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { api } from '../lib/api';
 import { portalAssets } from '../lib/portal-assets';
+import { useI18n } from '../i18n/I18nContext';
 
 export default function AlterarSenhaPage() {
+  const { t } = useI18n();
   const [senhaAtual, setSenhaAtual] = useState('');
   const [senhaNova, setSenhaNova] = useState('');
   const [confirmar, setConfirmar] = useState('');
@@ -15,11 +17,11 @@ export default function AlterarSenhaPage() {
     setErro('');
     setOk(false);
     if (senhaNova !== confirmar) {
-      setErro('A confirmação não coincide com a nova senha');
+      setErro(t('erp.password.mismatch'));
       return;
     }
     if (senhaNova.length < 6) {
-      setErro('A nova senha deve ter pelo menos 6 caracteres');
+      setErro(t('erp.password.minLength'));
       return;
     }
     setSalvando(true);
@@ -33,7 +35,7 @@ export default function AlterarSenhaPage() {
       setConfirmar('');
       setOk(true);
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao alterar senha');
+      setErro(err instanceof Error ? err.message : t('erp.password.error'));
     } finally {
       setSalvando(false);
     }
@@ -44,26 +46,23 @@ export default function AlterarSenhaPage() {
       <div className="relative rounded-xl overflow-hidden border border-white/10 h-36 sm:h-40">
         <img
           src={portalAssets.velasAltar}
-          alt="Tradição Umbanda"
+          alt={t('erp.layout.imageAlt')}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)] via-transparent to-transparent" />
-        <p className="absolute bottom-3 left-4 font-serif text-[var(--color-accent)] text-lg">Salve a Umbanda</p>
+        <p className="absolute bottom-3 left-4 font-serif text-[var(--color-accent)] text-lg">{t('erp.layout.tagline')}</p>
       </div>
-      <h2 className="text-xl font-serif text-[var(--color-accent)]">Alterar senha</h2>
-      <p className="text-sm text-white/70">
-        Use esta página para trocar a senha da sua conta. Diretoria pode redefinir senhas de outros usuários em
-        Usuários.
-      </p>
+      <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.password.title')}</h2>
+      <p className="text-sm text-white/70">{t('erp.password.description')}</p>
 
       <form onSubmit={salvar} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
         {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
-        {ok && <p className="text-[var(--color-success)] text-sm">Senha alterada com sucesso.</p>}
+        {ok && <p className="text-[var(--color-success)] text-sm">{t('erp.password.success')}</p>}
         <input
           type="password"
           value={senhaAtual}
           onChange={(e) => setSenhaAtual(e.target.value)}
-          placeholder="Senha atual"
+          placeholder={t('erp.password.current')}
           autoComplete="current-password"
           className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
           required
@@ -72,7 +71,7 @@ export default function AlterarSenhaPage() {
           type="password"
           value={senhaNova}
           onChange={(e) => setSenhaNova(e.target.value)}
-          placeholder="Nova senha (mín. 6)"
+          placeholder={t('erp.password.new')}
           autoComplete="new-password"
           minLength={6}
           className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
@@ -82,7 +81,7 @@ export default function AlterarSenhaPage() {
           type="password"
           value={confirmar}
           onChange={(e) => setConfirmar(e.target.value)}
-          placeholder="Confirmar nova senha"
+          placeholder={t('erp.password.confirm')}
           autoComplete="new-password"
           minLength={6}
           className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
@@ -93,7 +92,7 @@ export default function AlterarSenhaPage() {
           disabled={salvando}
           className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm font-medium disabled:opacity-60"
         >
-          {salvando ? 'Salvando…' : 'Salvar nova senha'}
+          {salvando ? t('erp.password.saving') : t('erp.password.save')}
         </button>
       </form>
     </div>

@@ -1,26 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { portalAssets } from '../lib/portal-assets';
+import { useI18n } from '../i18n/I18nContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import type { ErpTranslationKey } from '../i18n/erp-pt-BR';
 
-const nav: { path: string; label: string; roles: string[] }[] = [
-  { path: '/app/dashboard', label: 'Dashboard', roles: ['DIRETORIA', 'FINANCEIRO', 'MEDIUM'] },
-  { path: '/app/financeiro', label: 'Financeiro', roles: ['DIRETORIA', 'FINANCEIRO'] },
-  { path: '/app/recepcao', label: 'Recepção', roles: ['DIRETORIA', 'RECEPCAO'] },
-  { path: '/app/eventos', label: 'Eventos', roles: ['DIRETORIA', 'RECEPCAO'] },
+const nav: { path: string; labelKey: ErpTranslationKey; roles: string[] }[] = [
+  { path: '/app/dashboard', labelKey: 'erp.nav.dashboard', roles: ['DIRETORIA', 'FINANCEIRO', 'MEDIUM'] },
+  { path: '/app/financeiro', labelKey: 'erp.nav.financeiro', roles: ['DIRETORIA', 'FINANCEIRO'] },
+  { path: '/app/recepcao', labelKey: 'erp.nav.recepcao', roles: ['DIRETORIA', 'RECEPCAO'] },
+  { path: '/app/eventos', labelKey: 'erp.nav.eventos', roles: ['DIRETORIA', 'RECEPCAO'] },
   {
     path: '/app/pessoas',
-    label: 'Pessoas',
+    labelKey: 'erp.nav.pessoas',
     roles: ['DIRETORIA', 'RECEPCAO', 'FINANCEIRO', 'LIVRARIA', 'SUPORTE'],
   },
-  { path: '/app/livraria', label: 'Livraria', roles: ['DIRETORIA', 'LIVRARIA'] },
-  { path: '/app/ecommerce', label: 'E-commerce', roles: ['DIRETORIA', 'LIVRARIA'] },
-  { path: '/app/usuarios', label: 'Usuários', roles: ['DIRETORIA'] },
-  { path: '/app/auditoria', label: 'Auditoria', roles: ['DIRETORIA', 'SUPORTE'] },
+  { path: '/app/livraria', labelKey: 'erp.nav.livraria', roles: ['DIRETORIA', 'LIVRARIA'] },
+  { path: '/app/ecommerce', labelKey: 'erp.nav.ecommerce', roles: ['DIRETORIA', 'LIVRARIA'] },
+  { path: '/app/usuarios', labelKey: 'erp.nav.usuarios', roles: ['DIRETORIA'] },
+  { path: '/app/auditoria', labelKey: 'erp.nav.auditoria', roles: ['DIRETORIA', 'SUPORTE'] },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const { user } = useAuth();
+  const { t } = useI18n();
   const location = useLocation();
 
   return (
@@ -36,7 +40,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
               location.pathname === n.path ? 'bg-[var(--color-accent)] text-black' : 'hover:bg-white/10'
             }`}
           >
-            {n.label}
+            {t(n.labelKey)}
           </Link>
         ))}
     </>
@@ -45,46 +49,70 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 export default function AppLayout() {
   const { logout } = useAuth();
+  const { t } = useI18n();
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="app-shell flex flex-col md:flex-row">
-      <header className="md:hidden sticky top-0 z-40 flex items-center justify-between gap-3 px-4 py-3 bg-[var(--color-surface)] border-b border-white/10">
-        <span className="text-[var(--color-accent)] font-serif text-lg">Casa da Paz</span>
-        <button
-          type="button"
-          aria-expanded={menuOpen}
-          aria-controls="app-nav"
-          onClick={() => setMenuOpen((o) => !o)}
-          className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-white/20 text-lg"
-        >
-          {menuOpen ? '✕' : '☰'}
-        </button>
+      <header className="md:hidden relative z-[60] shrink-0 flex items-center justify-between gap-3 px-4 py-3 bg-[var(--color-surface)] border-b border-white/10">
+        <span className="text-[var(--color-accent)] font-serif text-lg">{t('home.title')}</span>
+        <div className="flex items-center gap-1">
+          <LanguageSwitcher className="text-xs text-white/70 hover:text-[var(--color-accent)] px-2 min-h-11" />
+          <button
+            type="button"
+            aria-expanded={menuOpen}
+            aria-controls="app-nav"
+            aria-label={menuOpen ? t('erp.app.closeMenu') : t('erp.app.openMenu')}
+            onClick={() => setMenuOpen((o) => !o)}
+            className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg border border-white/20 text-lg"
+          >
+            {menuOpen ? '✕' : '☰'}
+          </button>
+        </div>
       </header>
+
+      <button
+        type="button"
+        aria-label={t('erp.app.closeMenu')}
+        aria-hidden={!menuOpen}
+        tabIndex={menuOpen ? 0 : -1}
+        onClick={() => setMenuOpen(false)}
+        className={`md:hidden fixed inset-0 z-40 h-dvh bg-black/50 transition-opacity duration-300 ${
+          menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      />
 
       <aside
         id="app-nav"
-        className={`${
-          menuOpen ? 'flex' : 'hidden'
-        } md:flex shrink-0 w-full md:w-56 flex-col gap-1 p-4 bg-[var(--color-surface)] md:min-h-dvh border-b md:border-b-0 md:border-r border-white/10`}
+        className={`fixed top-0 left-0 z-[55] flex h-dvh w-64 max-w-[85vw] flex-col gap-1 p-4 pt-[4.25rem] bg-[var(--color-surface)] border-r border-white/10 transition-transform duration-300 ease-in-out md:static md:z-auto md:flex md:h-auto md:w-56 md:max-w-none md:min-h-dvh md:shrink-0 md:pt-4 md:translate-x-0 md:border-b-0 ${
+          menuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
-        <h1 className="hidden md:block text-[var(--color-accent)] font-serif text-lg mb-3">Casa da Paz</h1>
-        <nav className="flex flex-col gap-1">
+        <div className="hidden md:flex items-center justify-between gap-2 mb-3">
+          <h1 className="text-[var(--color-accent)] font-serif text-lg">{t('home.title')}</h1>
+          <LanguageSwitcher className="text-xs text-white/70 hover:text-[var(--color-accent)] px-1" />
+        </div>
+        <nav className="flex flex-col gap-1 overflow-y-auto min-h-0 flex-1">
           <NavLinks onNavigate={() => setMenuOpen(false)} />
           <Link
             to="/app/minha-senha"
             onClick={() => setMenuOpen(false)}
             className="block px-3 py-2.5 rounded text-sm hover:bg-white/10 text-white/80"
           >
-            Alterar senha
+            {t('erp.app.changePassword')}
           </Link>
         </nav>
         <button
           type="button"
           onClick={logout}
-          className="mt-4 md:mt-auto text-sm text-left px-3 py-2.5 hover:bg-white/10 rounded"
+          className="mt-4 md:mt-auto shrink-0 text-sm text-left px-3 py-2.5 hover:bg-white/10 rounded"
         >
-          Sair
+          {t('erp.app.logout')}
         </button>
       </aside>
 

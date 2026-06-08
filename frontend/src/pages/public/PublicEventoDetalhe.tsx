@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { PublicLayout } from '../../components/public/PublicLayout';
 import { api } from '../../lib/api';
@@ -16,17 +16,16 @@ interface EventoDetalhe {
   _count: { inscricoes: number };
 }
 
-const RECOMENDACOES = [
-  'Vista roupas claras ou brancas, com respeito ao ambiente sagrado.',
-  'Evite perfumes fortes e álcool antes da gira.',
-  'Chegue com alguns minutos de antecedência para acolhimento.',
-];
-
 export default function PublicEventoDetalhe() {
   const { id } = useParams<{ id: string }>();
-  const { t, locale } = useI18n();
+  const { t, dateLocale } = useI18n();
   const [evento, setEvento] = useState<EventoDetalhe | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+
+  const recomendacoes = useMemo(
+    () => [t('events.recommendations.1'), t('events.recommendations.2'), t('events.recommendations.3')],
+    [t]
+  );
 
   useEffect(() => {
     if (!id) return;
@@ -44,7 +43,7 @@ export default function PublicEventoDetalhe() {
       start,
       end,
       location: evento.local,
-      description: `${evento.resumo}\n\n${RECOMENDACOES.join('\n')}`,
+      description: `${evento.resumo}\n\n${recomendacoes.join('\n')}`,
     });
     downloadIcs(`casa-da-paz-${evento.id}.ics`, ics);
   };
@@ -63,7 +62,7 @@ export default function PublicEventoDetalhe() {
   };
 
   const dataFmt = evento
-    ? new Date(evento.dataEvento).toLocaleDateString(locale === 'en' ? 'en-US' : 'pt-BR', {
+    ? new Date(evento.dataEvento).toLocaleDateString(dateLocale, {
         weekday: 'long',
         day: '2-digit',
         month: 'long',
@@ -104,7 +103,7 @@ export default function PublicEventoDetalhe() {
               <div>
                 <h2 className="font-serif text-lg text-primary mb-2">{t('events.detail.recommendations')}</h2>
                 <ul className="list-disc pl-5 space-y-1 text-sm text-foreground/85">
-                  {RECOMENDACOES.map((r) => (
+                  {recomendacoes.map((r) => (
                     <li key={r}>{r}</li>
                   ))}
                 </ul>

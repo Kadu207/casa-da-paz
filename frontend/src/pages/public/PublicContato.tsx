@@ -1,13 +1,14 @@
 import { PublicLayout } from '../../components/public/PublicLayout';
 import { SafeImage } from '../../components/public/SafeImage';
 import { ADDRESS, WHATSAPP_NUMBER, portalAssets } from '../../lib/portal-assets';
+import { useI18n } from '../../i18n/I18nContext';
 
 const CHATWOOT_WEBSITE_TOKEN = import.meta.env.VITE_CHATWOOT_WEBSITE_TOKEN;
 
 export default function PublicContato() {
-  const whatsapp = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    'Olá! Gostaria de falar com a Casa da Paz.',
-  )}`;
+  const { t } = useI18n();
+
+  const whatsapp = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('contact.whatsapp.prefill'))}`;
 
   return (
     <PublicLayout>
@@ -17,14 +18,14 @@ export default function PublicContato() {
           alt=""
           width={1536}
           height={768}
-          fallbackLabel="Paisagem"
+          fallbackLabel={t('contact.title')}
           className="cover-fill"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/55 to-background" />
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-3xl mx-auto w-full px-4 pb-5">
-            <h1 className="font-serif text-3xl sm:text-4xl text-primary">Contato</h1>
-            <p className="text-foreground/75 text-sm mt-1">Estamos à sua escuta</p>
+            <h1 className="font-serif text-3xl sm:text-4xl text-primary">{t('contact.title')}</h1>
+            <p className="text-foreground/75 text-sm mt-1">{t('contact.subtitle')}</p>
           </div>
         </div>
       </section>
@@ -42,7 +43,7 @@ export default function PublicContato() {
             </div>
             <div>
               <p className="font-serif text-xl">WhatsApp</p>
-              <p className="text-sm opacity-90">Toque para abrir uma conversa</p>
+              <p className="text-sm opacity-90">{t('contact.whatsapp.hint')}</p>
             </div>
           </div>
         </a>
@@ -66,7 +67,7 @@ export default function PublicContato() {
         </a>
 
         <div className="rounded-2xl bg-card border border-border/60 p-5 sm:p-6">
-          <p className="font-serif text-lg text-primary mb-2">Onde estamos</p>
+          <p className="font-serif text-lg text-primary mb-2">{t('contact.where')}</p>
           <p className="text-foreground/85">
             {ADDRESS.line1}
             <br />
@@ -75,10 +76,10 @@ export default function PublicContato() {
         </div>
 
         {CHATWOOT_WEBSITE_TOKEN ? (
-          <p className="text-xs text-foreground/55 text-center">Chat online disponível em produção.</p>
+          <p className="text-xs text-foreground/55 text-center">{t('contact.chat.online')}</p>
         ) : (
           <div className="rounded-2xl border border-dashed border-border/60 p-5 sm:p-6 text-sm text-foreground/55 text-center">
-            Chat ao vivo em breve.
+            {t('contact.chat.soon')}
           </div>
         )}
       </section>

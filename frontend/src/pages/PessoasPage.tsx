@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { useI18n } from '../i18n/I18nContext';
+import { labelEnum } from '../i18n/helpers';
 
 type TipoPerfil = 'CONSULENTE' | 'MEDIUM' | 'DIRETORIA' | 'FUNCIONARIO';
 
@@ -27,6 +29,7 @@ const emptyForm = {
 };
 
 export default function PessoasPage() {
+  const { t, dateLocale } = useI18n();
   const { user } = useAuth();
   const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'RECEPCAO';
 
@@ -115,32 +118,32 @@ export default function PessoasPage() {
       setMostrarForm(false);
       await carregar();
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao salvar');
+      setErro(err instanceof Error ? err.message : t('erp.pessoas.saveError'));
     } finally {
       setSalvando(false);
     }
   };
 
   const excluir = async (id: number) => {
-    if (!confirm('Excluir esta pessoa?')) return;
+    if (!confirm(t('erp.pessoas.deleteConfirm'))) return;
     try {
       await api(`/pessoas/${id}`, { method: 'DELETE' });
       await carregar();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao excluir');
+      alert(err instanceof Error ? err.message : t('erp.pessoas.deleteError'));
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-xl font-serif text-[var(--color-accent)]">Pessoas</h2>
+        <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.pessoas.title')}</h2>
         {canWrite && (
           <button
             onClick={abrirNovo}
             className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm font-medium"
           >
-            Nova pessoa
+            {t('erp.pessoas.new')}
           </button>
         )}
       </div>
@@ -149,26 +152,28 @@ export default function PessoasPage() {
         <input
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar por nome ou telefone"
+          placeholder={t('erp.pessoas.searchPlaceholder')}
           className="px-3 py-2 rounded bg-black/30 border border-white/20 flex-1 min-w-[200px]"
         />
         <button onClick={() => carregar()} className="px-4 py-2 bg-white/10 rounded text-sm">
-          Buscar
+          {t('erp.common.search')}
         </button>
       </div>
 
       {mostrarForm && canWrite && (
         <form onSubmit={salvar} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
-          <h3 className="font-medium text-[var(--color-accent)]">{editId ? 'Editar pessoa' : 'Nova pessoa'}</h3>
+          <h3 className="font-medium text-[var(--color-accent)]">
+            {editId ? t('erp.pessoas.edit') : t('erp.pessoas.new')}
+          </h3>
           {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
           {duplicatas.length > 0 && (
             <div className="bg-amber-900/30 border border-amber-600/50 rounded p-3 text-sm">
-              <p className="font-medium text-amber-200 mb-2">Possíveis duplicatas encontradas:</p>
+              <p className="font-medium text-amber-200 mb-2">{t('erp.pessoas.duplicates')}</p>
               <ul className="space-y-1">
                 {duplicatas.map((d) => (
                   <li key={d.id} className="text-white/80">
                     {d.nomeCompleto} {d.telefone && `— ${d.telefone}`}{' '}
-                    <span className="text-amber-300/80">({d.motivo})</span>
+                    <span className="text-amber-300/80">({labelEnum(t, 'duplicata', d.motivo)})</span>
                   </li>
                 ))}
               </ul>
@@ -177,14 +182,14 @@ export default function PessoasPage() {
           <input
             value={form.nomeCompleto}
             onChange={(e) => setForm({ ...form, nomeCompleto: e.target.value })}
-            placeholder="Nome completo"
+            placeholder={t('erp.pessoas.fullName')}
             className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
             required
           />
           <input
             value={form.telefone}
             onChange={(e) => setForm({ ...form, telefone: e.target.value })}
-            placeholder="Telefone"
+            placeholder={t('erp.common.phone')}
             className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
           />
           <select
@@ -194,7 +199,7 @@ export default function PessoasPage() {
           >
             {PERFIS.map((p) => (
               <option key={p} value={p}>
-                {p}
+                {labelEnum(t, 'perfil', p)}
               </option>
             ))}
           </select>
@@ -204,7 +209,7 @@ export default function PessoasPage() {
               checked={form.maiorDeIdade}
               onChange={(e) => setForm({ ...form, maiorDeIdade: e.target.checked })}
             />
-            Maior de idade
+            {t('erp.pessoas.adult')}
           </label>
           <div className="flex gap-2">
             <button
@@ -212,14 +217,14 @@ export default function PessoasPage() {
               disabled={salvando}
               className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm disabled:opacity-50"
             >
-              {salvando ? 'Salvando…' : 'Salvar'}
+              {salvando ? t('erp.common.saving') : t('erp.common.save')}
             </button>
             <button
               type="button"
               onClick={() => setMostrarForm(false)}
               className="px-4 py-2 bg-white/10 rounded text-sm"
             >
-              Cancelar
+              {t('erp.common.cancel')}
             </button>
           </div>
         </form>
@@ -229,27 +234,29 @@ export default function PessoasPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left border-b border-white/20">
-              <th className="p-2">Nome</th>
-              <th className="p-2">Telefone</th>
-              <th className="p-2">Perfil</th>
-              <th className="p-2">Cadastro</th>
-              {canWrite && <th className="p-2">Ações</th>}
+              <th className="p-2">{t('erp.common.name')}</th>
+              <th className="p-2">{t('erp.common.phone')}</th>
+              <th className="p-2">{t('erp.common.status')}</th>
+              <th className="p-2">{t('erp.common.registered')}</th>
+              {canWrite && <th className="p-2">{t('erp.common.actions')}</th>}
             </tr>
           </thead>
           <tbody>
             {pessoas.map((p) => (
               <tr key={p.id} className="border-b border-white/10">
                 <td className="p-2">{p.nomeCompleto}</td>
-                <td className="p-2 text-white/70">{p.telefone ?? '—'}</td>
-                <td className="p-2">{p.tipoPerfil}</td>
-                <td className="p-2 text-white/60">{new Date(p.dataCadastro).toLocaleDateString('pt-BR')}</td>
+                <td className="p-2 text-white/70">{p.telefone ?? t('erp.common.emptyDash')}</td>
+                <td className="p-2">{labelEnum(t, 'perfil', p.tipoPerfil)}</td>
+                <td className="p-2 text-white/60">
+                  {new Date(p.dataCadastro).toLocaleDateString(dateLocale)}
+                </td>
                 {canWrite && (
                   <td className="p-2 space-x-2">
                     <button onClick={() => abrirEditar(p)} className="text-[var(--color-accent)] hover:underline">
-                      Editar
+                      {t('erp.common.edit')}
                     </button>
                     <button onClick={() => excluir(p.id)} className="text-[var(--color-danger)] hover:underline">
-                      Excluir
+                      {t('erp.common.delete')}
                     </button>
                   </td>
                 )}
@@ -258,7 +265,7 @@ export default function PessoasPage() {
             {pessoas.length === 0 && (
               <tr>
                 <td colSpan={canWrite ? 5 : 4} className="p-4 text-center text-white/50">
-                  Nenhuma pessoa encontrada
+                  {t('erp.pessoas.empty')}
                 </td>
               </tr>
             )}

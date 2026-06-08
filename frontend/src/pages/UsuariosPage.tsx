@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { useI18n } from '../i18n/I18nContext';
+import { labelEnum } from '../i18n/helpers';
 
 interface Usuario {
   id: number;
@@ -16,6 +18,7 @@ interface Pessoa {
 const SETORES = ['DIRETORIA', 'FINANCEIRO', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'] as const;
 
 export default function UsuariosPage() {
+  const { t } = useI18n();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [mostrarForm, setMostrarForm] = useState(false);
@@ -59,7 +62,7 @@ export default function UsuariosPage() {
       setForm({ login: '', senha: '', setorAcesso: 'RECEPCAO', pessoaId: '' });
       await carregar();
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao criar usuário');
+      setErro(err instanceof Error ? err.message : t('erp.usuarios.createError'));
     }
   };
 
@@ -75,7 +78,7 @@ export default function UsuariosPage() {
       setRedefinirId(null);
       setNovaSenhaAdmin('');
     } catch (err) {
-      setErro(err instanceof Error ? err.message : 'Erro ao redefinir senha');
+      setErro(err instanceof Error ? err.message : t('erp.usuarios.resetError'));
     }
   };
 
@@ -85,18 +88,18 @@ export default function UsuariosPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-xl font-serif text-[var(--color-accent)]">Usuários</h2>
+        <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.usuarios.title')}</h2>
         <button
           onClick={() => setMostrarForm(true)}
           className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm font-medium"
         >
-          Novo usuário
+          {t('erp.usuarios.new')}
         </button>
       </div>
 
       {mostrarForm && (
         <form onSubmit={salvar} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3 max-w-md">
-          <h3 className="font-medium text-[var(--color-accent)]">Novo usuário</h3>
+          <h3 className="font-medium text-[var(--color-accent)]">{t('erp.usuarios.new')}</h3>
           {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
           <select
             value={form.pessoaId}
@@ -104,7 +107,7 @@ export default function UsuariosPage() {
             className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
             required
           >
-            <option value="">Selecione a pessoa</option>
+            <option value="">{t('erp.usuarios.selectPerson')}</option>
             {pessoasSemUsuario.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.nomeCompleto}
@@ -115,10 +118,10 @@ export default function UsuariosPage() {
             type="text"
             value={form.login}
             onChange={(e) => setForm({ ...form, login: e.target.value })}
-            placeholder="Usuário (sem e-mail)"
+            placeholder={t('erp.usuarios.loginPlaceholder')}
             autoComplete="off"
             pattern="[a-zA-Z0-9._-]{3,50}"
-            title="3–50 caracteres: letras, números, ponto, hífen ou underscore"
+            title={t('erp.usuarios.loginHint')}
             className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
             required
           />
@@ -126,7 +129,7 @@ export default function UsuariosPage() {
             type="password"
             value={form.senha}
             onChange={(e) => setForm({ ...form, senha: e.target.value })}
-            placeholder="Senha (mín. 6)"
+            placeholder={t('erp.usuarios.passwordNew')}
             minLength={6}
             className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
             required
@@ -140,20 +143,20 @@ export default function UsuariosPage() {
           >
             {SETORES.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {labelEnum(t, 'setor', s)}
               </option>
             ))}
           </select>
           <div className="flex gap-2">
             <button type="submit" className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm">
-              Salvar
+              {t('erp.common.save')}
             </button>
             <button
               type="button"
               onClick={() => setMostrarForm(false)}
               className="px-4 py-2 bg-white/10 rounded text-sm"
             >
-              Cancelar
+              {t('erp.common.cancel')}
             </button>
           </div>
         </form>
@@ -162,21 +165,24 @@ export default function UsuariosPage() {
       {redefinirId != null && usuarioRedefinir && (
         <form onSubmit={redefinirSenha} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3 max-w-md">
           <h3 className="font-medium text-[var(--color-accent)]">
-            Redefinir senha — {usuarioRedefinir.pessoa.nomeCompleto} ({usuarioRedefinir.login})
+            {t('erp.usuarios.resetTitle', {
+              name: usuarioRedefinir.pessoa.nomeCompleto,
+              login: usuarioRedefinir.login,
+            })}
           </h3>
           {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
           <input
             type="password"
             value={novaSenhaAdmin}
             onChange={(e) => setNovaSenhaAdmin(e.target.value)}
-            placeholder="Nova senha (mín. 6)"
+            placeholder={t('erp.usuarios.passwordReset')}
             minLength={6}
             className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
             required
           />
           <div className="flex gap-2">
             <button type="submit" className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm">
-              Confirmar
+              {t('erp.common.confirm')}
             </button>
             <button
               type="button"
@@ -187,7 +193,7 @@ export default function UsuariosPage() {
               }}
               className="px-4 py-2 bg-white/10 rounded text-sm"
             >
-              Cancelar
+              {t('erp.common.cancel')}
             </button>
           </div>
         </form>
@@ -196,10 +202,10 @@ export default function UsuariosPage() {
       <table className="w-full text-sm">
         <thead>
           <tr className="text-left border-b border-white/20">
-            <th className="p-2">Nome</th>
-            <th className="p-2">Usuário</th>
-            <th className="p-2">Setor</th>
-            <th className="p-2">Ações</th>
+            <th className="p-2">{t('erp.common.name')}</th>
+            <th className="p-2">{t('erp.usuarios.colLogin')}</th>
+            <th className="p-2">{t('erp.usuarios.colSector')}</th>
+            <th className="p-2">{t('erp.common.actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -207,7 +213,7 @@ export default function UsuariosPage() {
             <tr key={u.id} className="border-b border-white/10">
               <td className="p-2">{u.pessoa.nomeCompleto}</td>
               <td className="p-2">{u.login}</td>
-              <td className="p-2">{u.setorAcesso}</td>
+              <td className="p-2">{labelEnum(t, 'setor', u.setorAcesso)}</td>
               <td className="p-2">
                 <button
                   type="button"
@@ -218,7 +224,7 @@ export default function UsuariosPage() {
                   }}
                   className="text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/20"
                 >
-                  Redefinir senha
+                  {t('erp.usuarios.resetAction')}
                 </button>
               </td>
             </tr>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { PublicLayout } from '../../components/public/PublicLayout';
+import { useI18n } from '../../i18n/I18nContext';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 
@@ -12,16 +13,18 @@ type AgStatus = {
   createdAt: string;
 };
 
-const STATUS_LABEL: Record<string, { 'pt-BR': string; en: string }> = {
-  PENDENTE: { 'pt-BR': 'Aguardando recepção', en: 'Awaiting reception' },
-  CONFIRMADO: { 'pt-BR': 'Confirmado', en: 'Confirmed' },
-  CANCELADO: { 'pt-BR': 'Cancelado', en: 'Cancelled' },
-};
-
 export default function PublicAcompanhar() {
   const { protocolo } = useParams();
+  const { t, dateLocale } = useI18n();
   const [data, setData] = useState<AgStatus | null>(null);
   const [err, setErr] = useState('');
+
+  const statusLabel = (status: string) => {
+    if (status === 'PENDENTE') return t('track.status.pending');
+    if (status === 'CONFIRMADO') return t('track.status.confirmed');
+    if (status === 'CANCELADO') return t('track.status.cancelled');
+    return status;
+  };
 
   useEffect(() => {
     if (!protocolo) return;
@@ -31,8 +34,8 @@ export default function PublicAcompanhar() {
         return r.json() as Promise<AgStatus>;
       })
       .then(setData)
-      .catch(() => setErr('Protocolo não encontrado.'));
-  }, [protocolo]);
+      .catch(() => setErr(t('track.notFound')));
+  }, [protocolo, t]);
 
   return (
     <PublicLayout>
@@ -41,24 +44,23 @@ export default function PublicAcompanhar() {
           <div className="rounded-2xl bg-card border border-border/60 p-6 text-center">
             <p className="text-destructive">{err}</p>
             <Link to="/public/agendar" className="text-primary text-sm mt-4 inline-block">
-              Novo agendamento
+              {t('track.newBooking')}
             </Link>
           </div>
         )}
         {data && (
           <div className="rounded-2xl bg-card border border-border/60 p-6 space-y-4">
-            <h1 className="font-serif text-2xl text-primary">Protocolo {data.protocolo}</h1>
+            <h1 className="font-serif text-2xl text-primary">{t('track.title', { protocol: data.protocolo })}</h1>
             <p>
-              <span className="text-foreground/70">Nome:</span> {data.nome}
+              <span className="text-foreground/70">{t('track.label.name')}:</span> {data.nome}
             </p>
             <p>
-              <span className="text-foreground/70">Status:</span>{' '}
-              {STATUS_LABEL[data.status]?.['pt-BR'] ?? data.status}
+              <span className="text-foreground/70">{t('track.label.status')}:</span> {statusLabel(data.status)}
             </p>
             {data.dataPreferida && (
               <p>
-                <span className="text-foreground/70">Data preferida:</span>{' '}
-                {new Date(data.dataPreferida).toLocaleDateString('pt-BR')}
+                <span className="text-foreground/70">{t('track.label.preferredDate')}:</span>{' '}
+                {new Date(data.dataPreferida).toLocaleDateString(dateLocale)}
               </p>
             )}
           </div>

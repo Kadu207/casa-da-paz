@@ -8,6 +8,7 @@ import {
   clienteAdminSchema,
   normalizeClienteData,
 } from '../lib/ecommerce-schemas.js';
+import { LGPD_POLICY_VERSION } from '../lib/lgpd.js';
 
 const router = Router();
 
@@ -112,6 +113,8 @@ router.post('/livraria/pedidos', checkoutLimiter, async (req, res) => {
           clienteId: cliente.id,
           valorTotal,
           status: 'PENDENTE_PAGAMENTO',
+          aceiteLgpdEm: new Date(),
+          aceiteLgpdVersao: LGPD_POLICY_VERSION,
         },
       });
 

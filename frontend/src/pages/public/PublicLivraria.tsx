@@ -61,6 +61,7 @@ export default function PublicLivraria() {
           cnpj: cliente.tipo === 'PJ' ? cliente.cnpj : undefined,
         },
         itens: [{ produtoId: comprando.id, quantidade }],
+        aceiteLgpd: true,
       }),
     });
     setComprando(null);
@@ -99,14 +100,14 @@ export default function PublicLivraria() {
       <div className="max-w-4xl mx-auto px-4 py-10">
         {pago && (
           <p className="mb-6 rounded-xl border border-green-500/40 bg-green-500/10 px-4 py-3 text-sm text-green-200">
-            Pagamento confirmado (quando Stripe estiver ativo).
+            {t('shop.paymentConfirmed')}
           </p>
         )}
         {sucesso && (
           <div className="mb-6 rounded-xl border border-primary/40 bg-primary/10 px-4 py-4 text-sm">
             <p className="font-medium text-primary">{t('shop.success')}</p>
             <p className="mt-1 text-foreground/85">
-              Protocolo: <strong className="select-all">{sucesso.protocolo}</strong>
+              {t('shop.protocol')}: <strong className="select-all">{sucesso.protocolo}</strong>
             </p>
             <p className="mt-2 text-foreground/70">{t('shop.stripePending')}</p>
           </div>
@@ -180,7 +181,7 @@ export default function PublicLivraria() {
               )}
               <p className="text-xl text-primary font-medium mt-4">R$ {Number(p.preco).toFixed(2)}</p>
               <p className="text-xs text-foreground/50 mt-1">
-                {p.estoqueAtual} em estoque
+                {t('shop.inStock', { count: p.estoqueAtual })}
               </p>
               <button
                 type="button"
@@ -218,14 +219,14 @@ export default function PublicLivraria() {
                 type="button"
                 onClick={() => setComprando(null)}
                 className="min-h-10 min-w-10 rounded-lg hover:bg-white/10"
-                aria-label="Fechar"
+                aria-label={t('shop.close')}
               >
                 ✕
               </button>
             </div>
             <div className="p-4 overflow-y-auto">
               <label className="block text-sm mb-2 text-white/80">
-                Quantidade
+                {t('shop.quantity')}
                 <input
                   type="number"
                   min={1}

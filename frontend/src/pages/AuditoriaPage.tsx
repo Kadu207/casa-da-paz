@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getToken } from '../lib/api';
+import { useI18n } from '../i18n/I18nContext';
+import { labelEnum } from '../i18n/helpers';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 
@@ -22,7 +24,6 @@ interface AuditResponse {
 }
 
 export interface AuditFilters {
-  locale: 'pt-BR' | 'en';
   page: number;
   setor: string;
   rota: string;
@@ -35,9 +36,9 @@ export interface AuditFilters {
 
 const SETORES = ['DIRETORIA', 'FINANCEIRO', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'] as const;
 
-function buildQuery(f: AuditFilters, csv = false): string {
+function buildQuery(f: AuditFilters, locale: string, csv = false): string {
   const p = new URLSearchParams();
-  p.set('locale', f.locale);
+  p.set('locale', locale);
   if (!csv) {
     p.set('page', String(f.page));
     p.set('limit', '25');
@@ -53,8 +54,8 @@ function buildQuery(f: AuditFilters, csv = false): string {
 }
 
 export default function AuditoriaPage() {
+  const { locale, t, dateLocale } = useI18n();
   const [filters, setFilters] = useState<AuditFilters>({
-    locale: 'pt-BR',
     page: 1,
     setor: '',
     rota: '',
@@ -73,17 +74,17 @@ export default function AuditoriaPage() {
     setLoading(true);
     try {
       const token = getToken();
-      const res = await fetch(`${API_BASE}/auditoria?${buildQuery(filters)}`, {
+      const res = await fetch(`${API_BASE}/auditoria?${buildQuery(filters, locale)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Erro ao carregar');
+      if (!res.ok) throw new Error(t('erp.auditoria.loadError'));
       setData(await res.json());
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, locale, t]);
 
   useEffect(() => {
     load();
@@ -91,7 +92,7 @@ export default function AuditoriaPage() {
 
   const applyFilters = () => {
     setFilters((f) => ({ ...f, ...draft, page: 1 }));
-    setToast('Filtros aplicados');
+    setToast(t('erp.auditoria.filtersApplied'));
     setTimeout(() => setToast(null), 2500);
   };
 
@@ -112,7 +113,7 @@ export default function AuditoriaPage() {
 
   const exportCsv = async () => {
     const token = getToken();
-    const res = await fetch(`${API_BASE}/auditoria/export.csv?${buildQuery(filters, true)}`, {
+    const res = await fetch(`${API_BASE}/auditoria/export.csv?${buildQuery(filters, locale, true)}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return;
@@ -128,7 +129,7 @@ export default function AuditoriaPage() {
 
   const exportPdf = async () => {
     const token = getToken();
-    const res = await fetch(`${API_BASE}/auditoria/export.pdf?${buildQuery(filters, true)}`, {
+    const res = await fetch(`${API_BASE}/auditoria/export.pdf?${buildQuery(filters, locale, true)}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return;
@@ -148,30 +149,23 @@ export default function AuditoriaPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl font-serif text-[var(--color-accent)]">Auditoria</h2>
-          <p className="text-sm text-white/60 mt-1">Registros de ações administrativas e do portal</p>
+          <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.auditoria.title')}</h2>
+          <p className="text-sm text-white/60 mt-1">{t('erp.auditoria.subtitle')}</p>
         </div>
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setFilters((f) => ({ ...f, locale: f.locale === 'pt-BR' ? 'en' : 'pt-BR' }))}
-            className="text-xs px-3 py-2 rounded border border-white/20 hover:bg-white/10"
-          >
-            {filters.locale === 'pt-BR' ? 'English' : 'Português'}
-          </button>
           <button
             type="button"
             onClick={exportCsv}
             className="text-sm px-4 py-2 rounded bg-[var(--color-accent)] text-black hover:opacity-90"
           >
-            Exportar CSV
+            {t('erp.auditoria.exportCsv')}
           </button>
           <button
             type="button"
             onClick={exportPdf}
             className="text-sm px-4 py-2 rounded border border-white/20 hover:bg-white/10"
           >
-            Exportar PDF
+            {t('erp.auditoria.exportPdf')}
           </button>
         </div>
       </div>
@@ -185,40 +179,40 @@ export default function AuditoriaPage() {
       <div className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <label className="text-xs text-white/60 block mb-1">Setor</label>
+            <label className="text-xs text-white/60 block mb-1">{t('erp.auditoria.filterSector')}</label>
             <select
               value={draft.setor}
               onChange={(e) => setDraft((d) => ({ ...d, setor: e.target.value }))}
               className="w-full bg-black/30 border border-white/20 rounded px-3 py-2 text-sm"
             >
-              <option value="">Todos</option>
+              <option value="">{t('erp.common.all')}</option>
               {SETORES.map((s) => (
                 <option key={s} value={s}>
-                  {s}
+                  {labelEnum(t, 'setor', s)}
                 </option>
               ))}
             </select>
           </div>
           <div>
-            <label className="text-xs text-white/60 block mb-1">Rota (contém)</label>
+            <label className="text-xs text-white/60 block mb-1">{t('erp.auditoria.filterRoute')}</label>
             <input
               value={draft.rota}
               onChange={(e) => setDraft((d) => ({ ...d, rota: e.target.value }))}
               className="w-full bg-black/30 border border-white/20 rounded px-3 py-2 text-sm"
-              placeholder="admin.eventos"
+              placeholder={t('erp.auditoria.routePlaceholder')}
             />
           </div>
           <div>
-            <label className="text-xs text-white/60 block mb-1">Busca</label>
+            <label className="text-xs text-white/60 block mb-1">{t('erp.auditoria.filterSearch')}</label>
             <input
               value={draft.q}
               onChange={(e) => setDraft((d) => ({ ...d, q: e.target.value }))}
               className="w-full bg-black/30 border border-white/20 rounded px-3 py-2 text-sm"
-              placeholder="motivo, rota, IP…"
+              placeholder={t('erp.auditoria.searchPlaceholder')}
             />
           </div>
           <div>
-            <label className="text-xs text-white/60 block mb-1">De</label>
+            <label className="text-xs text-white/60 block mb-1">{t('erp.auditoria.filterFrom')}</label>
             <input
               type="date"
               value={draft.de}
@@ -227,7 +221,7 @@ export default function AuditoriaPage() {
             />
           </div>
           <div>
-            <label className="text-xs text-white/60 block mb-1">Até</label>
+            <label className="text-xs text-white/60 block mb-1">{t('erp.auditoria.filterUntil')}</label>
             <input
               type="date"
               value={draft.ate}
@@ -242,10 +236,10 @@ export default function AuditoriaPage() {
             onClick={applyFilters}
             className="text-sm px-4 py-2 rounded bg-[var(--color-accent)] text-black"
           >
-            Aplicar filtros
+            {t('erp.auditoria.applyFilters')}
           </button>
           <button type="button" onClick={clearFilters} className="text-sm px-4 py-2 rounded hover:bg-white/10">
-            Limpar
+            {t('erp.auditoria.clear')}
           </button>
         </div>
       </div>
@@ -258,39 +252,42 @@ export default function AuditoriaPage() {
             ))}
           </div>
         ) : !data?.items.length ? (
-          <p className="p-8 text-center text-white/60">Nenhum registro encontrado</p>
+          <p className="p-8 text-center text-white/60">{t('erp.auditoria.empty')}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/10 text-left text-white/60">
                   <th className="p-3 cursor-pointer hover:text-white" onClick={() => toggleSort('createdAt')}>
-                    Data {filters.sort === 'createdAt' && (filters.order === 'desc' ? '↓' : '↑')}
+                    {t('erp.common.date')} {filters.sort === 'createdAt' && (filters.order === 'desc' ? '↓' : '↑')}
                   </th>
                   <th className="p-3 cursor-pointer hover:text-white" onClick={() => toggleSort('setor')}>
-                    Setor {filters.sort === 'setor' && (filters.order === 'desc' ? '↓' : '↑')}
+                    {t('erp.auditoria.filterSector')}{' '}
+                    {filters.sort === 'setor' && (filters.order === 'desc' ? '↓' : '↑')}
                   </th>
                   <th className="p-3 cursor-pointer hover:text-white" onClick={() => toggleSort('rota')}>
-                    Rota {filters.sort === 'rota' && (filters.order === 'desc' ? '↓' : '↑')}
+                    {t('erp.auditoria.colRoute')} {filters.sort === 'rota' && (filters.order === 'desc' ? '↓' : '↑')}
                   </th>
-                  <th className="p-3">Motivo</th>
-                  <th className="p-3">IP</th>
+                  <th className="p-3">{t('erp.auditoria.colReason')}</th>
+                  <th className="p-3">{t('erp.auditoria.colIp')}</th>
                 </tr>
               </thead>
               <tbody>
                 {data.items.map((log) => (
                   <tr key={log.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="p-3 whitespace-nowrap">
-                      {new Date(log.createdAt).toLocaleString(filters.locale === 'en' ? 'en-US' : 'pt-BR')}
+                      {new Date(log.createdAt).toLocaleString(dateLocale)}
                     </td>
-                    <td className="p-3">{log.setor ?? '—'}</td>
+                    <td className="p-3">
+                      {log.setor ? labelEnum(t, 'setor', log.setor) : t('erp.common.emptyDash')}
+                    </td>
                     <td className="p-3">
                       <span title={log.rota}>{log.rotaLabel}</span>
                     </td>
                     <td className="p-3 max-w-xs truncate" title={log.motivo ?? undefined}>
-                      {log.motivoLabel ?? '—'}
+                      {log.motivoLabel ?? t('erp.common.emptyDash')}
                     </td>
-                    <td className="p-3 font-mono text-xs">{log.ip ?? '—'}</td>
+                    <td className="p-3 font-mono text-xs">{log.ip ?? t('erp.common.emptyDash')}</td>
                   </tr>
                 ))}
               </tbody>
@@ -302,7 +299,11 @@ export default function AuditoriaPage() {
       {data && totalPages > 1 && (
         <div className="flex items-center justify-between text-sm">
           <p className="text-white/60">
-            {data.total} registros — página {data.page} de {totalPages}
+            {t('erp.auditoria.pagination', {
+              total: data.total,
+              page: data.page,
+              totalPages,
+            })}
           </p>
           <div className="flex gap-2">
             <button
@@ -311,7 +312,7 @@ export default function AuditoriaPage() {
               onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
               className="px-3 py-1 rounded border border-white/20 disabled:opacity-40"
             >
-              Anterior
+              {t('erp.auditoria.prev')}
             </button>
             <button
               type="button"
@@ -319,7 +320,7 @@ export default function AuditoriaPage() {
               onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
               className="px-3 py-1 rounded border border-white/20 disabled:opacity-40"
             >
-              Próxima
+              {t('erp.auditoria.next')}
             </button>
           </div>
         </div>

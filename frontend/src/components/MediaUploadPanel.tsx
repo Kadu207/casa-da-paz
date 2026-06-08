@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { getToken } from '../lib/api';
+import { useI18n } from '../i18n/I18nContext';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 
 export function MediaUploadPanel() {
+  const { t } = useI18n();
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<{ id: string; url: string } | null>(null);
@@ -23,7 +25,7 @@ export function MediaUploadPanel() {
   if (!enabled) {
     return (
       <div className="mb-6 p-4 rounded-xl bg-[var(--color-surface)] text-sm text-white/60">
-        Upload Cloudflare Images disponível em produção (CF_ACCOUNT_ID + CF_IMAGES_API_TOKEN no backend).
+        {t('erp.media.disabled')}
       </div>
     );
   }
@@ -42,11 +44,11 @@ export function MediaUploadPanel() {
         body: fd,
       });
       const data = (await res.json()) as { id?: string; url?: string; error?: string };
-      if (!res.ok) throw new Error(data.error ?? 'Falha no upload');
+      if (!res.ok) throw new Error(data.error ?? t('erp.media.uploadFail'));
       setResult({ id: data.id!, url: data.url! });
       setFile(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erro no upload');
+      setError(e instanceof Error ? e.message : t('erp.media.uploadError'));
     } finally {
       setUploading(false);
     }
@@ -54,7 +56,7 @@ export function MediaUploadPanel() {
 
   return (
     <div className="mb-6 p-4 rounded-xl bg-[var(--color-surface)] space-y-3">
-      <h3 className="text-sm font-medium text-[var(--color-accent)]">Upload portal (Cloudflare Images)</h3>
+      <h3 className="text-sm font-medium text-[var(--color-accent)]">{t('erp.media.title')}</h3>
       <input
         type="file"
         accept="image/jpeg,image/png,image/webp"
@@ -67,7 +69,7 @@ export function MediaUploadPanel() {
         onClick={upload}
         className="text-sm px-4 py-2 rounded bg-[var(--color-accent)] text-black disabled:opacity-50"
       >
-        {uploading ? 'Enviando…' : 'Enviar imagem'}
+        {uploading ? t('erp.media.uploading') : t('erp.media.upload')}
       </button>
       {error && <p className="text-sm text-red-400">{error}</p>}
       {result && (
