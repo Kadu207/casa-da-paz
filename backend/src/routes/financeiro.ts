@@ -4,8 +4,23 @@ import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { calcularAdimplencia, type AdimplenciaStatus } from '../lib/adimplencia.js';
+import { calcularAdimplencia } from '../lib/adimplencia.js';
 import { validarTransacao } from '../lib/financeiro.js';
+import {
+  resolverPeriodo,
+  agruparPorSemana,
+  agruparPorCategoria,
+  calcularTotaisConcluidos,
+  calcularTotaisPendentes,
+  type TransacaoFluxo,
+} from '../lib/fluxo-caixa.js';
+import {
+  parseListagemQuery,
+  buildListagemWhere,
+  parsePaginacao,
+  paginateMeta,
+} from '../lib/listagem-financeiro.js';
+import { planBatchStatusUpdate } from '../lib/batch-status.js';
 import { gerarAlertasAdimplencia } from '../jobs/adimplencia.js';
 
 const router = Router();
@@ -36,24 +51,48 @@ function mediumScope(req: Request): Prisma.FinanceiroTransacaoWhereInput | undef
 }
 
 router.get('/', authenticate, authorize('financeiro', 'read'), async (req, res) => {
-  const adimplenciaFilter = req.query.adimplencia as AdimplenciaStatus | undefined;
-  const tipo = req.query.tipo as 'RECEITA' | 'DESPESA' | undefined;
-
-  const transacoes = await prisma.financeiroTransacao.findMany({
-    where: {
-      ...mediumScope(req),
-      ...(tipo ? { tipo } : {}),
-    },
-    include: { pessoa: { select: { id: true, nomeCompleto: true } } },
-    orderBy: { dataTransacao: 'desc' },
-  });
-
-  let result = transacoes.map(withAdimplencia);
-  if (adimplenciaFilter) {
-    result = result.filter((t) => t.adimplencia === adimplenciaFilter);
+  const query = req.query as Record<string, string | undefined>;
+  const parsed = parseListagemQuery(query);
+  if (typeof parsed === 'string') {
+    res.status(400).json({ error: parsed });
+    return;
   }
 
-  res.json(result);
+  const whereResult = buildListagemWhere(parsed, mediumScope(req));
+  if (typeof whereResult === 'string') {
+    res.status(400).json({ error: whereResult });
+    return;
+  }
+
+  const { paginated, page, limit } = parsePaginacao(query.page, query.limit);
+  const include = { pessoa: { select: { id: true, nomeCompleto: true } } };
+  const orderBy = { dataTransacao: 'desc' as const };
+
+  if (!paginated) {
+    const transacoes = await prisma.financeiroTransacao.findMany({
+      where: whereResult,
+      include,
+      orderBy,
+    });
+    res.json(transacoes.map(withAdimplencia));
+    return;
+  }
+
+  const [total, transacoes] = await Promise.all([
+    prisma.financeiroTransacao.count({ where: whereResult }),
+    prisma.financeiroTransacao.findMany({
+      where: whereResult,
+      include,
+      orderBy,
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+  ]);
+
+  res.json({
+    data: transacoes.map(withAdimplencia),
+    meta: paginateMeta(total, page, limit),
+  });
 });
 
 router.get('/dashboard', authenticate, authorize('dashboard', 'read'), async (_req, res) => {
@@ -68,6 +107,81 @@ router.get('/dashboard', authenticate, authorize('dashboard', 'read'), async (_r
     _sum: { valor: true },
   });
   res.json({ receitas, despesas });
+});
+
+function toFluxoRow(t: {
+  tipo: TransacaoFluxo['tipo'];
+  categoria: string;
+  valor: { toString(): string };
+  status: TransacaoFluxo['status'];
+  dataTransacao: Date;
+  vencimento: Date | null;
+}): TransacaoFluxo {
+  return {
+    tipo: t.tipo,
+    categoria: t.categoria,
+    valor: Number(t.valor),
+    status: t.status,
+    dataTransacao: t.dataTransacao,
+    vencimento: t.vencimento,
+  };
+}
+
+router.get('/fluxo-caixa', authenticate, authorize('financeiro', 'read'), async (req, res) => {
+  const mes = req.query.mes ? Number(req.query.mes) : undefined;
+  const ano = req.query.ano ? Number(req.query.ano) : undefined;
+  const de = typeof req.query.de === 'string' ? req.query.de : undefined;
+  const ate = typeof req.query.ate === 'string' ? req.query.ate : undefined;
+
+  const periodo = resolverPeriodo({ de, ate, mes, ano });
+  if (typeof periodo === 'string') {
+    res.status(400).json({ error: periodo });
+    return;
+  }
+
+  const scope = mediumScope(req);
+  const transacoesDb = await prisma.financeiroTransacao.findMany({
+    where: {
+      ...scope,
+      OR: [
+        { dataTransacao: { gte: periodo.de, lte: periodo.ate } },
+        {
+          status: 'PENDENTE',
+          vencimento: { gte: periodo.de, lte: periodo.ate },
+        },
+      ],
+    },
+    select: {
+      tipo: true,
+      categoria: true,
+      valor: true,
+      status: true,
+      dataTransacao: true,
+      vencimento: true,
+    },
+  });
+
+  const rows = transacoesDb.map(toFluxoRow);
+  const noPeriodo = rows.filter(
+    (t) =>
+      t.dataTransacao >= periodo.de && t.dataTransacao <= periodo.ate
+  );
+
+  const concluidos = calcularTotaisConcluidos(noPeriodo);
+  const pendentes = calcularTotaisPendentes(rows);
+
+  res.json({
+    periodo: {
+      de: periodo.de.toISOString().slice(0, 10),
+      ate: periodo.ate.toISOString().slice(0, 10),
+    },
+    totais: {
+      ...concluidos,
+      ...pendentes,
+    },
+    porSemana: agruparPorSemana(noPeriodo, periodo),
+    porCategoria: agruparPorCategoria(noPeriodo),
+  });
 });
 
 router.get('/atrasados', authenticate, authorize('financeiro', 'read'), async (req, res) => {
@@ -87,6 +201,50 @@ router.get('/atrasados', authenticate, authorize('financeiro', 'read'), async (r
 router.post('/sync-alertas', authenticate, authorize('financeiro', 'write'), async (_req, res) => {
   const criados = await gerarAlertasAdimplencia();
   res.json({ criados });
+});
+
+const batchStatusSchema = z.object({
+  ids: z.array(z.number().int().positive()).min(1).max(200),
+  status: z.enum(['PENDENTE', 'CONCLUIDO']),
+});
+
+router.post('/batch/status', authenticate, authorize('financeiro', 'write'), async (req, res) => {
+  const parsed = batchStatusSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
+    return;
+  }
+
+  const { ids, status } = parsed.data;
+  const scope = mediumScope(req);
+  const transacoes = await prisma.financeiroTransacao.findMany({
+    where: { id: { in: ids }, ...scope },
+    select: { id: true, status: true, pessoaId: true },
+  });
+
+  const rowsById = new Map(
+    transacoes.map((t) => [t.id, { id: t.id, status: t.status, pessoaId: t.pessoaId }])
+  );
+
+  const canUpdate = (row: { pessoaId: number | null }) => {
+    if (req.user!.setorAcesso !== 'MEDIUM') return true;
+    return row.pessoaId === req.user!.pessoaId;
+  };
+
+  const plan = planBatchStatusUpdate(ids, status, rowsById, canUpdate);
+
+  if (plan.toUpdate.length > 0) {
+    await prisma.financeiroTransacao.updateMany({
+      where: { id: { in: plan.toUpdate }, ...scope },
+      data: { status },
+    });
+  }
+
+  res.json({
+    atualizados: plan.toUpdate.length,
+    ignorados: plan.ignorados,
+    erros: plan.erros,
+  });
 });
 
 router.post('/', authenticate, authorize('financeiro', 'write'), async (req, res) => {

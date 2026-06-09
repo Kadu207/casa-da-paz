@@ -10,4 +10,14 @@ if (-not (Test-Path "$nodeDir\npm.cmd")) {
 }
 
 $env:Path = "$nodeDir;" + $env:Path
+
+# PowerShell pode bloquear npm.ps1 (ExecutionPolicy). Usar sempre os .cmd.
+function npm {
+  & "$nodeDir\npm.cmd" @args
+}
+function npx {
+  & "$nodeDir\npx.cmd" @args
+}
+
 Write-Host "OK: Node $(node -v) | npm $(npm -v)" -ForegroundColor Green
+Write-Host "Dica: se npm falhar, use npm.cmd ou execute . .\scripts\setup-path.ps1" -ForegroundColor DarkGray

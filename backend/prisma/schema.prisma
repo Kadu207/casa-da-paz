@@ -121,6 +121,7 @@ model Usuario {
   senhaHash    String      @map("senha_hash") @db.VarChar(255)
   setorAcesso  SetorAcesso @map("setor_acesso")
   pessoa       Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+  fechamentosFinanceiros FinanceiroFechamentoMensal[]
 
   @@map("usuarios")
 }
@@ -137,7 +138,28 @@ model FinanceiroTransacao {
   observacoes     String?
   pessoa          Pessoa?          @relation(fields: [pessoaId], references: [id])
 
+  @@index([dataTransacao])
+  @@index([vencimento])
+  @@index([pessoaId])
   @@map("financeiro_transacoes")
+}
+
+model FinanceiroFechamentoMensal {
+  id            Int      @id @default(autoincrement())
+  ano           Int
+  mes           Int
+  receitasTotal Decimal  @map("receitas_total") @db.Decimal(12, 2)
+  despesasTotal Decimal  @map("despesas_total") @db.Decimal(12, 2)
+  saldo         Decimal  @db.Decimal(12, 2)
+  pendentesQtd  Int      @map("pendentes_qtd")
+  atrasadosQtd  Int      @map("atrasados_qtd")
+  observacoes   String?
+  fechadoPorId  Int      @map("fechado_por_id")
+  fechadoEm     DateTime @default(now()) @map("fechado_em")
+  fechadoPor    Usuario  @relation(fields: [fechadoPorId], references: [id])
+
+  @@unique([ano, mes])
+  @@map("financeiro_fechamentos_mensais")
 }
 
 model Evento {

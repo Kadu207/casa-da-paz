@@ -19,6 +19,8 @@ Start-Sleep -Seconds 3
 Set-Location "$root\backend"
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 
+. "$PSScriptRoot\setup-path.ps1"
+
 # Ajusta só DATABASE_URL se existir docker-compose.override.yml (ex.: 5437 neste PC)
 $override = "$root\infra\docker-compose.override.yml"
 if (Test-Path $override) {
