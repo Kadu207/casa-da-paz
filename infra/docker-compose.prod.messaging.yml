@@ -48,7 +48,7 @@ services:
       POSTGRES_DATABASE: chatwoot_db
       ACTIVE_STORAGE_SERVICE: local
     ports:
-      - "${CHATWOOT_BIND:-127.0.0.1}:${CHATWOOT_PORT:-3001}:3000"
+      - "${CHATWOOT_BIND:-0.0.0.0}:${CHATWOOT_PORT:-3001}:3000"
     volumes:
       - chatwoot_storage:/app/storage
     entrypoint: docker/entrypoints/rails.sh
