@@ -1,9 +1,10 @@
 # Envia frontend/dist para a VPS — rode NO SEU PC (Windows PowerShell), nao na VPS.
-# Build antes: Set-Location frontend; npm run build
-# Linux/Debian: use scripts/sync-frontend-vps.sh (chave SSH em ~/.ssh).
+# Build + sync (recomendado): .\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend
+# Linux/Debian: scripts/sync-frontend-vps.sh (chave SSH em ~/.ssh).
 #
-# Windows sem chave: .\scripts\sync-frontend-vps.ps1 -PasswordOnly -RestartFrontend
-# Com chave local:   .\scripts\sync-frontend-vps.ps1 -RestartFrontend
+# NAO use "..." no caminho. Da raiz do repo (Casa da Paz):
+#   .\scripts\build-frontend-prod.ps1
+#   .\scripts\sync-frontend-vps.ps1 -PasswordOnly -RestartFrontend
 param(
     [string]$RemoteHost = "",
     [string]$RemotePath = "~/casadapaz/frontend/dist",

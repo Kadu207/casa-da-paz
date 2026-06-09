@@ -28,6 +28,10 @@ services:
       DATABASE_URL: postgres://admin_casadapaz:${DB_PASSWORD}@db:5432/casadapaz_db
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGIN: https://casadapaz.inovatitech.com.br
+      N8N_URL: ${N8N_URL:-}
+      N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET:-}
+      CHATWOOT_URL: ${CHATWOOT_URL:-}
+      CHATWOOT_API_TOKEN: ${CHATWOOT_API_TOKEN:-}
     depends_on:
       - db
     networks:

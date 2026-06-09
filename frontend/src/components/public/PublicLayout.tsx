@@ -5,6 +5,7 @@ import { useI18n } from '../../i18n/I18nContext';
 import { NewsletterSignup } from './NewsletterSignup';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { CookieConsent } from './CookieConsent';
+import { ChatwootWidget } from './ChatwootWidget';
 
 export function PublicLayout({
   children,
@@ -13,7 +14,8 @@ export function PublicLayout({
   children: ReactNode;
   showBack?: boolean;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const chatwootLocale = locale === 'en' ? 'en' : 'pt_BR';
 
   return (
     <div className="portal-root min-h-dvh flex flex-col bg-background text-foreground">
@@ -104,6 +106,7 @@ export function PublicLayout({
         </div>
       </footer>
       <CookieConsent />
+      <ChatwootWidget locale={chatwootLocale} />
     </div>
   );
 }

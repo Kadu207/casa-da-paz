@@ -1,0 +1,46 @@
+{
+  "name": "Casa da Paz - Ingresso Oficina",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "casadapaz-ingresso-oficina",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "f1-webhook-ingresso",
+      "name": "Webhook Ingresso",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "casadapaz-ingresso-oficina"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "log1",
+              "name": "evento",
+              "value": "ingresso_oficina",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f2-set-ingresso",
+      "name": "Registrar evento",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Ingresso": {
+      "main": [[{ "node": "Registrar evento", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" }
+}

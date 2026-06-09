@@ -1,0 +1,46 @@
+{
+  "name": "Casa da Paz - Recibo Pago",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "casadapaz-recibo-pago",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "e1-webhook-recibo",
+      "name": "Webhook Recibo",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "casadapaz-recibo-pago"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "log1",
+              "name": "evento",
+              "value": "recibo_pago",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e2-set-recibo",
+      "name": "Registrar evento",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Recibo": {
+      "main": [[{ "node": "Registrar evento", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" }
+}

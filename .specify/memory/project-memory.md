@@ -17,12 +17,11 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 
 | Fase | Status |
 |------|--------|
-| 003-financeiro-v2 S1 | ✅ Produção |
-| 003-financeiro-v2 S2 | ✅ Produção |
-| 003-financeiro-v2 S3 | ✅ Produção + smoke OK |
-| 017-dashboard-v2 | ✅ Produção |
+| 003-financeiro-v2 S1–S3 | ✅ Produção |
+| 017-dashboard-v2 | ✅ Implementado — deploy pendente |
 | 018-painel-medium | ✅ Implementado — deploy pendente |
 | 019-auditoria-v2 | ✅ Implementado — deploy pendente |
+| **012-chatwoot-n8n** | 🔄 Infra + widget prontos — Meta token + VPS pendente |
 | 016-frontend-nextjs | 📋 Bloqueado (ADR-008) |
 
 ## Módulos
@@ -39,7 +38,7 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 ## Próximos passos
 
 1. Deploy 017–019 (backend + frontend)
-2. **012 Chatwoot/N8N prod**
+2. **012 Chatwoot/N8N prod** — runbook `docs/memory/runbooks/deploy-messaging-prod.md` (VPS + token Meta)
 3. Epic 016 Next.js — aguardando aprovação (ADR-008)
 
 Espelhamento Windows/Debian: posterior (`docs/memory/runbooks/dev-windows-linux-sync.md`).

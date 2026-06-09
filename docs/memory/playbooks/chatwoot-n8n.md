@@ -28,5 +28,7 @@ Header: `X-Webhook-Secret: ${N8N_WEBHOOK_SECRET}`
 Trigger manual (DIRETORIA): `POST /api/webhooks/n8n/trigger`
 
 ## Configuração produção
-- WhatsApp Business API conectada ao Chatwoot
-- `N8N_WEBHOOK_SECRET` no backend e N8N credentials
+- Runbook: **`docs/memory/runbooks/deploy-messaging-prod.md`**
+- WhatsApp Business API conectada ao Chatwoot (token Meta — gate humano)
+- `N8N_WEBHOOK_SECRET` no backend e header `X-Webhook-Secret`
+- Widget: `VITE_CHATWOOT_WEBSITE_TOKEN` + `VITE_CHATWOOT_BASE_URL` no build frontend

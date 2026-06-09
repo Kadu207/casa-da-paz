@@ -1,11 +1,10 @@
 import { PublicLayout } from '../../components/public/PublicLayout';
+import { isChatwootConfigured } from '../../components/public/ChatwootWidget';
 import { SafeImage } from '../../components/public/SafeImage';
 import { ADDRESS, WHATSAPP_NUMBER, portalAssets } from '../../lib/portal-assets';
 import { useI18n } from '../../i18n/I18nContext';
 import { DPO_EMAIL, DATA_PROTECTION_CONTACTS, formatContactList, whatsappDsarUrl } from '../../lib/lgpd-contact';
 import { Link } from 'react-router-dom';
-
-const CHATWOOT_WEBSITE_TOKEN = import.meta.env.VITE_CHATWOOT_WEBSITE_TOKEN;
 
 export default function PublicContato() {
   const { t, locale } = useI18n();
@@ -104,7 +103,7 @@ export default function PublicContato() {
           </p>
         </div>
 
-        {CHATWOOT_WEBSITE_TOKEN ? (
+        {isChatwootConfigured() ? (
           <p className="text-xs text-foreground/55 text-center">{t('contact.chat.online')}</p>
         ) : (
           <div className="rounded-2xl border border-dashed border-border/60 p-5 sm:p-6 text-sm text-foreground/55 text-center">

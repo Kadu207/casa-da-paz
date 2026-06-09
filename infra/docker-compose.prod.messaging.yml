@@ -1,0 +1,94 @@
+# Mensageria em produção — N8N + Chatwoot + Redis
+# Uso na VPS:
+#   ./scripts/compose-prod-messaging.sh up -d
+#   ./scripts/init-chatwoot-prod.sh   (primeira vez)
+#   ./scripts/import-n8n-workflows.sh
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - rede_casadapaz
+
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    environment:
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_USER}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_PASSWORD}
+      N8N_HOST: ${N8N_HOST:-localhost}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
+      WEBHOOK_URL: ${N8N_WEBHOOK_URL:-http://n8n:5678/}
+      GENERIC_TIMEZONE: America/Sao_Paulo
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - rede_casadapaz
+
+  chatwoot:
+    image: chatwoot/chatwoot:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    environment:
+      INSTALLATION_ENV: docker
+      RAILS_ENV: production
+      NODE_ENV: production
+      SECRET_KEY_BASE: ${CHATWOOT_SECRET}
+      FRONTEND_URL: ${CHATWOOT_PUBLIC_URL}
+      REDIS_URL: redis://redis:6379
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USERNAME: admin_casadapaz
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DATABASE: chatwoot_db
+      ACTIVE_STORAGE_SERVICE: local
+    ports:
+      - "${CHATWOOT_BIND:-127.0.0.1}:${CHATWOOT_PORT:-3001}:3000"
+    volumes:
+      - chatwoot_storage:/app/storage
+    entrypoint: docker/entrypoints/rails.sh
+    command: ["bundle", "exec", "rails", "s", "-p", "3000", "-b", "0.0.0.0"]
+    networks:
+      - rede_casadapaz
+
+  chatwoot-sidekiq:
+    image: chatwoot/chatwoot:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+      - chatwoot
+    environment:
+      INSTALLATION_ENV: docker
+      RAILS_ENV: production
+      NODE_ENV: production
+      SECRET_KEY_BASE: ${CHATWOOT_SECRET}
+      FRONTEND_URL: ${CHATWOOT_PUBLIC_URL}
+      REDIS_URL: redis://redis:6379
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USERNAME: admin_casadapaz
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DATABASE: chatwoot_db
+      ACTIVE_STORAGE_SERVICE: local
+    volumes:
+      - chatwoot_storage:/app/storage
+    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
+    networks:
+      - rede_casadapaz
+
+  backend:
+    environment:
+      N8N_URL: http://n8n:5678
+      N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET}
+      CHATWOOT_URL: http://chatwoot:3000
+      CHATWOOT_API_TOKEN: ${CHATWOOT_API_TOKEN:-}
+
+volumes:
+  n8n_data:
+  chatwoot_storage:
