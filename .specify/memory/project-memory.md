@@ -19,7 +19,7 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 |------|--------|
 | 003-financeiro-v2 S1 | ✅ Produção |
 | 003-financeiro-v2 S2 | ✅ Produção |
-| 003-financeiro-v2 S3 | 🔄 UI Vite (4 abas) — build OK; deploy + gates |
+| 003-financeiro-v2 S3 | 🔄 UI Vite (4 abas) — commit `75591c6`; prod assets OK; smoke manual pendente |
 | 016-frontend-nextjs | 📋 Spec only — **após S3 + gates** (ADR-008) |
 
 ## Módulos
