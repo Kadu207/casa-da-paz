@@ -2,6 +2,10 @@ import { Router } from 'express';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
 import { calcularAdimplencia } from '../lib/adimplencia.js';
+import {
+  parseMetricasPeriodo,
+  financeiroWhereNoPeriodo,
+} from '../lib/metricas-periodo.js';
 
 const router = Router();
 
@@ -45,7 +49,18 @@ router.get('/eventos', authenticate, authorize('dashboard', 'read'), async (_req
   res.json({ eventos: lista, totais });
 });
 
-router.get('/resumo', authenticate, authorize('dashboard', 'read'), async (_req, res) => {
+router.get('/resumo', authenticate, authorize('dashboard', 'read'), async (req, res) => {
+  const periodoParsed = parseMetricasPeriodo({
+    mes: typeof req.query.mes === 'string' ? req.query.mes : undefined,
+    ano: typeof req.query.ano === 'string' ? req.query.ano : undefined,
+  });
+  if (typeof periodoParsed === 'string') {
+    res.status(400).json({ error: periodoParsed });
+    return;
+  }
+
+  const finPeriodoWhere = periodoParsed ? financeiroWhereNoPeriodo(periodoParsed) : {};
+
   const now = new Date();
   const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -67,15 +82,15 @@ router.get('/resumo', authenticate, authorize('dashboard', 'read'), async (_req,
     eventosRanking,
   ] = await Promise.all([
     prisma.financeiroTransacao.aggregate({
-      where: { tipo: 'RECEITA', status: 'CONCLUIDO' },
+      where: { tipo: 'RECEITA', status: 'CONCLUIDO', ...finPeriodoWhere },
       _sum: { valor: true },
     }),
     prisma.financeiroTransacao.aggregate({
-      where: { tipo: 'DESPESA', status: 'CONCLUIDO' },
+      where: { tipo: 'DESPESA', status: 'CONCLUIDO', ...finPeriodoWhere },
       _sum: { valor: true },
     }),
     prisma.financeiroTransacao.findMany({
-      where: { status: 'PENDENTE' },
+      where: { status: 'PENDENTE', ...finPeriodoWhere },
       select: { vencimento: true, status: true },
     }),
     prisma.pessoa.count(),
@@ -89,12 +104,12 @@ router.get('/resumo', authenticate, authorize('dashboard', 'read'), async (_req,
     prisma.presenca.count({ where: { horarioChegada: { gte: inicioMes } } }),
     prisma.financeiroTransacao.groupBy({
       by: ['categoria'],
-      where: { tipo: 'RECEITA', status: 'CONCLUIDO' },
+      where: { tipo: 'RECEITA', status: 'CONCLUIDO', ...finPeriodoWhere },
       _sum: { valor: true },
     }),
     prisma.financeiroTransacao.groupBy({
       by: ['categoria'],
-      where: { tipo: 'DESPESA', status: 'CONCLUIDO' },
+      where: { tipo: 'DESPESA', status: 'CONCLUIDO', ...finPeriodoWhere },
       _sum: { valor: true },
     }),
     rankingEventos(),

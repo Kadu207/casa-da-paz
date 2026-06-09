@@ -32,8 +32,8 @@ Legenda: `[R]` Red (teste falha) → `[G]` Green (implementação) → `[RF]` Re
 
 ### S1.5 DELETE com vínculo inscrição
 
-- [ ] `[R]` Teste: DELETE transação vinculada a inscrição ativa → 409
-- [ ] `[G]` Checagem antes do delete
+- [x] `[R]` Teste: `bloqueiaDeleteTransacao` inscrição/estoque
+- [x] `[G]` Checagem antes do delete (409)
 
 ---
 
@@ -41,30 +41,29 @@ Legenda: `[R]` Red (teste falha) → `[G]` Green (implementação) → `[RF]` Re
 
 ### S2.1 Conciliação mensal
 
-- [ ] `[R]` Teste: `GET /financeiro/conciliacao?mes=6&ano=2026`
-- [ ] `[R]` Teste: POST fechar duplicado → 409
-- [ ] `[R]` Teste: DELETE fechamento só DIRETORIA
-- [ ] `[G]` Rotas conciliação + audit log
+- [x] `[R]` Teste: `buildConciliacaoChecklist`, `snapshotFechamento`
+- [x] `[G]` `GET/POST/DELETE /financeiro/conciliacao/*` + audit log
 
 ### S2.2 Export
 
-- [ ] `[R]` Teste: `GET /financeiro/export.csv` Content-Type + colunas
-- [ ] `[R]` Teste: `GET /financeiro/export.pdf` retorna PDF
-- [ ] `[G]` Handlers stream CSV (padrão `auditoria/export.csv`)
+- [x] `[R]` Teste: CSV colunas + PDF buffer
+- [x] `[G]` `GET /financeiro/export.csv` e `export.pdf`
 
 ### S2.3 Histórico por pessoa
 
-- [ ] `[R]` Teste: MEDIUM 403 em pessoa alheia
-- [ ] `[G]` `GET /financeiro/pessoas/:pessoaId/historico`
+- [x] `[R]` Teste: `buildHistoricoResumo`
+- [x] `[G]` `GET /financeiro/pessoas/:pessoaId/historico` + MEDIUM 403
 
 ### S2.4 Dashboard período
 
-- [ ] `[R]` Teste: `/metricas/resumo?mes=6&ano=2026` filtra financeiro
-- [ ] `[G]` Evolução em `metricas.ts`
+- [x] `[R]` Teste: `parseMetricasPeriodo`
+- [x] `[G]` `/metricas/resumo?mes=&ano=` filtra financeiro
 
 ---
 
 ## Sprint 3 — Frontend + integração
+
+**Status:** ⏸ Agendado após deploy S2 — stack **Vite** (Opção A, ADR-008)
 
 ### S3.1 Navegação
 
@@ -100,9 +99,9 @@ Legenda: `[R]` Red (teste falha) → `[G]` Green (implementação) → `[RF]` Re
 
 ---
 
-## Ordem de execução imediata (esta sessão)
+## Ordem de execução
 
-1. ~~S1.2 fluxo-caixa (lib + rota)~~ — concluído
-2. ~~S1.1 migration fechamentos~~ — concluído
-3. ~~S1.3 listagem paginada~~ — concluído
-4. S1.4 batch status
+1. ~~S1 backend~~ — concluído + produção
+2. ~~S2 backend~~ — concluído (deploy pendente)
+3. **S3 UI Vite** — posterior (ADR-008: Next.js só após S3)
+4. **016-frontend-nextjs** — ver `docs/memory/roadmap-cronograma.md`

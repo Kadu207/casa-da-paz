@@ -21,7 +21,21 @@ import {
   paginateMeta,
 } from '../lib/listagem-financeiro.js';
 import { planBatchStatusUpdate } from '../lib/batch-status.js';
+import {
+  buildConciliacaoChecklist,
+  buildConciliacaoTotais,
+  snapshotFechamento,
+} from '../lib/conciliacao.js';
+import { buildFinanceiroCsv, type TransacaoExportRow } from '../lib/financeiro-export.js';
+import { gerarPdfFinanceiro } from '../lib/financeiro-pdf.js';
+import {
+  bloqueiaDeleteTransacao,
+  transacaoObservacaoEventoId,
+} from '../lib/financeiro-delete-guard.js';
+import { buildHistoricoResumo } from '../lib/historico-pessoa.js';
+import { registrarAuditoria } from '../lib/auditoria.js';
 import { gerarAlertasAdimplencia } from '../jobs/adimplencia.js';
+import type { Periodo } from '../lib/fluxo-caixa.js';
 
 const router = Router();
 
@@ -35,6 +49,63 @@ const transacaoSchema = z.object({
   status: z.enum(['PENDENTE', 'CONCLUIDO']).default('PENDENTE'),
   observacoes: z.string().optional(),
 });
+
+function parsePeriodoQuery(query: Record<string, unknown>): Periodo | string {
+  const mes = query.mes !== undefined ? Number(query.mes) : undefined;
+  const ano = query.ano !== undefined ? Number(query.ano) : undefined;
+  const de = typeof query.de === 'string' ? query.de : undefined;
+  const ate = typeof query.ate === 'string' ? query.ate : undefined;
+  return resolverPeriodo({ mes, ano, de, ate });
+}
+
+function periodoLabel(periodo: Periodo, mes?: number, ano?: number): string {
+  if (mes && ano) return `${ano}-${String(mes).padStart(2, '0')}`;
+  return `${periodo.de.toISOString().slice(0, 10)}_${periodo.ate.toISOString().slice(0, 10)}`;
+}
+
+function toExportRow(t: {
+  id: number;
+  tipo: TransacaoFluxo['tipo'];
+  categoria: string;
+  valor: { toString(): string };
+  dataTransacao: Date;
+  vencimento: Date | null;
+  status: TransacaoFluxo['status'];
+  observacoes: string | null;
+  pessoa: { nomeCompleto: string } | null;
+}): TransacaoExportRow {
+  return {
+    id: t.id,
+    tipo: t.tipo,
+    categoria: t.categoria,
+    valor: Number(t.valor),
+    dataTransacao: t.dataTransacao,
+    vencimento: t.vencimento,
+    status: t.status,
+    observacoes: t.observacoes,
+    pessoaNome: t.pessoa?.nomeCompleto ?? null,
+  };
+}
+
+async function loadTransacoesConciliacao(scope: Prisma.FinanceiroTransacaoWhereInput, periodo: Periodo) {
+  return prisma.financeiroTransacao.findMany({
+    where: {
+      ...scope,
+      OR: [
+        { dataTransacao: { gte: periodo.de, lte: periodo.ate } },
+        { status: 'PENDENTE' },
+      ],
+    },
+    select: {
+      tipo: true,
+      categoria: true,
+      status: true,
+      dataTransacao: true,
+      vencimento: true,
+      valor: true,
+    },
+  });
+}
 
 function withAdimplencia<T extends { status: string; vencimento: Date | null }>(t: T) {
   return {
@@ -247,6 +318,246 @@ router.post('/batch/status', authenticate, authorize('financeiro', 'write'), asy
   });
 });
 
+router.get('/conciliacao', authenticate, authorize('financeiro', 'read'), async (req, res) => {
+  const mes = req.query.mes ? Number(req.query.mes) : undefined;
+  const ano = req.query.ano ? Number(req.query.ano) : undefined;
+  if (!mes || !ano) {
+    res.status(400).json({ error: 'Informe mes e ano' });
+    return;
+  }
+  const periodo = resolverPeriodo({ mes, ano });
+  if (typeof periodo === 'string') {
+    res.status(400).json({ error: periodo });
+    return;
+  }
+
+  const scope = mediumScope(req);
+  const rows = await loadTransacoesConciliacao(scope ?? {}, periodo);
+  const mapped = rows.map((t) => ({
+    ...t,
+    valor: Number(t.valor),
+  }));
+  const checklist = buildConciliacaoChecklist(mapped, periodo);
+  const totais = buildConciliacaoTotais(mapped, periodo);
+
+  const fechamento = await prisma.financeiroFechamentoMensal.findUnique({
+    where: { ano_mes: { ano, mes } },
+    include: { fechadoPor: { select: { id: true, login: true } } },
+  });
+
+  res.json({
+    mes,
+    ano,
+    checklist,
+    totais,
+    fechamento: fechamento
+      ? {
+          id: fechamento.id,
+          fechadoEm: fechamento.fechadoEm,
+          fechadoPor: { id: fechamento.fechadoPor.id, nome: fechamento.fechadoPor.login },
+        }
+      : null,
+  });
+});
+
+const fecharConciliacaoSchema = z.object({
+  mes: z.number().int().min(1).max(12),
+  ano: z.number().int().min(2000),
+  observacoes: z.string().max(500).optional(),
+});
+
+router.post(
+  '/conciliacao/fechar',
+  authenticate,
+  authorize('financeiro', 'write'),
+  async (req, res) => {
+    const parsed = fecharConciliacaoSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.flatten() });
+      return;
+    }
+
+    const { mes, ano, observacoes } = parsed.data;
+    const existente = await prisma.financeiroFechamentoMensal.findUnique({
+      where: { ano_mes: { ano, mes } },
+    });
+    if (existente) {
+      res.status(409).json({ error: 'Mês já fechado' });
+      return;
+    }
+
+    const periodo = resolverPeriodo({ mes, ano });
+    if (typeof periodo === 'string') {
+      res.status(400).json({ error: periodo });
+      return;
+    }
+
+    const scope = mediumScope(req);
+    const rows = await loadTransacoesConciliacao(scope ?? {}, periodo);
+    const mapped = rows.map((t) => ({ ...t, valor: Number(t.valor) }));
+    const checklist = buildConciliacaoChecklist(mapped, periodo);
+    const totais = buildConciliacaoTotais(mapped, periodo);
+    const snap = snapshotFechamento(checklist, totais);
+
+    const fechamento = await prisma.financeiroFechamentoMensal.create({
+      data: {
+        ano,
+        mes,
+        ...snap,
+        observacoes,
+        fechadoPorId: req.user!.userId,
+      },
+      include: { fechadoPor: { select: { id: true, login: true } } },
+    });
+
+    await registrarAuditoria(req, {
+      rota: 'financeiro.conciliacao.fechar',
+      motivo: `fechamento_${ano}_${mes}`,
+    });
+
+    res.status(201).json(fechamento);
+  }
+);
+
+router.delete(
+  '/conciliacao/:ano/:mes',
+  authenticate,
+  authorize('financeiro', 'write'),
+  async (req, res) => {
+    if (req.user!.setorAcesso !== 'DIRETORIA') {
+      res.status(403).json({ error: 'Apenas DIRETORIA pode reabrir mês' });
+      return;
+    }
+
+    const ano = Number(req.params.ano);
+    const mes = Number(req.params.mes);
+    if (!Number.isFinite(ano) || !Number.isFinite(mes)) {
+      res.status(400).json({ error: 'Ano/mês inválidos' });
+      return;
+    }
+
+    const deleted = await prisma.financeiroFechamentoMensal.deleteMany({
+      where: { ano, mes },
+    });
+    if (deleted.count === 0) {
+      res.status(404).json({ error: 'Fechamento não encontrado' });
+      return;
+    }
+
+    await registrarAuditoria(req, {
+      rota: 'financeiro.conciliacao.reabrir',
+      motivo: `reabrir_${ano}_${mes}`,
+    });
+
+    res.status(204).send();
+  }
+);
+
+router.get('/export.csv', authenticate, authorize('financeiro', 'read'), async (req, res) => {
+  const periodo = parsePeriodoQuery(req.query as Record<string, unknown>);
+  if (typeof periodo === 'string') {
+    res.status(400).json({ error: periodo });
+    return;
+  }
+
+  const mes = req.query.mes ? Number(req.query.mes) : undefined;
+  const ano = req.query.ano ? Number(req.query.ano) : undefined;
+  const scope = mediumScope(req);
+  const transacoes = await prisma.financeiroTransacao.findMany({
+    where: {
+      ...scope,
+      dataTransacao: { gte: periodo.de, lte: periodo.ate },
+    },
+    include: { pessoa: { select: { nomeCompleto: true } } },
+    orderBy: { dataTransacao: 'asc' },
+  });
+
+  const csv = buildFinanceiroCsv(transacoes.map(toExportRow));
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="financeiro-${periodoLabel(periodo, mes, ano)}.csv"`
+  );
+  res.send(csv);
+});
+
+router.get('/export.pdf', authenticate, authorize('financeiro', 'read'), async (req, res) => {
+  const periodo = parsePeriodoQuery(req.query as Record<string, unknown>);
+  if (typeof periodo === 'string') {
+    res.status(400).json({ error: periodo });
+    return;
+  }
+
+  const mes = req.query.mes ? Number(req.query.mes) : undefined;
+  const ano = req.query.ano ? Number(req.query.ano) : undefined;
+  const scope = mediumScope(req);
+  const transacoes = await prisma.financeiroTransacao.findMany({
+    where: {
+      ...scope,
+      dataTransacao: { gte: periodo.de, lte: periodo.ate },
+    },
+    include: { pessoa: { select: { nomeCompleto: true } } },
+    orderBy: { dataTransacao: 'asc' },
+  });
+
+  const pdf = await gerarPdfFinanceiro(
+    transacoes.map(toExportRow),
+    periodoLabel(periodo, mes, ano)
+  );
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="financeiro-${periodoLabel(periodo, mes, ano)}.pdf"`
+  );
+  res.send(pdf);
+});
+
+router.get(
+  '/pessoas/:pessoaId/historico',
+  authenticate,
+  authorize('financeiro', 'read'),
+  async (req, res) => {
+    const pessoaId = Number(req.params.pessoaId);
+    if (!Number.isFinite(pessoaId)) {
+      res.status(400).json({ error: 'pessoaId inválido' });
+      return;
+    }
+
+    if (req.user!.setorAcesso === 'MEDIUM' && req.user!.pessoaId !== pessoaId) {
+      res.status(403).json({ error: 'Acesso negado' });
+      return;
+    }
+
+    const pessoa = await prisma.pessoa.findUnique({
+      where: { id: pessoaId },
+      select: { id: true, nomeCompleto: true },
+    });
+    if (!pessoa) {
+      res.status(404).json({ error: 'Pessoa não encontrada' });
+      return;
+    }
+
+    const transacoes = await prisma.financeiroTransacao.findMany({
+      where: { pessoaId },
+      orderBy: { dataTransacao: 'desc' },
+    });
+
+    const resumo = buildHistoricoResumo(
+      transacoes.map((t) => ({
+        status: t.status,
+        vencimento: t.vencimento,
+        valor: Number(t.valor),
+      }))
+    );
+
+    res.json({
+      pessoa,
+      resumo,
+      transacoes: transacoes.map(withAdimplencia),
+    });
+  }
+);
+
 router.post('/', authenticate, authorize('financeiro', 'write'), async (req, res) => {
   const parsed = transacaoSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -351,6 +662,32 @@ router.delete('/:id', authenticate, authorize('financeiro', 'write'), async (req
   }
   if (req.user!.setorAcesso === 'MEDIUM') {
     res.status(403).json({ error: 'Acesso negado' });
+    return;
+  }
+
+  const eventoId = transacaoObservacaoEventoId(atual.observacoes);
+  let temInscricaoAtiva = false;
+  if (eventoId && atual.pessoaId) {
+    const inscricao = await prisma.inscricao.findUnique({
+      where: {
+        eventoId_pessoaId: { eventoId, pessoaId: atual.pessoaId },
+      },
+    });
+    temInscricaoAtiva = !!inscricao && inscricao.statusPagamento === 'PENDENTE';
+  }
+
+  const movCount = await prisma.estoqueMovimentacao.count({
+    where: { transacaoId: id },
+  });
+
+  const bloqueio = bloqueiaDeleteTransacao({
+    transacaoId: id,
+    observacoes: atual.observacoes,
+    temInscricaoAtiva,
+    temMovimentacaoEstoque: movCount > 0,
+  });
+  if (bloqueio) {
+    res.status(409).json({ error: bloqueio });
     return;
   }
 
