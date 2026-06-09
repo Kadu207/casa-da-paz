@@ -1,10 +1,14 @@
 # Envia frontend/dist para a VPS — rode NO SEU PC (Windows PowerShell), nao na VPS.
 # Build antes: Set-Location frontend; npm run build
-# Na VPS use apenas: cd ~/casadapaz/infra && ./scripts/compose-prod.sh restart frontend
+# Linux/Debian: use scripts/sync-frontend-vps.sh (chave SSH em ~/.ssh).
+#
+# Windows sem chave: .\scripts\sync-frontend-vps.ps1 -PasswordOnly -RestartFrontend
+# Com chave local:   .\scripts\sync-frontend-vps.ps1 -RestartFrontend
 param(
     [string]$RemoteHost = "",
     [string]$RemotePath = "~/casadapaz/frontend/dist",
-    [switch]$RestartFrontend
+    [switch]$RestartFrontend,
+    [switch]$PasswordOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -21,11 +25,33 @@ if (-not (Test-Path (Join-Path $localDist "index.html"))) {
     throw "frontend\dist\index.html ausente. Rode: cd frontend; npm ci; npm run build"
 }
 
+$sshExtra = @()
+if ($PasswordOnly) {
+    $sshExtra = @(
+        '-o', 'PreferredAuthentications=password',
+        '-o', 'PubkeyAuthentication=no',
+        '-o', 'BatchMode=no'
+    )
+    Write-Host "Auth: senha SSH (PasswordOnly)" -ForegroundColor DarkGray
+} else {
+    Write-Host "Auth: padrao OpenSSH (chave se existir em ~/.ssh)" -ForegroundColor DarkGray
+}
+
+function Invoke-Ssh {
+    param([string]$Target, [string]$Command)
+    & ssh @sshExtra $Target $Command
+}
+
+function Invoke-Scp {
+    param([string[]]$ScpArgs)
+    & scp @sshExtra @ScpArgs
+}
+
 function Invoke-RemotePermissions {
     param([string]$SshTarget, [string]$Path)
     $cmd = "find $Path -type d -exec chmod 755 {} \; && find $Path -type f -exec chmod 644 {} \; && test -r ${Path}/index.html && echo PERMS_OK || echo PERMS_FAIL"
     for ($i = 1; $i -le 3; $i++) {
-        $result = ssh $SshTarget $cmd 2>&1 | Out-String
+        $result = Invoke-Ssh -Target $SshTarget -Command $cmd 2>&1 | Out-String
         if ($result -match "PERMS_OK") {
             Write-Host "Permissoes OK em ${Path}" -ForegroundColor Green
             return
@@ -38,21 +64,20 @@ function Invoke-RemotePermissions {
 
 Write-Host "Enviando frontend/dist para ${RemoteHost}" -ForegroundColor Cyan
 
-# Limpa destino e envia conteudo completo (preserva assets/, portal/, etc.)
-ssh $RemoteHost "mkdir -p $RemotePath && rm -rf ${RemotePath}/*"
-scp -r "$localDist/." "${RemoteHost}:${RemotePath}/"
+Invoke-Ssh -Target $RemoteHost -Command "mkdir -p $RemotePath && rm -rf ${RemotePath}/*"
+Invoke-Scp -ScpArgs @('-r', "$localDist/.", "${RemoteHost}:${RemotePath}/")
 Invoke-RemotePermissions -SshTarget $RemoteHost -Path $RemotePath
 
 $assetMatch = Select-String -Path (Join-Path $localDist "index.html") -Pattern '/assets/(index-[^"]+\.js)' -AllMatches
 if ($assetMatch) {
     $jsBundle = $assetMatch.Matches[0].Groups[1].Value
-    $exists = ssh $RemoteHost "test -f ${RemotePath}/assets/${jsBundle} && echo OK || echo MISSING"
+    $exists = Invoke-Ssh -Target $RemoteHost -Command "test -f ${RemotePath}/assets/${jsBundle} && echo OK || echo MISSING"
     if ($exists -notmatch "OK") {
         throw "Bundle ${jsBundle} ausente em ${RemotePath}/assets/ apos sync."
     }
     Write-Host "Arquivo: assets/${jsBundle}" -ForegroundColor Green
 
-    $originCode = ssh $RemoteHost "curl -sf -o /dev/null -w '%{http_code}' http://127.0.0.1:9080/assets/${jsBundle} 2>/dev/null || echo 000"
+    $originCode = Invoke-Ssh -Target $RemoteHost -Command "curl -sf -o /dev/null -w '%{http_code}' http://127.0.0.1:9080/assets/${jsBundle} 2>/dev/null || echo 000"
     $originCode = ($originCode -replace '\s', '').Trim()
     if ($originCode -ne "200") {
         throw "Origin :9080 retornou HTTP ${originCode} para /assets/${jsBundle}. Rode: cd ~/casadapaz/infra && ./scripts/fix-frontend-permissions.sh && ./scripts/compose-prod.sh restart frontend"
@@ -61,7 +86,7 @@ if ($assetMatch) {
 }
 
 if ($RestartFrontend) {
-    ssh $RemoteHost "cd ~/casadapaz/infra && ./scripts/compose-prod.sh restart frontend"
+    Invoke-Ssh -Target $RemoteHost -Command "cd ~/casadapaz/infra && ./scripts/compose-prod.sh restart frontend"
     Write-Host "Frontend reiniciado." -ForegroundColor Green
 }
 

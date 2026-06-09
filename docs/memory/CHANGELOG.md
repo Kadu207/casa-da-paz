@@ -10,6 +10,9 @@
 ### Removido
 - `FinanceiroPage.tsx` legado (substituído pelas 4 telas)
 
+### Validado
+- Deploy VPS + smoke manual produção (2026-06-09)
+
 ## [0.1.0-alpha] — 2026-06-05
 
 ### Adicionado

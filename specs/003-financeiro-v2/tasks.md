@@ -63,7 +63,7 @@ Legenda: `[R]` Red (teste falha) → `[G]` Green (implementação) → `[RF]` Re
 
 ## Sprint 3 — Frontend + integração
 
-**Status:** ✅ Implementado (2026-06-09) — aguarda deploy frontend + gates S3.6
+**Status:** ✅ Concluído (2026-06-09) — produção validada
 
 ### S3.1 Navegação
 
@@ -95,7 +95,7 @@ Legenda: `[R]` Red (teste falha) → `[G]` Green (implementação) → `[RF]` Re
 
 - [x] `validador-integracao`: contratos API ↔ UI ↔ RBAC (2026-06-09)
 - [x] `validador-qualidade`: build + 70 testes backend + i18n
-- [ ] Smoke manual produção (fluxo mês anterior, batch pagar, fechar mês)
+- [x] Smoke manual produção (fluxo mês anterior, batch pagar, fechar mês) — 2026-06-09
 - [x] Atualizar `project-memory.md` + CHANGELOG
 
 ---
@@ -104,5 +104,5 @@ Legenda: `[R]` Red (teste falha) → `[G]` Green (implementação) → `[RF]` Re
 
 1. ~~S1 backend~~ — concluído + produção
 2. ~~S2 backend~~ — concluído + produção
-3. **S3 UI Vite** — implementado; deploy + gates pendentes (ADR-008: Next.js só após S3)
+3. ~~**S3 UI Vite**~~ — concluído + produção (ADR-008: Next.js só após aprovação)
 4. **016-frontend-nextjs** — ver `docs/memory/roadmap-cronograma.md`
