@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getToken } from '../lib/api';
+import { downloadApi } from '../lib/api-download';
 import { useI18n } from '../i18n/I18nContext';
 import { labelEnum } from '../i18n/helpers';
 
@@ -68,6 +69,8 @@ export default function AuditoriaPage() {
   const [draft, setDraft] = useState({ setor: '', rota: '', de: '', ate: '', q: '' });
   const [data, setData] = useState<AuditResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState<'csv' | 'pdf' | null>(null);
+  const [exportError, setExportError] = useState('');
   const [toast, setToast] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -111,36 +114,26 @@ export default function AuditoriaPage() {
     }));
   };
 
-  const exportCsv = async () => {
-    const token = getToken();
-    const res = await fetch(`${API_BASE}/auditoria/export.csv?${buildQuery(filters, locale, true)}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'auditoria-casa-da-paz.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-    load();
+  const exportFilename = (ext: 'csv' | 'pdf') => {
+    if (filters.de && filters.ate) return `auditoria-${filters.de}_${filters.ate}.${ext}`;
+    if (filters.de) return `auditoria-desde-${filters.de}.${ext}`;
+    return `auditoria-casa-da-paz.${ext}`;
   };
 
-  const exportPdf = async () => {
-    const token = getToken();
-    const res = await fetch(`${API_BASE}/auditoria/export.pdf?${buildQuery(filters, locale, true)}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'auditoria-casa-da-paz.pdf';
-    a.click();
-    URL.revokeObjectURL(url);
-    load();
+  const exportFile = async (fmt: 'csv' | 'pdf') => {
+    setExportError('');
+    setExporting(fmt);
+    try {
+      await downloadApi(
+        `/auditoria/export.${fmt}?${buildQuery(filters, locale, true)}`,
+        exportFilename(fmt)
+      );
+      await load();
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : t('erp.auditoria.exportError'));
+    } finally {
+      setExporting(null);
+    }
   };
 
   const totalPages = data ? Math.ceil(data.total / data.limit) : 0;
@@ -155,20 +148,24 @@ export default function AuditoriaPage() {
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={exportCsv}
-            className="text-sm px-4 py-2 rounded bg-[var(--color-accent)] text-black hover:opacity-90"
+            disabled={!!exporting}
+            onClick={() => exportFile('csv')}
+            className="text-sm px-4 py-2 rounded bg-[var(--color-accent)] text-black hover:opacity-90 disabled:opacity-50"
           >
-            {t('erp.auditoria.exportCsv')}
+            {exporting === 'csv' ? t('erp.auditoria.exporting') : t('erp.auditoria.exportCsv')}
           </button>
           <button
             type="button"
-            onClick={exportPdf}
-            className="text-sm px-4 py-2 rounded border border-white/20 hover:bg-white/10"
+            disabled={!!exporting}
+            onClick={() => exportFile('pdf')}
+            className="text-sm px-4 py-2 rounded border border-white/20 hover:bg-white/10 disabled:opacity-50"
           >
-            {t('erp.auditoria.exportPdf')}
+            {exporting === 'pdf' ? t('erp.auditoria.exporting') : t('erp.auditoria.exportPdf')}
           </button>
         </div>
       </div>
+
+      {exportError && <p className="text-sm text-[var(--color-danger)]">{exportError}</p>}
 
       {toast && (
         <p className="text-sm text-green-400" role="status">

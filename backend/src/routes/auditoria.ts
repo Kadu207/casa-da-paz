@@ -1,11 +1,15 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import type { Prisma } from '@prisma/client';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
 import { enriquecerLogAuditoria, type AuditLocale } from '../lib/audit-i18n.js';
 import { gerarPdfAuditoria } from '../lib/audit-pdf.js';
 import { registrarAuditoria } from '../lib/auditoria.js';
+import {
+  auditoriaExportFilename,
+  buildAuditoriaCsv,
+  buildAuditoriaWhere,
+} from '../lib/auditoria-export.js';
 
 const router = Router();
 
@@ -22,23 +26,19 @@ const querySchema = z.object({
   order: z.enum(['asc', 'desc']).default('desc'),
 });
 
-function buildWhere(q: z.infer<typeof querySchema>): Prisma.AdminAuditLogWhereInput {
-  const where: Prisma.AdminAuditLogWhereInput = {};
-  if (q.setor) where.setor = q.setor;
-  if (q.rota) where.rota = { contains: q.rota, mode: 'insensitive' };
-  if (q.de || q.ate) {
-    where.createdAt = {};
-    if (q.de) where.createdAt.gte = new Date(q.de + 'T00:00:00');
-    if (q.ate) where.createdAt.lte = new Date(q.ate + 'T23:59:59');
-  }
-  if (q.q) {
-    where.OR = [
-      { motivo: { contains: q.q, mode: 'insensitive' } },
-      { rota: { contains: q.q, mode: 'insensitive' } },
-      { ip: { contains: q.q } },
-    ];
-  }
-  return where;
+const EXPORT_LIMIT = 5000;
+
+async function loadExportLogs(
+  filters: z.infer<typeof querySchema>
+): Promise<{ locale: AuditLocale; logs: Awaited<ReturnType<typeof prisma.adminAuditLog.findMany>> }> {
+  const locale = (filters.locale ?? 'pt-BR') as AuditLocale;
+  const where = buildAuditoriaWhere(filters);
+  const logs = await prisma.adminAuditLog.findMany({
+    where,
+    orderBy: { [filters.sort]: filters.order },
+    take: EXPORT_LIMIT,
+  });
+  return { locale, logs };
 }
 
 router.get('/', authenticate, authorize('logs', 'read'), async (req, res) => {
@@ -50,7 +50,7 @@ router.get('/', authenticate, authorize('logs', 'read'), async (req, res) => {
 
   const { page, limit, sort, order } = parsed.data;
   const locale = (parsed.data.locale ?? 'pt-BR') as AuditLocale;
-  const where = buildWhere(parsed.data);
+  const where = buildAuditoriaWhere(parsed.data);
   const skip = (page - 1) * limit;
 
   const [total, logs] = await Promise.all([
@@ -78,14 +78,7 @@ router.get('/export.csv', authenticate, authorize('logs', 'read'), async (req, r
     return;
   }
 
-  const locale = (parsed.data.locale ?? 'pt-BR') as AuditLocale;
-  const where = buildWhere({ ...parsed.data, page: 1, limit: 25 });
-
-  const logs = await prisma.adminAuditLog.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-    take: 5000,
-  });
+  const { locale, logs } = await loadExportLogs({ ...parsed.data, page: 1, limit: 25 });
 
   await registrarAuditoria(req, {
     rota: 'admin.auditoria.export.csv',
@@ -94,26 +87,10 @@ router.get('/export.csv', authenticate, authorize('logs', 'read'), async (req, r
     setor: req.user!.setorAcesso,
   });
 
-  const header = 'data,setor,rota,rota_label,motivo,motivo_label,ip\n';
-  const rows = logs
-    .map((log) => {
-      const e = enriquecerLogAuditoria(log, locale);
-      const cols = [
-        e.createdAt.toISOString(),
-        e.setor ?? '',
-        e.rota,
-        e.rotaLabel,
-        (e.motivo ?? '').replace(/"/g, '""'),
-        (e.motivoLabel ?? '').replace(/"/g, '""'),
-        e.ip ?? '',
-      ];
-      return cols.map((c) => `"${c}"`).join(',');
-    })
-    .join('\n');
-
+  const filename = auditoriaExportFilename('csv', parsed.data.de, parsed.data.ate);
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename=auditoria-casa-da-paz.csv');
-  res.send('\uFEFF' + header + rows);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(buildAuditoriaCsv(logs, locale));
 });
 
 router.get('/export.pdf', authenticate, authorize('logs', 'read'), async (req, res) => {
@@ -123,14 +100,7 @@ router.get('/export.pdf', authenticate, authorize('logs', 'read'), async (req, r
     return;
   }
 
-  const locale = (parsed.data.locale ?? 'pt-BR') as AuditLocale;
-  const where = buildWhere({ ...parsed.data, page: 1, limit: 25 });
-
-  const logs = await prisma.adminAuditLog.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-    take: 5000,
-  });
+  const { locale, logs } = await loadExportLogs({ ...parsed.data, page: 1, limit: 25 });
 
   await registrarAuditoria(req, {
     rota: 'admin.auditoria.export.pdf',
@@ -140,8 +110,9 @@ router.get('/export.pdf', authenticate, authorize('logs', 'read'), async (req, r
   });
 
   const pdf = await gerarPdfAuditoria(logs, locale);
+  const filename = auditoriaExportFilename('pdf', parsed.data.de, parsed.data.ate);
   res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', 'attachment; filename=auditoria-casa-da-paz.pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.send(pdf);
 });
 

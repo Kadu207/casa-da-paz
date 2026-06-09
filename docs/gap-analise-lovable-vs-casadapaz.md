@@ -44,7 +44,7 @@
 |------|--------|
 | `/admin/auditoria` UI completa | 🟡 Tabela `admin_audit_log` + API i18n nesta sprint |
 | CRUD eventos Lovable (slug, ordem, publicado) | Parcial — `EventosPage` interno diferente |
-| Export CSV/PDF auditoria | ❌ V2 |
+| Export CSV/PDF auditoria | ✅ V2 (019) |
 | Dashboard métricas eventos | 🟡 Nesta sprint (Recharts) |
 
 ## Roadmap doc §9 — implementação nesta sprint

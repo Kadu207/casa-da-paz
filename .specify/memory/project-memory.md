@@ -22,6 +22,7 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 | 003-financeiro-v2 S3 | ✅ Produção + smoke OK |
 | 017-dashboard-v2 | ✅ Produção |
 | 018-painel-medium | ✅ Implementado — deploy pendente |
+| 019-auditoria-v2 | ✅ Implementado — deploy pendente |
 | 016-frontend-nextjs | 📋 Bloqueado (ADR-008) |
 
 ## Módulos
@@ -32,12 +33,12 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 | Financeiro | v2 S3 prod | 4 abas: lançamentos, fluxo, atrasados, conciliação |
 | Dashboard | v2 + painel MEDIUM | Filtro período; médium vê mensalidades/presenças/inscrições |
 | Portal + LGPD | Concluído | v2026-06-09 |
+| Auditoria | v2 export | CSV/PDF + filtros |
 | Next.js | Adiado | ADR-008 |
 
 ## Próximos passos
 
-1. Deploy 017 + 018 (backend + frontend)
-2. **Auditoria V2** ou **012 Chatwoot/N8N prod**
+1. Deploy 017–019 (backend + frontend)
 3. Epic 016 Next.js — aguardando aprovação (ADR-008)
 
 Espelhamento Windows/Debian: posterior (`docs/memory/runbooks/dev-windows-linux-sync.md`).

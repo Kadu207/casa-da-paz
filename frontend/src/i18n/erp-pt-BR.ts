@@ -323,6 +323,8 @@ export const erpPtBR = {
   'erp.auditoria.subtitle': 'Registros de ações administrativas e do portal',
   'erp.auditoria.exportCsv': 'Exportar CSV',
   'erp.auditoria.exportPdf': 'Exportar PDF',
+  'erp.auditoria.exportError': 'Erro na exportação',
+  'erp.auditoria.exporting': 'Exportando…',
   'erp.auditoria.loadError': 'Erro ao carregar',
   'erp.auditoria.filtersApplied': 'Filtros aplicados',
   'erp.auditoria.colRoute': 'Rota',

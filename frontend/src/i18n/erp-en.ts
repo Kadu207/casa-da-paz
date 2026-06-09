@@ -325,6 +325,8 @@ export const erpEn: Record<ErpTranslationKey, string> = {
   'erp.auditoria.subtitle': 'Administrative and portal action records',
   'erp.auditoria.exportCsv': 'Export CSV',
   'erp.auditoria.exportPdf': 'Export PDF',
+  'erp.auditoria.exportError': 'Export failed',
+  'erp.auditoria.exporting': 'Exporting…',
   'erp.auditoria.loadError': 'Could not load',
   'erp.auditoria.filtersApplied': 'Filters applied',
   'erp.auditoria.colRoute': 'Route',

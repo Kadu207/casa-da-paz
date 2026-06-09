@@ -10,7 +10,7 @@
 | **011-portal-publico** (core) | `/public/*`, LGPD, agendamento | ✅ Produção |
 | **001–006** (core ERP) | Auth, pessoas, recepção, inscrições, livraria | ✅ Base em prod |
 | **017-dashboard-v2** | Filtro mês/ano no dashboard | ✅ Implementado |
-| **018-painel-medium** | Painel MEDIUM (mensalidades, presenças, inscrições) | ✅ Implementado |
+| **019-auditoria-v2** | Export CSV/PDF + filtros | ✅ Implementado |
 
 ## Sequência acordada (Opção A)
 
@@ -20,7 +20,9 @@
     ↓
 ✅ 018-painel-medium
     ↓
-Auditoria V2 / 012-chatwoot-n8n-prod   ← próximo
+✅ 019-auditoria-v2
+    ↓
+012-chatwoot-n8n-prod   ← próximo
     ↓
 014-alertas-ui + automações N8N
     ↓
@@ -33,7 +35,7 @@ Auditoria V2 / 012-chatwoot-n8n-prod   ← próximo
 |------------|---------------|-------|
 | **1** | ~~Dashboard v2~~ | ✅ |
 | **2** | ~~Painel Médium~~ | ✅ |
-| **3** | **Auditoria V2** | Export CSV/PDF + filtros |
+| **3** | ~~Auditoria V2~~ | ✅ |
 | **4** | **012 Chatwoot/N8N prod** | Token Meta + env VPS |
 | **5** | **Portal polish** | Turnstile prod, imagens CDN |
 

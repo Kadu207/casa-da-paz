@@ -7,6 +7,8 @@ const ROTAS: Record<string, { 'pt-BR': string; en: string }> = {
   'admin.usuarios.role.update': { 'pt-BR': 'Alterar setor de usuário', en: 'Update user role' },
   'admin.auditoria.export.csv': { 'pt-BR': 'Exportar auditoria (CSV)', en: 'Export audit (CSV)' },
   'admin.auditoria.export.pdf': { 'pt-BR': 'Exportar auditoria (PDF)', en: 'Export audit (PDF)' },
+  'financeiro.conciliacao.fechar': { 'pt-BR': 'Fechar mês (conciliação)', en: 'Close month (reconciliation)' },
+  'financeiro.conciliacao.reabrir': { 'pt-BR': 'Reabrir mês (conciliação)', en: 'Reopen month (reconciliation)' },
   'admin.media.upload': { 'pt-BR': 'Upload imagem (Cloudflare)', en: 'Image upload (Cloudflare)' },
   'portal.newsletter.subscribe': { 'pt-BR': 'Inscrição newsletter', en: 'Newsletter signup' },
   'portal.evento.view': { 'pt-BR': 'Visualização de evento', en: 'Event view' },
