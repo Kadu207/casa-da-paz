@@ -21,7 +21,7 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 | 017-dashboard-v2 | ✅ Implementado — deploy pendente |
 | 018-painel-medium | ✅ Implementado — deploy pendente |
 | 019-auditoria-v2 | ✅ Implementado — deploy pendente |
-| **012-chatwoot-n8n** | 🔄 Infra + widget prontos — Meta token + VPS pendente |
+| **012-chatwoot-n8n** | 🔄 Prod no ar (`casadapaz-chat.inovatitech.com.br`) — falta WhatsApp/Meta |
 | 016-frontend-nextjs | 📋 Bloqueado (ADR-008) |
 
 ## Módulos
