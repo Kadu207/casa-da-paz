@@ -6,6 +6,7 @@ import {
   parseMetricasPeriodo,
   financeiroWhereNoPeriodo,
 } from '../lib/metricas-periodo.js';
+import { buildMeuPainelFinanceiro } from '../lib/meu-painel.js';
 
 const router = Router();
 
@@ -47,6 +48,68 @@ router.get('/eventos', authenticate, authorize('dashboard', 'read'), async (_req
     newsletterAtivos: await prisma.newsletterInscrito.count({ where: { ativo: true } }),
   };
   res.json({ eventos: lista, totais });
+});
+
+router.get('/meu-painel', authenticate, authorize('dashboard', 'read'), async (req, res) => {
+  if (req.user!.setorAcesso !== 'MEDIUM') {
+    res.status(403).json({ error: 'Apenas Médium' });
+    return;
+  }
+
+  const pessoaId = req.user!.pessoaId;
+
+  const [pessoa, transacoes, presencas, inscricoes] = await Promise.all([
+    prisma.pessoa.findUnique({
+      where: { id: pessoaId },
+      select: { id: true, nomeCompleto: true },
+    }),
+    prisma.financeiroTransacao.findMany({
+      where: { pessoaId },
+      orderBy: { dataTransacao: 'desc' },
+      take: 48,
+    }),
+    prisma.presenca.findMany({
+      where: { pessoaId },
+      orderBy: { horarioChegada: 'desc' },
+      take: 20,
+      include: { evento: { select: { nomeEvento: true } } },
+    }),
+    prisma.inscricao.findMany({
+      where: { pessoaId },
+      orderBy: { id: 'desc' },
+      take: 20,
+      include: { evento: { select: { nomeEvento: true } } },
+    }),
+  ]);
+
+  if (!pessoa) {
+    res.status(404).json({ error: 'Pessoa não encontrada' });
+    return;
+  }
+
+  const financeiro = buildMeuPainelFinanceiro(transacoes);
+
+  res.json({
+    pessoa,
+    financeiro,
+    presencas: presencas.map((p) => ({
+      id: p.id,
+      eventoNome: p.evento.nomeEvento,
+      horarioChegada: p.horarioChegada.toISOString(),
+      tipoPresenca: p.tipoPresenca,
+    })),
+    inscricoes: inscricoes.map((i) => {
+      const adimplencia = calcularAdimplencia(i.statusPagamento, i.vencimento);
+      return {
+        id: i.id,
+        eventoNome: i.evento.nomeEvento,
+        valor: Number(i.valor),
+        statusPagamento: i.statusPagamento,
+        adimplencia,
+        vencimento: i.vencimento?.toISOString().slice(0, 10) ?? null,
+      };
+    }),
+  });
 });
 
 router.get('/resumo', authenticate, authorize('dashboard', 'read'), async (req, res) => {

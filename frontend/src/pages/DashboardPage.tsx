@@ -18,6 +18,7 @@ import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { formatMoneyShort, labelEnum } from '../i18n/helpers';
 import type { ErpTranslationKey } from '../i18n/erp-pt-BR';
+import MediumDashboardPanel from '../components/dashboard/MediumDashboardPanel';
 
 const LEGEND_KEYS: ErpTranslationKey[] = [
   'erp.dashboard.legend.1',
@@ -121,12 +122,7 @@ export default function DashboardPage() {
   }, [carregar]);
 
   if (user?.setorAcesso === 'MEDIUM') {
-    return (
-      <div>
-        <h2 className="text-xl font-serif text-[var(--color-accent)] mb-4">{t('erp.dashboard.myPanel')}</h2>
-        <p className="text-white/80">{t('erp.dashboard.mediumHint')}</p>
-      </div>
-    );
+    return <MediumDashboardPanel />;
   }
 
   const periodoLabel = resumo?.periodo

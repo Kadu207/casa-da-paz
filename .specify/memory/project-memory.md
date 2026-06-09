@@ -20,8 +20,8 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 | 003-financeiro-v2 S1 | ✅ Produção |
 | 003-financeiro-v2 S2 | ✅ Produção |
 | 003-financeiro-v2 S3 | ✅ Produção + smoke OK |
-| 017-dashboard-v2 | ✅ Implementado — deploy pendente |
-| 018-painel-medium | 📋 Próximo |
+| 017-dashboard-v2 | ✅ Produção |
+| 018-painel-medium | ✅ Implementado — deploy pendente |
 | 016-frontend-nextjs | 📋 Bloqueado (ADR-008) |
 
 ## Módulos
@@ -30,15 +30,14 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 |--------|--------|-------|
 | Auth + RBAC | Concluído | JWT |
 | Financeiro | v2 S3 prod | 4 abas: lançamentos, fluxo, atrasados, conciliação |
-| Dashboard | v2 | Filtro mês/ano + link fluxo de caixa |
+| Dashboard | v2 + painel MEDIUM | Filtro período; médium vê mensalidades/presenças/inscrições |
 | Portal + LGPD | Concluído | v2026-06-09 |
 | Next.js | Adiado | ADR-008 |
 
 ## Próximos passos
 
-1. Deploy Dashboard v2 (frontend + backend `periodo` na API)
-2. **Painel Médium** (018) — dados próprios (`pessoa_id`)
-3. **012 Chatwoot/N8N prod** — quando token Meta disponível
-4. Epic 016 Next.js — aguardando aprovação explícita (ADR-008)
+1. Deploy 017 + 018 (backend + frontend)
+2. **Auditoria V2** ou **012 Chatwoot/N8N prod**
+3. Epic 016 Next.js — aguardando aprovação (ADR-008)
 
 Espelhamento Windows/Debian: posterior (`docs/memory/runbooks/dev-windows-linux-sync.md`).

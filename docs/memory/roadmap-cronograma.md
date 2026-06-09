@@ -10,6 +10,7 @@
 | **011-portal-publico** (core) | `/public/*`, LGPD, agendamento | ✅ Produção |
 | **001–006** (core ERP) | Auth, pessoas, recepção, inscrições, livraria | ✅ Base em prod |
 | **017-dashboard-v2** | Filtro mês/ano no dashboard | ✅ Implementado |
+| **018-painel-medium** | Painel MEDIUM (mensalidades, presenças, inscrições) | ✅ Implementado |
 
 ## Sequência acordada (Opção A)
 
@@ -17,8 +18,9 @@
 ✅ S2 backend + S3 UI financeiro (Vite)
 ✅ 017-dashboard-v2 (filtro período)
     ↓
-018-painel-medium   ← próximo
-012-chatwoot-n8n-prod (token Meta / workflows)
+✅ 018-painel-medium
+    ↓
+Auditoria V2 / 012-chatwoot-n8n-prod   ← próximo
     ↓
 014-alertas-ui + automações N8N
     ↓
@@ -30,7 +32,7 @@
 | Prioridade | Epic / escopo | Notas |
 |------------|---------------|-------|
 | **1** | ~~Dashboard v2~~ | ✅ |
-| **2** | **Painel Médium** | Mensalidade, presenças, inscrições (`pessoa_id`) |
+| **2** | ~~Painel Médium~~ | ✅ |
 | **3** | **Auditoria V2** | Export CSV/PDF + filtros |
 | **4** | **012 Chatwoot/N8N prod** | Token Meta + env VPS |
 | **5** | **Portal polish** | Turnstile prod, imagens CDN |
@@ -54,6 +56,7 @@
 ## Referências
 
 - Dashboard: `specs/017-dashboard-v2/`
+- Painel Médium: `specs/018-painel-medium/`
 - Financeiro v2: `specs/003-financeiro-v2/`
 - Portal: `specs/011-portal-publico/spec.md`
 - Next.js (futuro): `specs/016-frontend-nextjs/spec.md`
