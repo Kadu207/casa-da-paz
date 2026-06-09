@@ -39,6 +39,7 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 ## Próximos passos
 
 1. Deploy 017–019 (backend + frontend)
+2. **012 Chatwoot/N8N prod**
 3. Epic 016 Next.js — aguardando aprovação (ADR-008)
 
 Espelhamento Windows/Debian: posterior (`docs/memory/runbooks/dev-windows-linux-sync.md`).

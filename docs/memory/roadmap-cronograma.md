@@ -10,6 +10,7 @@
 | **011-portal-publico** (core) | `/public/*`, LGPD, agendamento | ✅ Produção |
 | **001–006** (core ERP) | Auth, pessoas, recepção, inscrições, livraria | ✅ Base em prod |
 | **017-dashboard-v2** | Filtro mês/ano no dashboard | ✅ Implementado |
+| **018-painel-medium** | Painel MEDIUM | ✅ Implementado |
 | **019-auditoria-v2** | Export CSV/PDF + filtros | ✅ Implementado |
 
 ## Sequência acordada (Opção A)
