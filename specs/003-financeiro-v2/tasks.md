@@ -63,45 +63,46 @@ Legenda: `[R]` Red (teste falha) → `[G]` Green (implementação) → `[RF]` Re
 
 ## Sprint 3 — Frontend + integração
 
-**Status:** ⏸ Agendado após deploy S2 — stack **Vite** (Opção A, ADR-008)
+**Status:** ✅ Implementado (2026-06-09) — aguarda deploy frontend + gates S3.6
 
 ### S3.1 Navegação
 
-- [ ] `[G]` Sub-nav Financeiro (4 abas) em layout compartilhado
-- [ ] `[G]` Rotas em `App.tsx` + `RequireRole`
+- [x] `[G]` Sub-nav Financeiro (4 abas) em layout compartilhado
+- [x] `[G]` Rotas em `App.tsx` + `RequireRole`
 
 ### S3.2 Lançamentos
 
-- [ ] `[G]` Filtros período/tipo/categoria/status/adimplência
-- [ ] `[G]` Paginação + modal editar + confirmar excluir
-- [ ] `[G]` i18n pt-BR + en
+- [x] `[G]` Filtros período/tipo/categoria/status/adimplência
+- [x] `[G]` Paginação + modal editar + confirmar excluir
+- [x] `[G]` i18n pt-BR + en
 
 ### S3.3 Fluxo de caixa
 
-- [ ] `[G]` `FinanceiroFluxoPage`: KPIs + Recharts barras/linha
+- [x] `[G]` `FinanceiroFluxoPage`: KPIs + Recharts barras/linha
 - [ ] Smoke: selecionar mês anterior atualiza gráficos
 
 ### S3.4 Atrasados
 
-- [ ] `[G]` `FinanceiroAtrasadosPage`: checkbox + batch pagar
-- [ ] `[G]` Coluna dias atraso
+- [x] `[G]` `FinanceiroAtrasadosPage`: checkbox + batch pagar
+- [x] `[G]` Coluna dias atraso
 
 ### S3.5 Conciliação
 
-- [ ] `[G]` `FinanceiroConciliacaoPage`: checklist, export, fechar mês
-- [ ] `[G]` Histórico 12 meses + badge fechado
+- [x] `[G]` `FinanceiroConciliacaoPage`: checklist, export, fechar mês
+- [x] `[G]` Histórico 12 meses + badge fechado
 
 ### S3.6 Gates
 
-- [ ] `validador-integracao`: contratos API ↔ UI ↔ RBAC
-- [ ] `validador-qualidade`: lint + test + i18n completo
-- [ ] Atualizar `project-memory.md` + CHANGELOG
+- [x] `validador-integracao`: contratos API ↔ UI ↔ RBAC (2026-06-09)
+- [x] `validador-qualidade`: build + 70 testes backend + i18n
+- [ ] Smoke manual produção (fluxo mês anterior, batch pagar, fechar mês)
+- [x] Atualizar `project-memory.md` + CHANGELOG
 
 ---
 
 ## Ordem de execução
 
 1. ~~S1 backend~~ — concluído + produção
-2. ~~S2 backend~~ — concluído (deploy pendente)
-3. **S3 UI Vite** — posterior (ADR-008: Next.js só após S3)
+2. ~~S2 backend~~ — concluído + produção
+3. **S3 UI Vite** — implementado; deploy + gates pendentes (ADR-008: Next.js só após S3)
 4. **016-frontend-nextjs** — ver `docs/memory/roadmap-cronograma.md`

@@ -37,7 +37,9 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             to={n.path}
             onClick={onNavigate}
             className={`block px-3 py-2.5 rounded text-sm ${
-              location.pathname === n.path ? 'bg-[var(--color-accent)] text-black' : 'hover:bg-white/10'
+              location.pathname === n.path || location.pathname.startsWith(`${n.path}/`)
+                ? 'bg-[var(--color-accent)] text-black'
+                : 'hover:bg-white/10'
             }`}
           >
             {t(n.labelKey)}

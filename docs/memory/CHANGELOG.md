@@ -1,5 +1,15 @@
 # Changelog — Casa da Paz
 
+## [Unreleased]
+
+### Adicionado
+- **Financeiro v2 S3 (UI Vite):** 4 abas — Lançamentos, Fluxo de caixa, Atrasados, Conciliação
+- Sub-nav `FinanceiroLayout`, rotas aninhadas em `/app/financeiro/*`
+- i18n pt-BR/en para módulo financeiro; export CSV/PDF; batch pagar atrasados
+
+### Removido
+- `FinanceiroPage.tsx` legado (substituído pelas 4 telas)
+
 ## [0.1.0-alpha] — 2026-06-05
 
 ### Adicionado

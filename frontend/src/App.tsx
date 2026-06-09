@@ -1,7 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
-import FinanceiroPage from './pages/FinanceiroPage';
+import FinanceiroLayout from './components/financeiro/FinanceiroLayout';
+import FinanceiroLancamentosPage from './pages/financeiro/FinanceiroLancamentosPage';
+import FinanceiroFluxoPage from './pages/financeiro/FinanceiroFluxoPage';
+import FinanceiroAtrasadosPage from './pages/financeiro/FinanceiroAtrasadosPage';
+import FinanceiroConciliacaoPage from './pages/financeiro/FinanceiroConciliacaoPage';
 import RecepcaoPage from './pages/RecepcaoPage';
 import LivrariaPage from './pages/LivrariaPage';
 import UsuariosPage from './pages/UsuariosPage';
@@ -55,10 +59,16 @@ export default function App() {
           path="financeiro"
           element={
             <RequireRole path="/app/financeiro">
-              <FinanceiroPage />
+              <FinanceiroLayout />
             </RequireRole>
           }
-        />
+        >
+          <Route index element={<Navigate to="lancamentos" replace />} />
+          <Route path="lancamentos" element={<FinanceiroLancamentosPage />} />
+          <Route path="fluxo" element={<FinanceiroFluxoPage />} />
+          <Route path="atrasados" element={<FinanceiroAtrasadosPage />} />
+          <Route path="conciliacao" element={<FinanceiroConciliacaoPage />} />
+        </Route>
         <Route
           path="recepcao"
           element={

@@ -1,4 +1,6 @@
-# Envia frontend/dist para a VPS (build local antes: cd frontend; npm run build)
+# Envia frontend/dist para a VPS — rode NO SEU PC (Windows PowerShell), nao na VPS.
+# Build antes: Set-Location frontend; npm run build
+# Na VPS use apenas: cd ~/casadapaz/infra && ./scripts/compose-prod.sh restart frontend
 param(
     [string]$RemoteHost = "",
     [string]$RemotePath = "~/casadapaz/frontend/dist",
