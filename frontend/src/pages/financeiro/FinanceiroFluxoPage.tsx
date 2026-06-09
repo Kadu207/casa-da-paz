@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   BarChart,
   Bar,
@@ -18,9 +19,14 @@ import type { FluxoCaixaResponse } from '../../types/financeiro';
 
 export default function FinanceiroFluxoPage() {
   const { t, locale } = useI18n();
+  const [searchParams] = useSearchParams();
   const init = mesAnoAtual();
-  const [mes, setMes] = useState(init.mes);
-  const [ano, setAno] = useState(init.ano);
+  const qpMes = Number(searchParams.get('mes'));
+  const qpAno = Number(searchParams.get('ano'));
+  const [mes, setMes] = useState(
+    Number.isFinite(qpMes) && qpMes >= 1 && qpMes <= 12 ? qpMes : init.mes
+  );
+  const [ano, setAno] = useState(Number.isFinite(qpAno) && qpAno >= 2020 ? qpAno : init.ano);
   const [data, setData] = useState<FluxoCaixaResponse | null>(null);
   const [erro, setErro] = useState('');
 

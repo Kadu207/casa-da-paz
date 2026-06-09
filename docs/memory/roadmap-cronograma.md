@@ -2,47 +2,59 @@
 
 **Atualizado:** 2026-06-09
 
-## Em andamento
+## Concluído
 
-| Fase | Escopo | Stack | Status |
-|------|--------|-------|--------|
-| **003-financeiro-v2 S1** | fluxo-caixa, listagem, batch | Express/Prisma | ✅ Produção |
-| **003-financeiro-v2 S2** | conciliação, export, histórico, métricas período | Express/Prisma | 🔄 Backend TDD |
-| **003-financeiro-v2 S3** | 4 abas UI financeiro | React/Vite | ⏸ Agendado após S2 |
+| Fase | Escopo | Status |
+|------|--------|--------|
+| **003-financeiro-v2 S1–S3** | API + 4 abas UI (Vite) | ✅ Produção + smoke |
+| **011-portal-publico** (core) | `/public/*`, LGPD, agendamento | ✅ Produção |
+| **001–006** (core ERP) | Auth, pessoas, recepção, inscrições, livraria | ✅ Base em prod |
+| **017-dashboard-v2** | Filtro mês/ano no dashboard | ✅ Implementado |
 
 ## Sequência acordada (Opção A)
 
 ```
-S2 backend (agora)
-    ↓ deploy VPS + smoke
-S3 frontend Vite (posterior)
-    ↓ gates integração/qualidade
-016-frontend-nextjs (monorepo /public + /app)
-    ↓ ADR-009 + cutover plan
-Produção Next.js (sem quebrar API Express)
+✅ S2 backend + S3 UI financeiro (Vite)
+✅ 017-dashboard-v2 (filtro período)
+    ↓
+018-painel-medium   ← próximo
+012-chatwoot-n8n-prod (token Meta / workflows)
+    ↓
+014-alertas-ui + automações N8N
+    ↓
+016-frontend-nextjs (monorepo /public + /app) — só com aprovação + ADR-009
 ```
 
-## Quando executar Next.js (016)
+## Próxima onda (recomendada)
 
-**Iniciar somente quando:**
+| Prioridade | Epic / escopo | Notas |
+|------------|---------------|-------|
+| **1** | ~~Dashboard v2~~ | ✅ |
+| **2** | **Painel Médium** | Mensalidade, presenças, inscrições (`pessoa_id`) |
+| **3** | **Auditoria V2** | Export CSV/PDF + filtros |
+| **4** | **012 Chatwoot/N8N prod** | Token Meta + env VPS |
+| **5** | **Portal polish** | Turnstile prod, imagens CDN |
 
-1. Sprint 3 de `003-financeiro-v2` estiver **concluído e em produção** (fluxo, atrasados, conciliação na UI Vite).
-2. Checklist de gates S3.6 passar (integração API ↔ UI ↔ RBAC).
-3. Usuário aprovar epic 016 explicitamente.
-4. ADR-009 (plano de migração/cutover) ratificado.
+## Bloqueado / adiado
 
-**Não executar agora:** SEO/SSR do portal `/public/*` permanece com SPA Vite até essa fase.
+| Item | Motivo |
+|------|--------|
+| **016 Next.js** | ADR-008 — aguarda aprovação explícita do usuário |
+| **Espelhamento Windows/Debian** | Posterior — runbook em `dev-windows-linux-sync.md` |
+| **Chatwoot widget prod** | `VITE_CHATWOOT_WEBSITE_TOKEN` pendente |
 
 ## Pipeline (inalterado)
 
 | Ambiente | Fluxo |
 |----------|--------|
 | CI | `backend`: lint + test · `frontend`: lint + build |
-| VPS | `git pull` → backup → `deploy.sh` · frontend via `sync-frontend-vps.ps1` ou build Docker |
-| Next.js (futuro) | Novo job CI + runbook deploy — só após 016 |
+| VPS | `git pull` → backup → `deploy.sh` · frontend via `sync-frontend-vps.ps1` / `.sh` |
+| Next.js (futuro) | Novo job CI + runbook — só após 016 |
 
 ## Referências
 
-- Spec financeiro v2: `specs/003-financeiro-v2/spec.md`
-- Spec Next.js (futuro): `specs/016-frontend-nextjs/spec.md`
-- ADR adiamento: `docs/memory/decisions/008-defer-nextjs-pos-financeiro-v2.md`
+- Dashboard: `specs/017-dashboard-v2/`
+- Financeiro v2: `specs/003-financeiro-v2/`
+- Portal: `specs/011-portal-publico/spec.md`
+- Next.js (futuro): `specs/016-frontend-nextjs/spec.md`
+- ADR adiamento Next: `docs/memory/decisions/008-defer-nextjs-pos-financeiro-v2.md`

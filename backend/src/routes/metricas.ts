@@ -63,6 +63,9 @@ router.get('/resumo', authenticate, authorize('dashboard', 'read'), async (req, 
 
   const now = new Date();
   const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+  const presencasWhere = periodoParsed
+    ? { horarioChegada: { gte: periodoParsed.de, lte: periodoParsed.ate } }
+    : { horarioChegada: { gte: inicioMes } };
 
   const [
     receitasAgg,
@@ -101,7 +104,7 @@ router.get('/resumo', authenticate, authorize('dashboard', 'read'), async (req, 
     prisma.evento.aggregate({ _sum: { visualizacoes: true } }),
     prisma.inscricao.count(),
     prisma.newsletterInscrito.count({ where: { ativo: true } }),
-    prisma.presenca.count({ where: { horarioChegada: { gte: inicioMes } } }),
+    prisma.presenca.count({ where: presencasWhere }),
     prisma.financeiroTransacao.groupBy({
       by: ['categoria'],
       where: { tipo: 'RECEITA', status: 'CONCLUIDO', ...finPeriodoWhere },
@@ -122,6 +125,14 @@ router.get('/resumo', authenticate, authorize('dashboard', 'read'), async (req, 
   ).length;
 
   res.json({
+    periodo: periodoParsed
+      ? {
+          mes: periodoParsed.de.getMonth() + 1,
+          ano: periodoParsed.de.getFullYear(),
+          de: periodoParsed.de.toISOString().slice(0, 10),
+          ate: periodoParsed.ate.toISOString().slice(0, 10),
+        }
+      : null,
     financeiro: {
       receitasConcluidas: receitas,
       despesasConcluidas: despesas,

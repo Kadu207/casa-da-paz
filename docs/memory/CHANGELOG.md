@@ -3,7 +3,8 @@
 ## [Unreleased]
 
 ### Adicionado
-- **Financeiro v2 S3 (UI Vite):** 4 abas — Lançamentos, Fluxo de caixa, Atrasados, Conciliação
+- **Dashboard v2 (017):** seletor mês/ano, KPIs/gráficos por período, link para fluxo de caixa
+- API `/metricas/resumo` retorna `periodo`; presenças filtradas no período
 - Sub-nav `FinanceiroLayout`, rotas aninhadas em `/app/financeiro/*`
 - i18n pt-BR/en para módulo financeiro; export CSV/PDF; batch pagar atrasados
 
