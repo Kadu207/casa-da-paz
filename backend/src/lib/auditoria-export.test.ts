@@ -10,8 +10,9 @@ describe('buildAuditoriaWhere', () => {
 
   it('filtra periodo de datas', () => {
     const w = buildAuditoriaWhere({ de: '2026-06-01', ate: '2026-06-30' });
-    expect(w.createdAt?.gte).toEqual(new Date('2026-06-01T00:00:00'));
-    expect(w.createdAt?.lte).toEqual(new Date('2026-06-30T23:59:59'));
+    const createdAt = w.createdAt as { gte?: Date; lte?: Date } | undefined;
+    expect(createdAt?.gte).toEqual(new Date('2026-06-01T00:00:00'));
+    expect(createdAt?.lte).toEqual(new Date('2026-06-30T23:59:59'));
   });
 });
 
