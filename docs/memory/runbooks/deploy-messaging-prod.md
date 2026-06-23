@@ -95,7 +95,28 @@ docker ps --filter name=chatwoot
 
 ## 4. Cloudflare — expor Chatwoot (inovati-server)
 
-No **inovati-server**, cloudflared roda em Docker Swarm e **não alcança** `127.0.0.1`. Use a mesma lógica do site principal (`172.17.0.1`).
+No **inovati-server**, cloudflared roda em Docker Swarm. O site principal usa **`http://128.140.77.31:9080`** — use o **mesmo padrao** para Chatwoot: **`http://128.140.77.31:3001`**.
+
+### IMPORTANTE — hostname e certificado SSL
+
+O Universal SSL gratuito da Cloudflare cobre `*.inovatitech.com.br`, mas **NAO** cobre
+`chat.casadapaz.inovatitech.com.br` (3o nivel). Sintoma: `TLS handshake failure` no curl HTTPS.
+
+**Use hostname de 2o nivel** (recomendado):
+
+| Campo | Valor |
+|-------|--------|
+| Subdomain | `casadapaz-chat` |
+| Domain | `inovatitech.com.br` |
+| URL final | `https://casadapaz-chat.inovatitech.com.br` |
+
+Remova ou ignore `chat.casadapaz.inovatitech.com.br` se criou antes.
+
+Atualize na VPS `infra/.env.production`:
+
+```bash
+CHATWOOT_PUBLIC_URL=https://casadapaz-chat.inovatitech.com.br
+```
 
 **Antes** de configurar Cloudflare: Chatwoot deve estar rodando (`docker ps` mostra container chatwoot).
 
@@ -104,20 +125,22 @@ No **inovati-server**, cloudflared roda em Docker Swarm e **não alcança** `127
 
 | Campo | Valor |
 |-------|--------|
-| Subdomain | `chat` |
-| Domain | `casadapaz.inovatitech.com.br` |
+| Subdomain | `casadapaz-chat` |
+| Domain | `inovatitech.com.br` |
 | Type | HTTP |
-| URL | `http://172.17.0.1:3001` |
+| URL | `http://128.140.77.31:3001` |
 
-Se o painel rejeitar, tente `128.140.77.31:3001` (sem `http://`).
-
-3. Aguarde ~1 min, teste:
+3. Aguarde ~2 min, teste:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" https://chat.casadapaz.inovatitech.com.br
+curl -s -o /dev/null -w "%{http_code}\n" https://casadapaz-chat.inovatitech.com.br
 ```
 
-Só então abra no navegador. Se der “página não pode ser exibida” **antes** dos passos acima, é esperado — nada estava publicado ainda.
+Esperado: **302**. Se `TLS handshake failure`, confira SSL/TLS → Edge Certificates no painel Cloudflare.
+
+### Alternativa (nao recomendada): certificado avancado
+
+SSL/TLS → Edge Certificates → Order Advanced Certificate para `*.casadapaz.inovatitech.com.br`.
 
 ## 5. Cloudflare — VPS dedicada (alternativa)
 
