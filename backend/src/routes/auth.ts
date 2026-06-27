@@ -2,7 +2,19 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
-import { authenticate, authorize, signToken } from '../middleware/auth.js';
+import {
+  authenticate,
+  authorize,
+  requireSupervisor,
+  signToken,
+} from '../middleware/auth.js';
+import {
+  RBAC_RESOURCES,
+  canManageTargetUser,
+  defaultGrantsForSetor,
+  effectiveGrants,
+  type PolicyGrants,
+} from '../policies/rbac.js';
 
 const router = Router();
 
@@ -17,17 +29,62 @@ const loginSchema = z.object({
   senha: z.string().min(6),
 });
 
+const operationalSetorSchema = z.enum([
+  'DIRETORIA',
+  'FINANCEIRO',
+  'RECEPCAO',
+  'LIVRARIA',
+  'MEDIUM',
+  'SUPORTE',
+]);
+
 const usuarioSchema = z.object({
   login: loginFieldSchema,
   senha: z.string().min(6),
-  setorAcesso: z.enum(['DIRETORIA', 'FINANCEIRO', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE']),
+  setorAcesso: operationalSetorSchema,
   pessoaId: z.number().int().positive(),
 });
+
+const grantSchema = z.enum(['read', 'write', 'own', 'none']);
+const policyGrantsSchema = z.record(z.enum(RBAC_RESOURCES), grantSchema);
 
 const alterarSenhaSchema = z.object({
   senhaAtual: z.string().min(1),
   senhaNova: z.string().min(6),
 });
+
+async function loadUsuarioOr404(id: number, res: import('express').Response) {
+  const usuario = await prisma.usuario.findUnique({
+    where: { id },
+    include: { pessoa: true, policy: true },
+  });
+  if (!usuario) {
+    res.status(404).json({ error: 'Usuário não encontrado' });
+    return null;
+  }
+  return usuario;
+}
+
+function serializeUsuario(u: {
+  id: number;
+  login: string;
+  setorAcesso: import('@prisma/client').SetorAcesso;
+  pessoaId: number;
+  pessoa?: unknown;
+  policy?: { grants: unknown } | null;
+  senhaHash?: string;
+}) {
+  const customGrants = (u.policy?.grants as PolicyGrants | undefined) ?? null;
+  return {
+    id: u.id,
+    login: u.login,
+    setorAcesso: u.setorAcesso,
+    pessoaId: u.pessoaId,
+    pessoa: u.pessoa,
+    policy: customGrants,
+    effectiveGrants: effectiveGrants(u.setorAcesso, customGrants),
+  };
+}
 
 router.post('/login', async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
@@ -38,7 +95,7 @@ router.post('/login', async (req, res) => {
   const { login, senha } = parsed.data;
   const usuario = await prisma.usuario.findUnique({
     where: { login },
-    include: { pessoa: true },
+    include: { pessoa: true, policy: true },
   });
   if (!usuario || !(await bcrypt.compare(senha, usuario.senhaHash))) {
     res.status(401).json({ error: 'Credenciais inválidas' });
@@ -52,30 +109,81 @@ router.post('/login', async (req, res) => {
   });
   res.json({
     token,
-    user: {
-      id: usuario.id,
-      login: usuario.login,
-      setorAcesso: usuario.setorAcesso,
-      pessoa: usuario.pessoa,
-    },
+    user: serializeUsuario(usuario),
   });
 });
 
 router.get('/me', authenticate, async (req, res) => {
   const usuario = await prisma.usuario.findUnique({
     where: { id: req.user!.userId },
-    include: { pessoa: true },
+    include: { pessoa: true, policy: true },
   });
   if (!usuario) {
     res.status(404).json({ error: 'Usuário não encontrado' });
     return;
   }
+  res.json(serializeUsuario(usuario));
+});
+
+router.get('/politicas/catalogo', authenticate, requireSupervisor, (_req, res) => {
   res.json({
-    id: usuario.id,
-    login: usuario.login,
-    setorAcesso: usuario.setorAcesso,
-    pessoa: usuario.pessoa,
+    resources: RBAC_RESOURCES,
+    grants: ['read', 'write', 'own', 'none'],
+    operationalSetores: operationalSetorSchema.options,
+    defaults: {
+      DIRETORIA: defaultGrantsForSetor('DIRETORIA'),
+      FINANCEIRO: defaultGrantsForSetor('FINANCEIRO'),
+      RECEPCAO: defaultGrantsForSetor('RECEPCAO'),
+      LIVRARIA: defaultGrantsForSetor('LIVRARIA'),
+      MEDIUM: defaultGrantsForSetor('MEDIUM'),
+      SUPORTE: defaultGrantsForSetor('SUPORTE'),
+    },
   });
+});
+
+router.get('/usuarios/:id/politicas', authenticate, requireSupervisor, async (req, res) => {
+  const usuario = await loadUsuarioOr404(Number(req.params.id), res);
+  if (!usuario) return;
+  if (!canManageTargetUser(req.user!.setorAcesso, usuario.setorAcesso)) {
+    res.status(403).json({ error: 'Não é possível configurar políticas deste usuário' });
+    return;
+  }
+  const custom = (usuario.policy?.grants as PolicyGrants | undefined) ?? {};
+  res.json({
+    usuarioId: usuario.id,
+    setorAcesso: usuario.setorAcesso,
+    customGrants: custom,
+    effectiveGrants: effectiveGrants(usuario.setorAcesso, custom),
+    defaults: defaultGrantsForSetor(usuario.setorAcesso),
+  });
+});
+
+router.put('/usuarios/:id/politicas', authenticate, requireSupervisor, async (req, res) => {
+  const id = Number(req.params.id);
+  const usuario = await loadUsuarioOr404(id, res);
+  if (!usuario) return;
+  if (!canManageTargetUser(req.user!.setorAcesso, usuario.setorAcesso)) {
+    res.status(403).json({ error: 'Não é possível configurar políticas deste usuário' });
+    return;
+  }
+  const parsed = policyGrantsSchema.safeParse(req.body.grants ?? req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
+    return;
+  }
+  await prisma.usuarioPolicy.upsert({
+    where: { usuarioId: id },
+    create: {
+      usuarioId: id,
+      grants: parsed.data,
+      atualizadoPorId: req.user!.userId,
+    },
+    update: {
+      grants: parsed.data,
+      atualizadoPorId: req.user!.userId,
+    },
+  });
+  res.json({ ok: true, grants: parsed.data });
 });
 
 router.put('/me/senha', authenticate, async (req, res) => {
@@ -103,9 +211,12 @@ router.put('/me/senha', authenticate, async (req, res) => {
 
 router.get('/usuarios', authenticate, authorize('usuarios', 'read'), async (_req, res) => {
   const usuarios = await prisma.usuario.findMany({
-    include: { pessoa: { select: { id: true, nomeCompleto: true, telefone: true } } },
+    include: {
+      pessoa: { select: { id: true, nomeCompleto: true, telefone: true } },
+      policy: true,
+    },
   });
-  res.json(usuarios.map((u) => ({ ...u, senhaHash: undefined })));
+  res.json(usuarios.map((u) => serializeUsuario(u)));
 });
 
 router.post('/usuarios', authenticate, authorize('usuarios', 'write'), async (req, res) => {
@@ -118,20 +229,24 @@ router.post('/usuarios', authenticate, authorize('usuarios', 'write'), async (re
   const senhaHash = await bcrypt.hash(senha, 10);
   const usuario = await prisma.usuario.create({
     data: { login, senhaHash, setorAcesso, pessoaId },
-    include: { pessoa: true },
+    include: { pessoa: true, policy: true },
   });
-  res.status(201).json({ ...usuario, senhaHash: undefined });
+  res.status(201).json(serializeUsuario(usuario));
 });
 
 router.put('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async (req, res) => {
   const id = Number(req.params.id);
+  const target = await loadUsuarioOr404(id, res);
+  if (!target) return;
+  if (!canManageTargetUser(req.user!.setorAcesso, target.setorAcesso)) {
+    res.status(403).json({ error: 'Sem permissão para alterar este usuário' });
+    return;
+  }
   const body = z
     .object({
       login: loginFieldSchema.optional(),
       senha: z.string().min(6).optional(),
-      setorAcesso: z
-        .enum(['DIRETORIA', 'FINANCEIRO', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'])
-        .optional(),
+      setorAcesso: operationalSetorSchema.optional(),
     })
     .safeParse(req.body);
   if (!body.success) {
@@ -145,13 +260,24 @@ router.put('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async 
   const usuario = await prisma.usuario.update({
     where: { id },
     data,
-    include: { pessoa: true },
+    include: { pessoa: true, policy: true },
   });
-  res.json({ ...usuario, senhaHash: undefined });
+  res.json(serializeUsuario(usuario));
 });
 
 router.delete('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async (req, res) => {
-  await prisma.usuario.delete({ where: { id: Number(req.params.id) } });
+  const id = Number(req.params.id);
+  if (id === req.user!.userId) {
+    res.status(400).json({ error: 'Não é possível excluir o próprio usuário' });
+    return;
+  }
+  const target = await loadUsuarioOr404(id, res);
+  if (!target) return;
+  if (!canManageTargetUser(req.user!.setorAcesso, target.setorAcesso)) {
+    res.status(403).json({ error: 'Sem permissão para excluir este usuário' });
+    return;
+  }
+  await prisma.usuario.delete({ where: { id } });
   res.status(204).send();
 });
 

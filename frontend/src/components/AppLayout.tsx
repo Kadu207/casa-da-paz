@@ -1,25 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, hasPermission } from '../context/AuthContext';
 import { portalAssets } from '../lib/portal-assets';
 import { useI18n } from '../i18n/I18nContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import type { ErpTranslationKey } from '../i18n/erp-pt-BR';
 
-const nav: { path: string; labelKey: ErpTranslationKey; roles: string[] }[] = [
-  { path: '/app/dashboard', labelKey: 'erp.nav.dashboard', roles: ['DIRETORIA', 'FINANCEIRO', 'MEDIUM'] },
-  { path: '/app/financeiro', labelKey: 'erp.nav.financeiro', roles: ['DIRETORIA', 'FINANCEIRO'] },
-  { path: '/app/recepcao', labelKey: 'erp.nav.recepcao', roles: ['DIRETORIA', 'RECEPCAO'] },
-  { path: '/app/eventos', labelKey: 'erp.nav.eventos', roles: ['DIRETORIA', 'RECEPCAO'] },
-  {
-    path: '/app/pessoas',
-    labelKey: 'erp.nav.pessoas',
-    roles: ['DIRETORIA', 'RECEPCAO', 'FINANCEIRO', 'LIVRARIA', 'SUPORTE'],
-  },
-  { path: '/app/livraria', labelKey: 'erp.nav.livraria', roles: ['DIRETORIA', 'LIVRARIA'] },
-  { path: '/app/ecommerce', labelKey: 'erp.nav.ecommerce', roles: ['DIRETORIA', 'LIVRARIA'] },
-  { path: '/app/usuarios', labelKey: 'erp.nav.usuarios', roles: ['DIRETORIA'] },
-  { path: '/app/auditoria', labelKey: 'erp.nav.auditoria', roles: ['DIRETORIA', 'SUPORTE'] },
+const nav: { path: string; labelKey: ErpTranslationKey; resource: string }[] = [
+  { path: '/app/dashboard', labelKey: 'erp.nav.dashboard', resource: 'dashboard' },
+  { path: '/app/financeiro', labelKey: 'erp.nav.financeiro', resource: 'financeiro' },
+  { path: '/app/recepcao', labelKey: 'erp.nav.recepcao', resource: 'eventos' },
+  { path: '/app/eventos', labelKey: 'erp.nav.eventos', resource: 'eventos' },
+  { path: '/app/pessoas', labelKey: 'erp.nav.pessoas', resource: 'pessoas' },
+  { path: '/app/livraria', labelKey: 'erp.nav.livraria', resource: 'livraria' },
+  { path: '/app/ecommerce', labelKey: 'erp.nav.ecommerce', resource: 'ecommerce' },
+  { path: '/app/usuarios', labelKey: 'erp.nav.usuarios', resource: 'usuarios' },
+  { path: '/app/auditoria', labelKey: 'erp.nav.auditoria', resource: 'auditoria' },
+  { path: '/app/integracoes', labelKey: 'erp.nav.integracoes', resource: 'integracoes' },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
@@ -30,7 +27,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       {nav
-        .filter((n) => user && n.roles.includes(user.setorAcesso))
+        .filter((n) => user && hasPermission(user, n.resource, 'read'))
         .map((n) => (
           <Link
             key={n.path}

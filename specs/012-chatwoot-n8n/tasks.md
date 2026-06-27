@@ -11,6 +11,43 @@
 - [x] T9 — Rebuild frontend com `VITE_CHATWOOT_*` + sync — **bubble no ar** (2026-06-10)
 - [ ] T10 — Smoke `test-agendamento-n8n.ps1` em prod
 
+## T8 — Meta WhatsApp (gate humano)
+
+Pré-requisitos: Chatwoot em `https://casadapaz-chat.inovatitech.com.br` (HTTP 302).
+
+- [ ] Conta **Meta Business** com app WhatsApp Business API
+- [ ] No Meta: Phone Number ID, WABA ID, **Permanent Access Token**
+- [ ] Chatwoot → Settings → Inboxes → **Add Inbox → WhatsApp**
+- [ ] Colar token Meta no painel Chatwoot (nunca no repositório)
+- [ ] Enviar mensagem teste do inbox WhatsApp para um número real
+- [ ] (Opcional) `CHATWOOT_API_TOKEN` em `infra/.env.production` para N8N enviar mensagens
+
+## T10 — Smoke E2E produção
+
+Pré-requisitos: stack base UP (`curl http://127.0.0.1:9080/health` → JSON ok), N8N rodando.
+
+```bash
+# Na VPS — health
+curl -s http://127.0.0.1:9080/health
+curl -s -o /dev/null -w "%{http_code}\n" https://casadapaz.inovatitech.com.br/health
+```
+
+```powershell
+# No PC — ajustar $base para produção se necessário
+$env:CASADAPAZ_API = "https://casadapaz.inovatitech.com.br/api"
+# Login DIRETORIA, POST agendamento público, confirmar recepção, verificar N8N Executions
+```
+
+Checklist manual:
+
+- [ ] Portal `/public/agendar` — formulário envia (Turnstile OK)
+- [ ] Backend dispara `novo_agendamento` → N8N execution 200
+- [ ] Recepção confirma agendamento → `agendamento_confirmado` no N8N
+- [ ] Widget em `/public/contato` abre bubble Chatwoot
+- [ ] (Após T8) Mensagem WhatsApp recebida no número de teste
+
+Script local: `scripts/test-agendamento-n8n.ps1` (localhost). Para prod, adaptar `$base` ou criar `scripts/test-agendamento-n8n-prod.ps1`.
+
 ## Produção (2026-06-10)
 
 - Chatwoot público: `https://casadapaz-chat.inovatitech.com.br` (2º nível — Universal SSL não cobre 3º nível)

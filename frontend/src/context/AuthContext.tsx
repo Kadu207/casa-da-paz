@@ -2,6 +2,8 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { api, getToken } from '../lib/api';
 
 export type SetorAcesso =
+  | 'SUPERVISOR'
+  | 'ADMIN'
   | 'DIRETORIA'
   | 'FINANCEIRO'
   | 'RECEPCAO'
@@ -9,11 +11,40 @@ export type SetorAcesso =
   | 'MEDIUM'
   | 'SUPORTE';
 
-interface User {
+export type PolicyGrant = 'read' | 'write' | 'own' | 'none';
+
+export interface User {
   id: number;
   login: string;
   setorAcesso: SetorAcesso;
   pessoa: { id: number; nomeCompleto: string };
+  policy?: Partial<Record<string, PolicyGrant>> | null;
+  effectiveGrants?: Partial<Record<string, PolicyGrant>>;
+}
+
+function grantAllows(grant: PolicyGrant | undefined, action: 'read' | 'write'): boolean {
+  if (!grant || grant === 'none') return false;
+  if (grant === 'own') return action === 'read';
+  if (action === 'read') return grant === 'read' || grant === 'write';
+  return grant === 'write';
+}
+
+export function hasPermission(
+  user: User | null,
+  resource: string,
+  action: 'read' | 'write' = 'read'
+): boolean {
+  if (!user) return false;
+  if (user.setorAcesso === 'SUPERVISOR') {
+    if (resource === 'integracoes' || resource === 'webhooks') return action === 'read';
+    return true;
+  }
+  if (user.setorAcesso === 'ADMIN') {
+    return ['integracoes', 'webhooks', 'logs', 'manutencao'].includes(resource);
+  }
+  const grant = user.effectiveGrants?.[resource];
+  if (grant) return grantAllows(grant, action);
+  return false;
 }
 
 interface AuthContextType {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { labelEnum } from '../i18n/helpers';
 
@@ -16,13 +17,30 @@ interface Pessoa {
 }
 
 const SETORES = ['DIRETORIA', 'FINANCEIRO', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'] as const;
+const POLICY_RESOURCES = [
+  'pessoas', 'financeiro', 'import', 'eventos', 'checkin', 'livraria', 'estoque',
+  'dashboard', 'agendamentos', 'logs', 'ecommerce', 'auditoria', 'manutencao',
+] as const;
+const GRANT_OPTIONS = ['read', 'write', 'own', 'none'] as const;
+
+type GrantOpt = (typeof GRANT_OPTIONS)[number];
+
+interface PolicyPayload {
+  customGrants: Partial<Record<string, GrantOpt>>;
+  effectiveGrants: Partial<Record<string, GrantOpt>>;
+  defaults: Partial<Record<string, GrantOpt>>;
+}
 
 export default function UsuariosPage() {
+  const { user } = useAuth();
   const { t } = useI18n();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [redefinirId, setRedefinirId] = useState<number | null>(null);
+  const [policyUserId, setPolicyUserId] = useState<number | null>(null);
+  const [policyDraft, setPolicyDraft] = useState<Partial<Record<string, GrantOpt>>>({});
+  const [policyDefaults, setPolicyDefaults] = useState<Partial<Record<string, GrantOpt>>>({});
   const [novaSenhaAdmin, setNovaSenhaAdmin] = useState('');
   const [erro, setErro] = useState('');
   const [form, setForm] = useState({
@@ -81,6 +99,40 @@ export default function UsuariosPage() {
       setErro(err instanceof Error ? err.message : t('erp.usuarios.resetError'));
     }
   };
+
+  const abrirPoliticas = async (id: number) => {
+    setErro('');
+    try {
+      const data = await api<PolicyPayload>(`/auth/usuarios/${id}/politicas`);
+      setPolicyDefaults(data.defaults);
+      setPolicyDraft(data.customGrants ?? {});
+      setPolicyUserId(id);
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.usuarios.policyLoadError'));
+    }
+  };
+
+  const salvarPoliticas = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (policyUserId == null) return;
+    setErro('');
+    try {
+      await api(`/auth/usuarios/${policyUserId}/politicas`, {
+        method: 'PUT',
+        body: JSON.stringify({ grants: policyDraft }),
+      });
+      setPolicyUserId(null);
+      await carregar();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.usuarios.policySaveError'));
+    }
+  };
+
+  if (user?.setorAcesso !== 'SUPERVISOR') {
+    return (
+      <p className="text-white/70">{t('erp.usuarios.supervisorOnly')}</p>
+    );
+  }
 
   const pessoasSemUsuario = pessoas.filter((p) => !usuarios.some((u) => u.pessoa.id === p.id));
   const usuarioRedefinir = usuarios.find((u) => u.id === redefinirId);
@@ -199,6 +251,45 @@ export default function UsuariosPage() {
         </form>
       )}
 
+      {policyUserId != null && (
+        <form onSubmit={salvarPoliticas} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
+          <h3 className="font-medium text-[var(--color-accent)]">{t('erp.usuarios.policiesTitle')}</h3>
+          {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
+          <div className="grid gap-2 sm:grid-cols-2">
+            {POLICY_RESOURCES.map((res) => (
+              <label key={res} className="flex items-center justify-between gap-2 text-sm">
+                <span className="capitalize">{res}</span>
+                <select
+                  value={policyDraft[res] ?? policyDefaults[res] ?? 'none'}
+                  onChange={(e) =>
+                    setPolicyDraft({ ...policyDraft, [res]: e.target.value as GrantOpt })
+                  }
+                  className="px-2 py-1 rounded bg-black/30 border border-white/20 text-xs"
+                >
+                  {GRANT_OPTIONS.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <button type="submit" className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm">
+              {t('erp.common.save')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPolicyUserId(null)}
+              className="px-4 py-2 bg-white/10 rounded text-sm"
+            >
+              {t('erp.common.cancel')}
+            </button>
+          </div>
+        </form>
+      )}
+
       <table className="w-full text-sm">
         <thead>
           <tr className="text-left border-b border-white/20">
@@ -214,7 +305,7 @@ export default function UsuariosPage() {
               <td className="p-2">{u.pessoa.nomeCompleto}</td>
               <td className="p-2">{u.login}</td>
               <td className="p-2">{labelEnum(t, 'setor', u.setorAcesso)}</td>
-              <td className="p-2">
+              <td className="p-2 flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -226,6 +317,15 @@ export default function UsuariosPage() {
                 >
                   {t('erp.usuarios.resetAction')}
                 </button>
+                {SETORES.includes(u.setorAcesso as (typeof SETORES)[number]) && (
+                  <button
+                    type="button"
+                    onClick={() => abrirPoliticas(u.id)}
+                    className="text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/20"
+                  >
+                    {t('erp.usuarios.policiesAction')}
+                  </button>
+                )}
               </td>
             </tr>
           ))}

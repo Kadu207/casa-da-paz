@@ -35,7 +35,7 @@ router.post('/pix', async (req, res) => {
   res.json({ ok: true, transacaoId: t.id, status: t.status });
 });
 
-router.post('/n8n/trigger', authenticate, authorize('webhooks', 'write'), async (req, res) => {
+router.post('/n8n/trigger', authenticate, authorize('integracoes', 'write'), async (req, res) => {
   const body = z
     .object({
       workflow: z.enum([

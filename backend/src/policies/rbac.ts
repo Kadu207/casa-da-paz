@@ -1,22 +1,52 @@
 import type { SetorAcesso } from '@prisma/client';
 
-type Resource =
-  | 'usuarios'
-  | 'pessoas'
-  | 'financeiro'
-  | 'import'
-  | 'eventos'
-  | 'checkin'
-  | 'livraria'
-  | 'estoque'
-  | 'dashboard'
-  | 'agendamentos'
-  | 'logs'
-  | 'webhooks'
-  | 'ecommerce';
+export const RBAC_RESOURCES = [
+  'usuarios',
+  'pessoas',
+  'financeiro',
+  'import',
+  'eventos',
+  'checkin',
+  'livraria',
+  'estoque',
+  'dashboard',
+  'agendamentos',
+  'logs',
+  'webhooks',
+  'integracoes',
+  'ecommerce',
+  'auditoria',
+  'manutencao',
+] as const;
 
-const matrix: Record<SetorAcesso, Partial<Record<Resource, 'read' | 'write' | 'own'>>> = {
-  DIRETORIA: {
+export type Resource = (typeof RBAC_RESOURCES)[number];
+export type PolicyGrant = 'read' | 'write' | 'own' | 'none';
+export type PolicyGrants = Partial<Record<Resource, PolicyGrant>>;
+
+export const OPERATIONAL_ROLES: SetorAcesso[] = [
+  'DIRETORIA',
+  'FINANCEIRO',
+  'RECEPCAO',
+  'LIVRARIA',
+  'MEDIUM',
+  'SUPORTE',
+];
+
+export function isSystemRole(setor: SetorAcesso): boolean {
+  return setor === 'SUPERVISOR' || setor === 'ADMIN';
+}
+
+export function isOperationalRole(setor: SetorAcesso): boolean {
+  return OPERATIONAL_ROLES.includes(setor);
+}
+
+export function canManageTargetUser(actor: SetorAcesso, target: SetorAcesso): boolean {
+  if (actor !== 'SUPERVISOR') return false;
+  return isOperationalRole(target);
+}
+
+const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
+  SUPERVISOR: {
     usuarios: 'write',
     pessoas: 'write',
     financeiro: 'write',
@@ -27,9 +57,32 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, 'read' | 'write' | 'o
     estoque: 'write',
     dashboard: 'read',
     agendamentos: 'write',
-    logs: 'read',
-    webhooks: 'write',
+    logs: 'write',
+    webhooks: 'read',
+    integracoes: 'read',
     ecommerce: 'write',
+    auditoria: 'write',
+    manutencao: 'write',
+  },
+  ADMIN: {
+    webhooks: 'write',
+    integracoes: 'write',
+    logs: 'write',
+    manutencao: 'read',
+  },
+  DIRETORIA: {
+    pessoas: 'write',
+    financeiro: 'write',
+    import: 'write',
+    eventos: 'write',
+    checkin: 'write',
+    livraria: 'write',
+    estoque: 'write',
+    dashboard: 'read',
+    agendamentos: 'write',
+    logs: 'read',
+    ecommerce: 'write',
+    auditoria: 'write',
   },
   FINANCEIRO: {
     pessoas: 'read',
@@ -56,17 +109,49 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, 'read' | 'write' | 'o
   SUPORTE: {
     pessoas: 'read',
     logs: 'write',
+    auditoria: 'read',
+    manutencao: 'write',
   },
 };
+
+function grantAllows(grant: PolicyGrant, action: 'read' | 'write'): boolean {
+  if (grant === 'none') return false;
+  if (grant === 'own') return action === 'read';
+  if (action === 'read') return grant === 'read' || grant === 'write';
+  return grant === 'write';
+}
+
+export function defaultGrantsForSetor(setor: SetorAcesso): PolicyGrants {
+  return { ...matrix[setor] };
+}
 
 export function canAccess(
   setor: SetorAcesso,
   resource: Resource,
-  action: 'read' | 'write' = 'read'
+  action: 'read' | 'write' = 'read',
+  customGrants?: PolicyGrants | null
 ): boolean {
+  const custom = customGrants?.[resource];
+  if (custom !== undefined) {
+    return grantAllows(custom, action);
+  }
+
   const perm = matrix[setor]?.[resource];
   if (!perm) return false;
-  if (perm === 'own') return action === 'read';
-  if (action === 'read') return perm === 'read' || perm === 'write';
-  return perm === 'write';
+  return grantAllows(perm, action);
+}
+
+export function effectiveGrants(
+  setor: SetorAcesso,
+  customGrants?: PolicyGrants | null
+): PolicyGrants {
+  if (isSystemRoleStatic(setor)) {
+    return defaultGrantsForSetor(setor);
+  }
+  const base = defaultGrantsForSetor(setor);
+  return { ...base, ...(customGrants ?? {}) };
+}
+
+function isSystemRoleStatic(setor: SetorAcesso): boolean {
+  return setor === 'SUPERVISOR' || setor === 'ADMIN';
 }

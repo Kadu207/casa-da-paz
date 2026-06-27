@@ -15,6 +15,8 @@ enum TipoPerfil {
 }
 
 enum SetorAcesso {
+  SUPERVISOR
+  ADMIN
   DIRETORIA
   FINANCEIRO
   RECEPCAO
@@ -122,8 +124,22 @@ model Usuario {
   setorAcesso  SetorAcesso @map("setor_acesso")
   pessoa       Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
   fechamentosFinanceiros FinanceiroFechamentoMensal[]
+  policy       UsuarioPolicy?
 
   @@map("usuarios")
+}
+
+/// Overrides de RBAC configurados pelo SUPERVISOR (recurso → read | write | own | none)
+model UsuarioPolicy {
+  id              Int      @id @default(autoincrement())
+  usuarioId       Int      @unique @map("usuario_id")
+  grants          Json     @default("{}")
+  atualizadoPorId Int?     @map("atualizado_por_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("usuario_policies")
 }
 
 model FinanceiroTransacao {

@@ -80,10 +80,14 @@ if ($assetMatch) {
 
     $originCode = Invoke-Ssh -Target $RemoteHost -Command "curl -sf -o /dev/null -w '%{http_code}' http://127.0.0.1:9080/assets/${jsBundle} 2>/dev/null || echo 000"
     $originCode = ($originCode -replace '\s', '').Trim()
-    if ($originCode -ne "200") {
+    if ($originCode -eq "200") {
+        Write-Host "Origin :9080 serve assets/${jsBundle} (HTTP 200)" -ForegroundColor Green
+    } elseif ($originCode -eq "000") {
+        Write-Host "AVISO: stack parada (HTTP 000 em :9080). Arquivos sincronizados." -ForegroundColor Yellow
+        Write-Host "  Na VPS: cd ~/casadapaz/infra && CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh" -ForegroundColor Yellow
+    } else {
         throw "Origin :9080 retornou HTTP ${originCode} para /assets/${jsBundle}. Rode: cd ~/casadapaz/infra && ./scripts/fix-frontend-permissions.sh && ./scripts/compose-prod.sh restart frontend"
     }
-    Write-Host "Origin :9080 serve assets/${jsBundle} (HTTP 200)" -ForegroundColor Green
 }
 
 if ($RestartFrontend) {

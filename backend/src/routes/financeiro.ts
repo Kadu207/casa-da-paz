@@ -424,8 +424,8 @@ router.delete(
   authenticate,
   authorize('financeiro', 'write'),
   async (req, res) => {
-    if (req.user!.setorAcesso !== 'DIRETORIA') {
-      res.status(403).json({ error: 'Apenas DIRETORIA pode reabrir mês' });
+    if (req.user!.setorAcesso !== 'DIRETORIA' && req.user!.setorAcesso !== 'SUPERVISOR') {
+      res.status(403).json({ error: 'Apenas DIRETORIA ou SUPERVISOR pode reabrir mês' });
       return;
     }
 

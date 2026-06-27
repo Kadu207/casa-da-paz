@@ -25,6 +25,24 @@ import AlterarSenhaPage from './pages/AlterarSenhaPage';
 import AppLayout from './components/AppLayout';
 import { RequireRole } from './guards/RequireRole';
 
+function IntegracoesPage() {
+  return (
+    <div className="space-y-4 max-w-2xl">
+      <h2 className="text-xl font-serif text-[var(--color-accent)]">Integrações</h2>
+      <p className="text-white/80 text-sm leading-relaxed">
+        Área reservada ao perfil <strong>ADMIN</strong>: webhooks N8N, Chatwoot/WhatsApp e variáveis de
+        ambiente em produção. Consulte o runbook{' '}
+        <code className="text-[var(--color-accent)]">docs/memory/runbooks/deploy-messaging-prod.md</code>.
+      </p>
+      <ul className="text-sm text-white/70 list-disc pl-5 space-y-1">
+        <li>POST /api/webhooks/n8n/trigger — disparo manual (testes)</li>
+        <li>POST /api/webhooks/pix — conciliação PIX (secret)</li>
+        <li>Stack messaging na VPS — Chatwoot + N8N</li>
+      </ul>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <Routes>
@@ -125,7 +143,15 @@ export default function App() {
             </RequireRole>
           }
         />
-        <Route path="minha-senha" element={<RequireRole path="/app/minha-senha"><AlterarSenhaPage /></RequireRole>} />
+        <Route path="minha-senha" element={<AlterarSenhaPage />} />
+        <Route
+          path="integracoes"
+          element={
+            <RequireRole path="/app/integracoes">
+              <IntegracoesPage />
+            </RequireRole>
+          }
+        />
       </Route>
       <Route path="*" element={<Navigate to="/public" replace />} />
     </Routes>

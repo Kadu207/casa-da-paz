@@ -12,10 +12,10 @@ Mensageria em produção: widget Chatwoot no portal, N8N orquestrando webhooks d
 - [x] Scripts VPS: init Chatwoot, import workflows, compose wrapper
 - [x] Widget SDK no portal (`ChatwootWidget`)
 - [x] 6 workflows N8N (stubs webhook)
-- [x] Runbook Meta token + Cloudflare
-- [ ] Meta WhatsApp conectado (gate humano)
-- [ ] `VITE_CHATWOOT_*` no build de produção
-- [ ] Smoke E2E agendamento → N8N → Chatwoot
+- [x] Runbook `docs/memory/runbooks/deploy-messaging-prod.md`
+- [ ] Meta WhatsApp conectado (gate humano) — ver **T8** em `tasks.md`
+- [x] `VITE_CHATWOOT_*` no build de produção (bubble no ar 2026-06-10)
+- [ ] Smoke E2E agendamento → N8N → Chatwoot — ver **T10** em `tasks.md`
 
 ## Fora de escopo V1
 

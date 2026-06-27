@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { canAccess, canManageTargetUser, effectiveGrants } from '../policies/rbac.js';
 import { buildMeuPainelFinanceiro } from './meu-painel.js';
 
 describe('buildMeuPainelFinanceiro', () => {
@@ -34,5 +35,25 @@ describe('buildMeuPainelFinanceiro', () => {
     expect(result.resumo.totalPendente).toBe(50);
     expect(result.mensalidades).toHaveLength(2);
     expect(result.mensalidades[0].adimplencia).toBe('PAGO');
+  });
+});
+
+describe('RBAC hierarquia', () => {
+  it('SUPERVISOR gerencia usuários operacionais', () => {
+    expect(canAccess('SUPERVISOR', 'usuarios', 'write')).toBe(true);
+    expect(canManageTargetUser('SUPERVISOR', 'FINANCEIRO')).toBe(true);
+    expect(canManageTargetUser('SUPERVISOR', 'ADMIN')).toBe(false);
+  });
+
+  it('ADMIN só integrações e logs', () => {
+    expect(canAccess('ADMIN', 'integracoes', 'write')).toBe(true);
+    expect(canAccess('ADMIN', 'usuarios', 'write')).toBe(false);
+    expect(canAccess('ADMIN', 'financeiro', 'read')).toBe(false);
+  });
+
+  it('políticas customizadas sobrescrevem padrão', () => {
+    expect(canAccess('FINANCEIRO', 'financeiro', 'write')).toBe(true);
+    expect(canAccess('FINANCEIRO', 'financeiro', 'write', { financeiro: 'none' })).toBe(false);
+    expect(effectiveGrants('RECEPCAO', { financeiro: 'read' }).financeiro).toBe('read');
   });
 });

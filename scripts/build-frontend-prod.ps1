@@ -15,6 +15,13 @@ if (-not (Test-Path (Join-Path $frontend "package.json"))) {
 
 Set-Location $frontend
 
+# Limpar dist evita EPERM no sw.js (PWA) quando arquivos ficam bloqueados no Windows
+$distDir = Join-Path $frontend "dist"
+if (Test-Path $distDir) {
+    Write-Host "Limpando $distDir" -ForegroundColor DarkGray
+    Remove-Item -Recurse -Force $distDir
+}
+
 if (-not $SkipInstall) {
     Write-Host "npm ci em $frontend" -ForegroundColor Cyan
     npm.cmd ci

@@ -3,6 +3,58 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+async function seedSupervisorOnly() {
+  const pessoaSupervisor = await prisma.pessoa.upsert({
+    where: { id: 10 },
+    update: {},
+    create: {
+      id: 10,
+      nomeCompleto: 'Supervisor Casa da Paz',
+      telefone: '31999990001',
+      tipoPerfil: 'DIRETORIA',
+      maiorDeIdade: true,
+    },
+  });
+
+  await prisma.usuario.upsert({
+    where: { login: 'supervisor' },
+    update: { senhaHash: await bcrypt.hash('supervisor123', 10), setorAcesso: 'SUPERVISOR' },
+    create: {
+      login: 'supervisor',
+      senhaHash: await bcrypt.hash('supervisor123', 10),
+      setorAcesso: 'SUPERVISOR',
+      pessoaId: pessoaSupervisor.id,
+    },
+  });
+
+  const pessoaIntegracao = await prisma.pessoa.upsert({
+    where: { id: 11 },
+    update: {},
+    create: {
+      id: 11,
+      nomeCompleto: 'Admin Integrações',
+      telefone: '31999990002',
+      tipoPerfil: 'FUNCIONARIO',
+      maiorDeIdade: true,
+    },
+  });
+
+  await prisma.usuario.upsert({
+    where: { login: 'admin.integracoes' },
+    update: { senhaHash: await bcrypt.hash('integra123', 10), setorAcesso: 'ADMIN' },
+    create: {
+      login: 'admin.integracoes',
+      senhaHash: await bcrypt.hash('integra123', 10),
+      setorAcesso: 'ADMIN',
+      pessoaId: pessoaIntegracao.id,
+    },
+  });
+
+  console.log('Seed OK — supervisor / supervisor123 (SUPERVISOR)');
+  console.log('Seed OK — admin.integracoes / integra123 (ADMIN)');
+  console.log('Senha do login admin NÃO foi alterada.');
+}
+
 async function main() {
   const pessoaAdmin = await prisma.pessoa.upsert({
     where: { id: 1 },
@@ -17,7 +69,7 @@ async function main() {
 
   await prisma.usuario.upsert({
     where: { login: 'admin' },
-    update: { senhaHash: await bcrypt.hash('admin123', 10) },
+    update: { setorAcesso: 'DIRETORIA' },
     create: {
       login: 'admin',
       senhaHash: await bcrypt.hash('admin123', 10),
@@ -25,6 +77,8 @@ async function main() {
       pessoaId: pessoaAdmin.id,
     },
   });
+
+  await seedSupervisorOnly();
 
   const consulente = await prisma.pessoa.upsert({
     where: { id: 2 },
@@ -181,10 +235,18 @@ async function main() {
     },
   });
 
-  console.log('Seed OK — admin / admin123');
+  console.log('Seed OK — admin / admin123 (DIRETORIA)');
+  console.log('Seed OK — supervisor / supervisor123 (SUPERVISOR)');
+  console.log('Seed OK — admin.integracoes / integra123 (ADMIN)');
   console.log('Seed OK — medium / medium123');
 }
 
-main()
-  .catch(console.error)
-  .finally(() => prisma.$disconnect());
+if (process.argv.includes('--supervisor-only')) {
+  seedSupervisorOnly()
+    .catch(console.error)
+    .finally(() => prisma.$disconnect());
+} else {
+  main()
+    .catch(console.error)
+    .finally(() => prisma.$disconnect());
+}

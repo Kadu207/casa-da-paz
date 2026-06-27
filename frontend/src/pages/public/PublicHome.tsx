@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { PublicLayout } from '../../components/public/PublicLayout';
 import { SafeImage, buildSrcSet } from '../../components/public/SafeImage';
-import { ADDRESS, portalAssets } from '../../lib/portal-assets';
+import { ADDRESS, portalAssets, portalMapLinks } from '../../lib/portal-assets';
 import { useI18n } from '../../i18n/I18nContext';
 
 export default function PublicHome() {
@@ -42,10 +43,8 @@ export default function PublicHome() {
     },
   ] as const;
 
-  const mapHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ADDRESS.query)}`;
-  const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(ADDRESS.query)}&output=embed`;
-  const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ADDRESS.query)}`;
-  const wazeHref = `https://www.waze.com/ul?ll=${ADDRESS.wazeCoords}&navigate=yes&q=${encodeURIComponent(ADDRESS.line1)}`;
+  const maps = portalMapLinks();
+  const [mapUseEmbed, setMapUseEmbed] = useState(false);
 
   return (
     <PublicLayout showBack={false}>
@@ -192,10 +191,12 @@ export default function PublicHome() {
               {ADDRESS.line1}
               <br />
               {ADDRESS.line2}
+              <br />
+              <span className="text-foreground/70">CEP {ADDRESS.cep}</span>
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <a
-                href={directionsHref}
+                href={maps.googleDirections}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="min-h-11 inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground font-medium px-5 py-2.5 hover:bg-primary/90 transition-colors"
@@ -203,7 +204,7 @@ export default function PublicHome() {
                 {t('home.map.directions')}
               </a>
               <a
-                href={mapHref}
+                href={maps.googleSearch}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="min-h-11 inline-flex items-center justify-center rounded-xl border border-primary text-primary font-medium px-5 py-2.5 hover:bg-primary/10 transition-colors"
@@ -211,7 +212,7 @@ export default function PublicHome() {
                 {t('home.map.googleMaps')}
               </a>
               <a
-                href={wazeHref}
+                href={maps.waze}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="min-h-11 inline-flex items-center justify-center rounded-xl border border-primary text-primary font-medium px-5 py-2.5 hover:bg-primary/10 transition-colors"
@@ -221,13 +222,24 @@ export default function PublicHome() {
             </div>
           </div>
           <div className="aspect-[4/3] sm:aspect-[16/10] w-full bg-background">
-            <iframe
-              title={t('home.map.iframeTitle')}
-              src={mapSrc}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="h-full w-full border-0"
-            />
+            {mapUseEmbed ? (
+              <iframe
+                title={t('home.map.iframeTitle')}
+                src={maps.osmEmbed}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="h-full w-full border-0"
+              />
+            ) : (
+              <img
+                src={maps.osmStatic}
+                alt={t('home.map.staticAlt')}
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover bg-background"
+                onError={() => setMapUseEmbed(true)}
+              />
+            )}
           </div>
         </div>
       </section>

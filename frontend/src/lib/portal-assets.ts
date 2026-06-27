@@ -55,9 +55,27 @@ export const portalAssets = {
 
 export const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? '5531999990000';
 
+/** Terreiro Casa da Paz — Rua Valério Eugênio, 570, Bairro Areal (CEP 36407-006) */
 export const ADDRESS = {
   line1: 'Rua Valério Eugênio, 570',
   line2: 'Bairro Areal — Conselheiro Lafaiete, MG',
-  query: 'Casa da Paz - Rua Valério Eugênio, 570 - Areal, Conselheiro Lafaiete - MG',
-  wazeCoords: '-20.659,-43.788',
+  cep: '36407-006',
+  /** OpenStreetMap — Rua Valério Eugênio, Areal (geocodificado) */
+  lat: -20.6566677,
+  lng: -43.8013328,
+  query:
+    'Rua Valério Eugênio, 570, Bairro Areal, Conselheiro Lafaiete, MG, 36407-006, Brasil',
 } as const;
+
+export function portalMapLinks() {
+  const { lat, lng, query } = ADDRESS;
+  const coords = `${lat},${lng}`;
+  const bbox = `${lng - 0.0025},${lat - 0.0018},${lng + 0.0025},${lat + 0.0018}`;
+  return {
+    googleSearch: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`,
+    googleDirections: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`,
+    waze: `https://www.waze.com/ul?q=${encodeURIComponent(query)}&navigate=yes`,
+    osmStatic: `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=17&size=800x480&maptype=mapnik&markers=${lat},${lng},red-pushpin`,
+    osmEmbed: `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`,
+  };
+}
