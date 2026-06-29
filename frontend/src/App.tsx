@@ -21,6 +21,7 @@ import PublicLivraria from './pages/public/PublicLivraria';
 import PublicTermos from './pages/public/PublicTermos';
 import EcommerceAdminPage from './pages/EcommerceAdminPage';
 import AuditoriaPage from './pages/AuditoriaPage';
+import AlertasPage from './pages/AlertasPage';
 import AlterarSenhaPage from './pages/AlterarSenhaPage';
 import AppLayout from './components/AppLayout';
 import { RequireRole } from './guards/RequireRole';
@@ -86,6 +87,14 @@ export default function App() {
           <Route path="fluxo" element={<FinanceiroFluxoPage />} />
           <Route path="atrasados" element={<FinanceiroAtrasadosPage />} />
           <Route path="conciliacao" element={<FinanceiroConciliacaoPage />} />
+          <Route
+            path="alertas"
+            element={
+              <RequireRole path="/app/financeiro/alertas">
+                <AlertasPage />
+              </RequireRole>
+            }
+          />
         </Route>
         <Route
           path="recepcao"

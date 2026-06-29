@@ -7,6 +7,7 @@ const tabs: { to: string; labelKey: ErpTranslationKey; end?: boolean }[] = [
   { to: '/app/financeiro/fluxo', labelKey: 'erp.financeiro.tab.fluxo' },
   { to: '/app/financeiro/atrasados', labelKey: 'erp.financeiro.tab.atrasados' },
   { to: '/app/financeiro/conciliacao', labelKey: 'erp.financeiro.tab.conciliacao' },
+  { to: '/app/financeiro/alertas', labelKey: 'erp.financeiro.tab.alertas' },
 ];
 
 export default function FinanceiroLayout() {
