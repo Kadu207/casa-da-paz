@@ -382,6 +382,7 @@ export const erpPtBR = {
   'erp.alertas.pagination': '{total} alertas — página {page} de {totalPages}',
   'erp.alertas.prev': 'Anterior',
   'erp.alertas.next': 'Próxima',
+  'erp.alertas.pendingBadge': '{count} alerta(s) pendente(s)',
   'erp.enum.setor.DIRETORIA': 'Diretoria',
   'erp.enum.setor.FINANCEIRO': 'Financeiro',
   'erp.enum.setor.RECEPCAO': 'Recepção',

@@ -82,8 +82,8 @@ Referência de padrão: `frontend/src/pages/AuditoriaPage.tsx` (filtros + tabela
 
 ### S2.3 — Badge pendências (S2.1 opcional)
 
-- [ ] `[ ]` GET `/api/alertas?disparado=false&limit=1` → usar `total` no menu/tab
-- [ ] `[ ]` Badge numérico se `total > 0` (FinanceiroLayout ou AppLayout)
+- [x] `[G]` GET `/api/alertas?disparado=false&limit=1` → usar `total` no menu/tab
+- [x] `[G]` Badge numérico se `total > 0` (FinanceiroLayout)
 
 ### S2.4 — Gates S2
 

@@ -384,6 +384,7 @@ export const erpEn: Record<ErpTranslationKey, string> = {
   'erp.alertas.pagination': '{total} alerts — page {page} of {totalPages}',
   'erp.alertas.prev': 'Previous',
   'erp.alertas.next': 'Next',
+  'erp.alertas.pendingBadge': '{count} pending alert(s)',
   'erp.enum.setor.DIRETORIA': 'Board',
   'erp.enum.setor.FINANCEIRO': 'Finance',
   'erp.enum.setor.RECEPCAO': 'Reception',
