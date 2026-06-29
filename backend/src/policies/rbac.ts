@@ -16,6 +16,7 @@ export const RBAC_RESOURCES = [
   'integracoes',
   'ecommerce',
   'auditoria',
+  'alertas',
   'manutencao',
 ] as const;
 
@@ -62,6 +63,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     integracoes: 'read',
     ecommerce: 'write',
     auditoria: 'write',
+    alertas: 'write',
     manutencao: 'write',
   },
   ADMIN: {
@@ -83,18 +85,21 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     logs: 'read',
     ecommerce: 'write',
     auditoria: 'write',
+    alertas: 'write',
   },
   FINANCEIRO: {
     pessoas: 'read',
     financeiro: 'write',
     import: 'write',
     dashboard: 'read',
+    alertas: 'write',
   },
   RECEPCAO: {
     pessoas: 'write',
     eventos: 'write',
     checkin: 'write',
     agendamentos: 'write',
+    alertas: 'read',
   },
   LIVRARIA: {
     pessoas: 'read',
@@ -110,6 +115,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     pessoas: 'read',
     logs: 'write',
     auditoria: 'read',
+    alertas: 'read',
     manutencao: 'write',
   },
 };

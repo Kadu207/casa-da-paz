@@ -13,6 +13,7 @@ import importRoutes from './routes/import.js';
 import agendamentosRoutes from './routes/agendamentos.js';
 import metricasRoutes from './routes/metricas.js';
 import auditoriaRoutes from './routes/auditoria.js';
+import alertasRoutes from './routes/alertas.js';
 import mediaRoutes from './routes/media.js';
 
 const app = express();
@@ -38,6 +39,7 @@ app.use('/api/webhooks', webhooksRoutes);
 app.use('/api/import', importRoutes);
 app.use('/api/metricas', metricasRoutes);
 app.use('/api/auditoria', auditoriaRoutes);
+app.use('/api/alertas', alertasRoutes);
 app.use('/api/media', mediaRoutes);
 
 app.listen(PORT, () => {

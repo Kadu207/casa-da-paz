@@ -20,6 +20,7 @@
 | Dashboard | ✅ | ✅ | ❌ | ❌ | 👁️ próprio | ❌ |
 | Agendamentos | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
 | Auditoria | ✅ | ❌ | ❌ | ❌ | ❌ | 👁️ |
+| Alertas | ✅ | ✅ | 👁️ | ❌ | ❌ | 👁️ |
 | Logs/Manutenção | 👁️ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 **SUPERVISOR** gerencia usuários operacionais e sobrescreve permissões via `usuario_policies.grants` (JSON).
