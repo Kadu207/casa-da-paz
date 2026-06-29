@@ -46,7 +46,7 @@ Checklist manual:
 - [ ] Widget em `/public/contato` abre bubble Chatwoot
 - [ ] (Após T8) Mensagem WhatsApp recebida no número de teste
 
-Script local: `scripts/test-agendamento-n8n.ps1` (localhost). Para prod, adaptar `$base` ou criar `scripts/test-agendamento-n8n-prod.ps1`.
+Script local: `scripts/test-agendamento-n8n.ps1` (localhost). Prod: `scripts/test-agendamento-n8n-prod.ps1` (`$env:CASADAPAZ_API`).
 
 ## Produção (2026-06-10)
 

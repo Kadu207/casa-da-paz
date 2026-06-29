@@ -20,9 +20,39 @@
         "assignments": {
           "assignments": [
             {
-              "id": "log1",
+              "id": "ev1",
               "name": "evento",
-              "value": "lembrete_atraso",
+              "value": "={{ $json.workflow || 'lembrete_atraso' }}",
+              "type": "string"
+            },
+            {
+              "id": "a1",
+              "name": "alertaId",
+              "value": "={{ $json.alertaId }}",
+              "type": "number"
+            },
+            {
+              "id": "p1",
+              "name": "pessoaId",
+              "value": "={{ $json.pessoaId }}",
+              "type": "number"
+            },
+            {
+              "id": "t1",
+              "name": "telefone",
+              "value": "={{ $json.telefone || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "m1",
+              "name": "mensagem",
+              "value": "={{ $json.mensagem || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "tp1",
+              "name": "tipo",
+              "value": "={{ $json.tipo || '' }}",
               "type": "string"
             }
           ]
@@ -30,17 +60,92 @@
         "options": {}
       },
       "id": "d2-set-atraso",
-      "name": "Registrar evento",
+      "name": "Normalizar payload",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-tel",
+              "leftValue": "={{ $json.telefone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d3-if-telefone",
+      "name": "Tem telefone?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.CHATWOOT_PUBLIC_URL || 'http://localhost:3001').replace(/\\/$/, '') + '/api/v1/accounts/1/conversations' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $env.CHATWOOT_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"source_id\": \"{{ $json.telefone }}\",\n  \"inbox_id\": 1,\n  \"message\": { \"content\": \"{{ $json.mensagem }}\" }\n}",
+        "options": {}
+      },
+      "id": "d4-chatwoot-stub",
+      "name": "Chatwoot WhatsApp (012-T8)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 220],
+      "disabled": true,
+      "notes": "Ativar após Meta token + CHATWOOT_API_TOKEN em produção (012-T8)."
+    },
+    {
+      "parameters": {},
+      "id": "d5-no-op",
+      "name": "Sem telefone (log)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [960, 400]
     }
   ],
   "connections": {
     "Webhook Lembrete": {
-      "main": [[{ "node": "Registrar evento", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Normalizar payload", "type": "main", "index": 0 }]]
+    },
+    "Normalizar payload": {
+      "main": [[{ "node": "Tem telefone?", "type": "main", "index": 0 }]]
+    },
+    "Tem telefone?": {
+      "main": [
+        [{ "node": "Chatwoot WhatsApp (012-T8)", "type": "main", "index": 0 }],
+        [{ "node": "Sem telefone (log)", "type": "main", "index": 0 }]
+      ]
     }
   },
   "active": true,
-  "settings": { "executionOrder": "v1" }
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": true }
 }

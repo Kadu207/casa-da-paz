@@ -98,8 +98,9 @@ Referência de padrão: `frontend/src/pages/AuditoriaPage.tsx` (filtros + tabela
 
 ## S3 — N8N + integração prod (após 012-T8)
 
-- [ ] `[G]` Validar workflow `infra/n8n/workflows/lembrete-atraso.json` aceita payload de reenvio
-- [ ] `[ ]` Nó Chatwoot API no workflow (depende **012-T8** Meta token)
+- [x] `[G]` Validar workflow `infra/n8n/workflows/lembrete-atraso.json` aceita payload de reenvio
+- [x] `[G]` Nó Chatwoot API no workflow (desabilitado — ativar após **012-T8** Meta token)
+- [x] `[G]` Script smoke local: `scripts/test-alertas-reenviar.ps1`
 - [ ] `[ ]` Smoke prod: sync-alertas → UI → reenviar → N8N 200 → WhatsApp recebido
 
 ---

@@ -28,7 +28,7 @@ $headers = @{ Authorization = "Bearer $($login.token)" }
 Write-Host "4. Gerar log via newsletter..."
 $email = "e2e-audit-$(Get-Random)@test.local"
 Invoke-RestMethod -Uri "$base/public/newsletter" -Method POST -ContentType "application/json" `
-  -Body (@{ email = $email; locale = "pt-BR" } | ConvertTo-Json) | Out-Null
+  -Body (@{ email = $email; locale = "pt-BR"; aceiteLgpd = $true } | ConvertTo-Json) | Out-Null
 
 Write-Host "5. Listar auditoria com filtro rota=portal..."
 $audit = Invoke-RestMethod -Uri ($base + '/auditoria?rota=portal&limit=5') -Headers $headers
