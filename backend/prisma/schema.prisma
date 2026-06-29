@@ -8,9 +8,13 @@ datasource db {
 }
 
 enum TipoPerfil {
+  PRESIDENTE
   CONSULENTE
   MEDIUM
   DIRETORIA
+  TESOURARIA
+  CONSELHEIRO
+  SUPORTE_TI
   FUNCIONARIO
 }
 
@@ -112,8 +116,22 @@ model Pessoa {
   presencas     Presenca[]
   inscricoes    Inscricao[]
   agendamentos  AgendamentoPublico[]
+  responsaveis  PessoaResponsavel[]
 
   @@map("pessoas")
+}
+
+model PessoaResponsavel {
+  id           Int      @id @default(autoincrement())
+  pessoaId     Int      @map("pessoa_id")
+  nomeCompleto String   @map("nome_completo") @db.VarChar(150)
+  telefone     String?  @db.VarChar(20)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  pessoa Pessoa @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+
+  @@index([pessoaId])
+  @@map("pessoa_responsaveis")
 }
 
 model Usuario {

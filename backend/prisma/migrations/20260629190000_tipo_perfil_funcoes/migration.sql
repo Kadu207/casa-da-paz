@@ -1,0 +1,4 @@
+-- Expandir funções de cadastro (pessoa.tipo_perfil)
+ALTER TYPE "TipoPerfil" ADD VALUE IF NOT EXISTS 'TESOURARIA';
+ALTER TYPE "TipoPerfil" ADD VALUE IF NOT EXISTS 'CONSELHEIRO';
+ALTER TYPE "TipoPerfil" ADD VALUE IF NOT EXISTS 'SUPORTE_TI';
