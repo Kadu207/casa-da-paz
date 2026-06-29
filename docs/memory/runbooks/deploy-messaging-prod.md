@@ -14,7 +14,7 @@
 **Não use `...` no caminho.** Da pasta raiz do repo:
 
 ```powershell
-Set-Location "C:\Users\Carlos\OneDrive\Área de Trabalho\Projetos DEV\Casa da Paz"
+Set-Location "C:\Projetos DEV\Casa da Paz"
 Copy-Item frontend\.env.production.example frontend\.env.production
 # Edite frontend\.env.production com VITE_CHATWOOT_* após criar inbox no Chatwoot
 .\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend

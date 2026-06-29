@@ -24,3 +24,10 @@ README-Carlos.md
 backend/.env-*.example
 backend/-*.env
 scripts/vps.local.ps1
+
+# Backups locais de banco (dados sensíveis)
+backups/
+
+# Python
+__pycache__/
+*.pyc

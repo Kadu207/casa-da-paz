@@ -8,15 +8,15 @@ Mesma pasta de projetos nos dois SOs, com deploy VPS via **chave SSH no Linux** 
 
 | SO | Caminho raiz dos projetos | Casa da Paz |
 |----|---------------------------|-------------|
-| **Windows** | `C:\Users\Carlos\OneDrive\Área de Trabalho\Projetos DEV` | `...\Projetos DEV\Casa da Paz` |
+| **Windows** | `C:\Projetos DEV` | `C:\Projetos DEV\Casa da Paz` |
 | **Debian 13** | `~/Projetos DEV` | `~/Projetos DEV/Casa da Paz` |
 
 Abra no Cursor **sempre** a pasta do repo (`Casa da Paz`), não só `Projetos DEV`.
 
-## Opção A — OneDrive (já usa no Windows)
+## Opção A — OneDrive (opcional)
 
 1. Instale cliente OneDrive no Debian (`rclone` + mount, ou [abraunegg/onedrive](https://github.com/abraunegg/onedrive)).
-2. Sincronize a pasta remota equivalente a **Área de Trabalho** para `~/OneDrive` ou direto para `~/Projetos DEV`.
+2. Sincronize `C:\Projetos DEV` (Windows) para `~/Projetos DEV` (Linux), ou use OneDrive como espelho da mesma árvore.
 3. No Cursor (Linux): **File → Open Folder** → `~/Projetos DEV/Casa da Paz`.
 
 **Cuidado:** não edite o mesmo arquivo nos dois PCs ao mesmo tempo; feche Cursor em um antes de abrir no outro, ou use Git como árbitro.

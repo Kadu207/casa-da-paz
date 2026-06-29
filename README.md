@@ -24,20 +24,20 @@ ERP/CRM para o terreiro de Umbanda afroindígena Casa da Paz (Conselheiro Lafaie
 ### Opção A — Scripts (recomendado)
 
 ```powershell
-Set-Location "C:\Users\carlo\OneDrive\Área de Trabalho\Projetos DEV\Casa da Paz"
+Set-Location "C:\Projetos DEV\Casa da Paz"
 
 # Terminal 1 — Backend + banco
 .\scripts\start-backend.ps1
 
 # Terminal 2 — Frontend (abra outro PowerShell)
-Set-Location "C:\Users\carlo\OneDrive\Área de Trabalho\Projetos DEV\Casa da Paz"
+Set-Location "C:\Projetos DEV\Casa da Paz"
 .\scripts\start-frontend.ps1
 ```
 
 ### Opção B — Manual (com PATH corrigido)
 
 ```powershell
-Set-Location "C:\Users\carlo\OneDrive\Área de Trabalho\Projetos DEV\Casa da Paz"
+Set-Location "C:\Projetos DEV\Casa da Paz"
 . .\scripts\setup-path.ps1
 
 Set-Location infra
@@ -54,7 +54,7 @@ npm run dev
 Em **outro terminal**, repita `setup-path.ps1` e depois:
 
 ```powershell
-Set-Location "C:\Users\carlo\OneDrive\Área de Trabalho\Projetos DEV\Casa da Paz"
+Set-Location "C:\Projetos DEV\Casa da Paz"
 . .\scripts\setup-path.ps1
 Set-Location frontend
 npm install
