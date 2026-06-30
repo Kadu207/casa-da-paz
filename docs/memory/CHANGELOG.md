@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Adicionado
+- **Cadastros por função:** seções Presidente/Diretoria/Tesouraria/etc.; `PessoaResponsavel` para menores
+- **Alertas UI (014 S1–S3):** API `/api/alertas`, página Financeiro, badge pendências, workflow N8N `lembrete_atraso`
+- Scripts smoke: `test-alertas-reenviar.ps1`, `test-dashboard-v2.ps1`, `test-painel-medium.ps1`, `test-agendamento-n8n-prod.ps1`
 - **Dashboard v2 (017):** seletor mês/ano, KPIs/gráficos por período, link para fluxo de caixa
 - **Painel Médium (018):** `GET /metricas/meu-painel`, KPIs + mensalidades/presenças/inscrições
 - **Auditoria v2 (019):** export CSV/PDF com filtros, sort e filename por período
@@ -15,6 +18,7 @@
 
 ### Validado
 - Deploy VPS + smoke manual produção (2026-06-09)
+- Smoke local 017–019 + alertas reenvio N8N (2026-06-29)
 
 ## [0.1.0-alpha] — 2026-06-05
 

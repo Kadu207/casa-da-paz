@@ -13,13 +13,14 @@ if ! $COMPOSE ps -q n8n | grep -q .; then
 fi
 
 N8N_ID=$($COMPOSE ps -q n8n)
+IMPORT_DIR="/tmp/n8n-workflows-import-$(date +%Y%m%d%H%M%S)"
 
 echo "Copiando workflows..."
-docker exec "$N8N_ID" rm -rf /tmp/n8n-workflows 2>/dev/null || true
-docker cp "$WORKFLOWS_DIR" "$N8N_ID:/tmp/n8n-workflows"
+docker exec -u root "$N8N_ID" rm -rf /tmp/n8n-workflows 2>/dev/null || true
+docker cp "$WORKFLOWS_DIR" "$N8N_ID:${IMPORT_DIR}"
 
 echo "Importando..."
-docker exec "$N8N_ID" n8n import:workflow --separate --input=/tmp/n8n-workflows
+docker exec "$N8N_ID" n8n import:workflow --separate --input="${IMPORT_DIR}"
 
 echo "Publicando..."
 while IFS= read -r line; do
@@ -28,6 +29,8 @@ while IFS= read -r line; do
     docker exec "$N8N_ID" n8n publish:workflow --id="$id" || true
   fi
 done < <(docker exec "$N8N_ID" n8n list:workflow 2>/dev/null || true)
+
+docker exec -u root "$N8N_ID" rm -rf "${IMPORT_DIR}" 2>/dev/null || true
 
 echo "Reiniciando n8n..."
 $COMPOSE restart n8n

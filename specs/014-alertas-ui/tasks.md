@@ -107,8 +107,8 @@ Referência de padrão: `frontend/src/pages/AuditoriaPage.tsx` (filtros + tabela
 
 ## S4 — Gates release
 
-- [ ] `npm test` backend · `npm run build` frontend
-- [ ] Atualizar `project-memory.md` + `docs/memory/CHANGELOG.md`
+- [x] `npm test` backend · `npm run build` frontend
+- [x] Atualizar `project-memory.md` + `docs/memory/CHANGELOG.md`
 - [ ] Deploy VPS (confirmar com usuário)
 
 ---

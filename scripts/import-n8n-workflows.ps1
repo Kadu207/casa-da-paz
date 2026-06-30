@@ -2,30 +2,43 @@
 $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot -Parent
 $workflowsDir = Join-Path $root "infra\n8n\workflows"
+$container = "casadapaz_n8n"
 
-if (-not (docker ps -q -f name=casadapaz_n8n)) {
-  Write-Host "Container casadapaz_n8n nao esta rodando. Execute .\scripts\start-messaging.ps1"
+if (-not (docker ps -q -f name=$container)) {
+  Write-Host "Container $container nao esta rodando. Execute .\scripts\start-messaging.ps1"
   exit 1
 }
 
-Write-Host "Copiando workflows para o container..."
-docker exec casadapaz_n8n rm -rf /tmp/n8n-workflows 2>$null | Out-Null
-docker cp "$workflowsDir" casadapaz_n8n:/tmp/n8n-workflows
+$importDir = "/tmp/n8n-workflows-import-$(Get-Date -Format 'yyyyMMddHHmmss')"
+
+Write-Host "Copiando workflows para o container ($importDir)..."
+$prevEap = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+docker exec -u root $container rm -rf /tmp/n8n-workflows 2>&1 | Out-Null
+$ErrorActionPreference = $prevEap
+
+docker cp "$workflowsDir" "${container}:${importDir}"
 
 Write-Host "Importando..."
-docker exec casadapaz_n8n n8n import:workflow --separate --input=/tmp/n8n-workflows
+docker exec $container n8n import:workflow --separate --input=$importDir
 
 Write-Host "Publicando workflows..."
-$ids = docker exec casadapaz_n8n n8n list:workflow 2>&1 | ForEach-Object {
+$ids = docker exec $container n8n list:workflow 2>&1 | ForEach-Object {
   if ($_ -match '^([A-Za-z0-9]+)\|Casa da Paz') { $Matches[1] }
 }
 foreach ($id in $ids) {
   if ($id) {
-    docker exec casadapaz_n8n n8n publish:workflow --id=$id 2>&1 | Out-Null
+    docker exec $container n8n publish:workflow --id=$id 2>&1 | Out-Null
   }
 }
+
+Write-Host "Limpando pasta temporaria..."
+$ErrorActionPreference = "Continue"
+docker exec -u root $container rm -rf $importDir 2>&1 | Out-Null
+$ErrorActionPreference = "Stop"
+
 Write-Host "Reiniciando n8n para ativar webhooks..."
-docker restart casadapaz_n8n | Out-Null
+docker restart $container | Out-Null
 Start-Sleep -Seconds 8
 
 Write-Host ""
