@@ -24,6 +24,7 @@ export default function PublicAgendar() {
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState('');
+  const [turnstileRequired, setTurnstileRequired] = useState(turnstileConfigured());
   const [aceiteLgpd, setAceiteLgpd] = useState(false);
   const mountedAt = useRef(Date.now());
 
@@ -50,7 +51,7 @@ export default function PublicAgendar() {
       return;
     }
 
-    if (turnstileConfigured() && !turnstileToken) {
+    if (turnstileRequired && !turnstileToken) {
       setSubmitError(t('schedule.error.turnstile'));
       setSubmitting(false);
       return;
@@ -194,6 +195,13 @@ export default function PublicAgendar() {
         ) : (
           <form
             onSubmit={submit}
+            onKeyDown={(e) => {
+              if (e.key !== 'Enter' || e.target instanceof HTMLTextAreaElement) return;
+              if (turnstileRequired && !turnstileToken) {
+                e.preventDefault();
+                setSubmitError(t('schedule.error.turnstile'));
+              }
+            }}
             className="rounded-2xl bg-card border border-border/60 p-6 sm:p-8 shadow-lg space-y-5"
             noValidate
           >
@@ -239,7 +247,14 @@ export default function PublicAgendar() {
                 placeholder={t('schedule.placeholder.notes')}
               />
             </Field>
-            <TurnstileWidget onToken={setTurnstileToken} onExpire={() => setTurnstileToken('')} />
+            <TurnstileWidget
+              onRequiredChange={setTurnstileRequired}
+              onToken={(token) => {
+                setTurnstileToken(token);
+                setSubmitError('');
+              }}
+              onExpire={() => setTurnstileToken('')}
+            />
             <LgpdConsentCheckbox checked={aceiteLgpd} onChange={setAceiteLgpd} id="agendar-lgpd" />
             <button
               type="submit"

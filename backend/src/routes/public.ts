@@ -5,7 +5,7 @@ import { prisma } from '../lib/prisma.js';
 import { dispararN8n } from '../lib/n8n.js';
 import { protocoloAgendamento } from '../lib/protocolo.js';
 import { registrarAuditoria } from '../lib/auditoria.js';
-import { clientIp, turnstileEnabled, verifyTurnstile } from '../lib/turnstile.js';
+import { clientIp, turnstileEnabled, turnstileSiteKey, verifyTurnstile } from '../lib/turnstile.js';
 import { LGPD_POLICY_VERSION, assertLgpdConsent } from '../lib/lgpd.js';
 
 const router = Router();
@@ -20,6 +20,13 @@ const newsletterLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 10,
   message: { error: 'Limite de inscrições atingido. Tente mais tarde.' },
+});
+
+router.get('/portal-config', (_req, res) => {
+  res.json({
+    turnstileSiteKey: turnstileSiteKey(),
+    turnstileEnabled: turnstileEnabled(),
+  });
 });
 
 router.get('/eventos', async (_req, res) => {

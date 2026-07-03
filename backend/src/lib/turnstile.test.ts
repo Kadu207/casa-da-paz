@@ -1,12 +1,21 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { turnstileEnabled, verifyTurnstile } from './turnstile.js';
+import { turnstileEnabled, turnstileSiteKey, verifyTurnstile } from './turnstile.js';
 
 describe('turnstile', () => {
-  const orig = process.env.TURNSTILE_SECRET_KEY;
+  const origSecret = process.env.TURNSTILE_SECRET_KEY;
+  const origSite = process.env.TURNSTILE_SITE_KEY;
 
   afterEach(() => {
-    process.env.TURNSTILE_SECRET_KEY = orig;
+    process.env.TURNSTILE_SECRET_KEY = origSecret;
+    process.env.TURNSTILE_SITE_KEY = origSite;
     vi.restoreAllMocks();
+  });
+
+  it('site key publica opcional', () => {
+    delete process.env.TURNSTILE_SITE_KEY;
+    expect(turnstileSiteKey()).toBeNull();
+    process.env.TURNSTILE_SITE_KEY = ' 0xabc ';
+    expect(turnstileSiteKey()).toBe('0xabc');
   });
 
   it('desabilitado sem secret', async () => {

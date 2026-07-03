@@ -1,83 +1,116 @@
-import { useEffect, useRef, useState } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { useEffect, useState } from 'react';
 
-const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY ?? '';
+const ENV_SITE_KEY = (import.meta.env.VITE_TURNSTILE_SITE_KEY ?? '').trim();
+const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (
-        el: HTMLElement,
-        opts: {
-          sitekey: string;
-          callback: (token: string) => void;
-          'expired-callback'?: () => void;
-          theme?: 'light' | 'dark' | 'auto';
-        }
-      ) => string;
-      reset: (widgetId: string) => void;
-    };
-    onTurnstileLoad?: () => void;
+async function fetchSiteKey(): Promise<string | null> {
+  try {
+    const res = await fetch(`${API_BASE}/public/portal-config`, { cache: 'no-store' });
+    if (!res.ok) return ENV_SITE_KEY || null;
+    const data = (await res.json()) as { turnstileSiteKey?: string | null };
+    return data.turnstileSiteKey?.trim() || ENV_SITE_KEY || null;
+  } catch {
+    return ENV_SITE_KEY || null;
   }
 }
 
 export function turnstileConfigured(): boolean {
-  return Boolean(SITE_KEY);
+  return Boolean(ENV_SITE_KEY);
 }
 
 interface Props {
   onToken: (token: string) => void;
   onExpire?: () => void;
+  onRequiredChange?: (required: boolean) => void;
 }
 
-export function TurnstileWidget({ onToken, onExpire }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-  const widgetId = useRef<string | null>(null);
-  const [ready, setReady] = useState(false);
+export function TurnstileWidget({ onToken, onExpire, onRequiredChange }: Props) {
+  const [siteKey, setSiteKey] = useState<string | null>(null);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'verified' | 'error'>('loading');
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
-    if (!SITE_KEY) return;
-
-    const mount = () => {
-      if (!ref.current || !window.turnstile || widgetId.current) return;
-      widgetId.current = window.turnstile.render(ref.current, {
-        sitekey: SITE_KEY,
-        theme: 'auto',
-        callback: onToken,
-        'expired-callback': () => {
-          onExpire?.();
-          if (widgetId.current) window.turnstile?.reset(widgetId.current);
-        },
+    let cancelled = false;
+    setStatus('loading');
+    fetchSiteKey()
+      .then((key) => {
+        if (cancelled) return;
+        setSiteKey(key);
+        onRequiredChange?.(Boolean(key));
+        if (!key) setStatus('error');
+      })
+      .catch(() => {
+        if (cancelled) return;
+        const key = ENV_SITE_KEY || null;
+        setSiteKey(key);
+        onRequiredChange?.(Boolean(key));
+        if (!key) setStatus('error');
       });
-      setReady(true);
-    };
-
-    if (window.turnstile) {
-      mount();
-      return;
-    }
-
-    window.onTurnstileLoad = mount;
-    const existing = document.querySelector('script[data-turnstile]');
-    if (!existing) {
-      const s = document.createElement('script');
-      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad';
-      s.async = true;
-      s.defer = true;
-      s.setAttribute('data-turnstile', '1');
-      document.head.appendChild(s);
-    }
-
     return () => {
-      window.onTurnstileLoad = undefined;
+      cancelled = true;
     };
-  }, [onToken, onExpire]);
+  }, [retry, onRequiredChange]);
 
-  if (!SITE_KEY) return null;
+  if (status === 'loading' && !siteKey) {
+    return (
+      <div className="rounded-xl border border-border/60 bg-background/40 p-3">
+        <p className="text-xs text-foreground/70">Carregando verificação de segurança…</p>
+      </div>
+    );
+  }
+
+  if (!siteKey) {
+    return (
+      <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-3">
+        <p className="text-xs text-destructive" role="alert">
+          Verificação indisponível (site key ausente). Confira TURNSTILE_SITE_KEY na VPS.
+        </p>
+        <button type="button" className="mt-2 text-xs text-primary underline" onClick={() => setRetry((n) => n + 1)}>
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-[65px]">
-      <div ref={ref} />
-      {!ready && <p className="text-xs text-foreground/60">Carregando verificação…</p>}
+    <div className="rounded-xl border border-border/60 bg-background/40 p-3">
+      <p className="text-sm font-medium mb-2">Verificação de segurança</p>
+      <div className="turnstile-widget-host min-h-[65px] w-full overflow-visible">
+        <Turnstile
+          key={`${siteKey}-${retry}`}
+          siteKey={siteKey}
+          options={{ theme: 'light', size: 'normal' }}
+          onSuccess={(token) => {
+            onToken(token);
+            setStatus('verified');
+          }}
+          onExpire={() => {
+            onExpire?.();
+            setStatus('ready');
+          }}
+          onError={() => setStatus('error')}
+          onWidgetLoad={() => setStatus('ready')}
+        />
+      </div>
+      {status === 'ready' && (
+        <p className="text-xs text-foreground/70 mt-2">Marque a caixa acima para continuar.</p>
+      )}
+      {status === 'verified' && (
+        <p className="text-xs text-success mt-2">Verificação concluída.</p>
+      )}
+      {status === 'error' && (
+        <>
+          <p className="text-xs text-destructive mt-2" role="alert">
+            Falha na verificação. Confira o domínio no painel Cloudflare Turnstile (
+            <code className="text-[11px]">casadapaz.inovatitech.com.br</code>
+            ) ou desative bloqueadores.
+          </p>
+          <button type="button" className="mt-2 text-xs text-primary underline" onClick={() => setRetry((n) => n + 1)}>
+            Tentar novamente
+          </button>
+        </>
+      )}
     </div>
   );
 }
