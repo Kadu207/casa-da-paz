@@ -1,6 +1,6 @@
 # Agentes — Casa da Paz
 
-Espelho PT: [`docs/agentes.md`](docs/agentes.md) (e `agentes.md` na raiz, se existir) · Memória: [`.specify/memory/memory.md`](.specify/memory/memory.md)
+Espelho PT: [`agents.md`](agents.md) · Memória: [`.specify/memory/memory.md`](.specify/memory/memory.md)
 
 ## Orquestração padrão
 

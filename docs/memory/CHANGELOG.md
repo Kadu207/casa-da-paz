@@ -4,7 +4,7 @@
 
 ### Adicionado
 - **021 Financeiro Asaas + Marketing:** ContaFinanceira, cobranças/assinaturas Asaas, webhook idempotente, transparência interna ERP, papel MARKETING (`/app/marketing`), checkout público via Asaas (ADR-009)
-- Harness: `docs/agentes.md`, `.specify/memory/memory.md`, skills atualizadas
+- Harness: `agents.md`, `.specify/memory/memory.md`, skills atualizadas
 - Smoke: `scripts/test-financeiro-asaas.ps1`
 - **Cadastros por função:** seções Presidente/Diretoria/Tesouraria/etc.; `PessoaResponsavel` para menores
 - **Alertas UI (014 S1–S3):** API `/api/alertas`, página Financeiro, badge pendências, workflow N8N `lembrete_atraso`

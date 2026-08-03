@@ -10,8 +10,9 @@ Este é o **Casa da Paz Management System Cloud** — ERP/CRM para terreiro de U
 ## Arquivos de memória (ler primeiro)
 - `.specify/memory/constitution.md` — princípios
 - `.specify/memory/project-memory.md` — estado atual
+- `.specify/memory/memory.md` — índice vivo
 - `docs/analise-requisitos-consolidada.md` — requisitos completos
-- `AGENTS.md` — orquestração de agentes
+- `agents.md` / `AGENTS.md` — orquestração de agentes
 
 ## Stack
 React/Vite/TS + Express/Prisma/PostgreSQL + Python IA + Chatwoot + N8N

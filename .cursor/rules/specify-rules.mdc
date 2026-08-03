@@ -6,7 +6,7 @@ alwaysApply: true
 # Casa da Paz — Regras do Projeto
 
 ## Antes de agir
-1. Ler `.specify/memory/project-memory.md` e `AGENTS.md`
+1. Ler `.specify/memory/project-memory.md`, `agents.md` e `AGENTS.md`
 2. Consultar `docs/analise-requisitos-consolidada.md` para escopo
 3. Features em `specs/<feature>/` seguem ciclo SDD
 

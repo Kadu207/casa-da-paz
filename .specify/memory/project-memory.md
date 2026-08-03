@@ -42,15 +42,15 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 
 ## Harness
 
-- `AGENTS.md` + `docs/agentes.md` (entrada PT)
+- `AGENTS.md` + `agents.md` (entrada de orquestração)
 - `.specify/memory/memory.md` + `project-memory.md`
 - Skills em `.cursor/skills/`
 
 ## Próximos passos
 
-1. Aplicar migration `20260803000000_financeiro_asaas_gestor` no ambiente local/prod
-2. Configurar `ASAAS_API_KEY` sandbox e testar webhook
+1. **VPS deploy 021** — código em `main` (`c5001d8`); SSH local do agente sem chave — executar na máquina do usuário (ver runbook)
+2. Configurar `ASAAS_API_KEY` sandbox (local + VPS); **não** usar chave produção até fornecida
 3. **012 T8** — Meta WhatsApp no Chatwoot (gate humano)
-4. **Deploy VPS** — só com confirmação do usuário (inclui Asaas prod)
+4. Smoke pós-deploy: `https://casadapaz.inovatitech.com.br/health`
 
 Espelhamento Windows/Debian: posterior (`docs/memory/runbooks/dev-windows-linux-sync.md`).
