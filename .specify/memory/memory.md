@@ -14,8 +14,7 @@ Ponto de entrada da memória do projeto. Atualizar `project-memory.md` ao encerr
 
 | Arquivo | Função |
 |---------|--------|
-| [AGENTS.md](../../AGENTS.md) | Orquestração (canônico) |
-| [agents.md](../../agents.md) | Entrada agents + índice de skills |
+| [agents.md](../../agents.md) | Orquestração de agentes + índice de skills |
 | [.cursor/skills/](../../.cursor/skills/) | 8 skills de domínio |
 
 ## Contratos e requisitos

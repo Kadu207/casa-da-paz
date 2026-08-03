@@ -1,5 +1,5 @@
 # Movido
 
-O arquivo canônico é **[`agents.md`](../agents.md)** na raiz do repositório (não `agentes.md`).
+O arquivo canônico é **[`agents.md`](../agents.md)** na raiz do repositório.
 
-Este stub existe só para não quebrar links antigos.
+Nomes incorretos / obsoletos: `agentes.md`, `AGENTS.md` (renomeado para `agents.md`).

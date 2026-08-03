@@ -42,7 +42,7 @@ Ver **`docs/memory/roadmap-cronograma.md`**
 
 ## Harness
 
-- `AGENTS.md` + `agents.md` (entrada de orquestração)
+- `agents.md` (entrada de orquestração)
 - `.specify/memory/memory.md` + `project-memory.md`
 - Skills em `.cursor/skills/`
 

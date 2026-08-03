@@ -69,7 +69,7 @@ npm run dev
 ## Documentação
 
 - [Requisitos consolidados](docs/analise-requisitos-consolidada.md)
-- [Agentes](AGENTS.md)
+- [Agentes](agents.md)
 - [ADRs](docs/memory/decisions/)
 
 ## Deploy

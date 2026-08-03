@@ -6,7 +6,7 @@ description: Orquestrador central Casa da Paz. Roteia tarefas para agentes de do
 # Agente Orquestrador — Casa da Paz
 
 ## Fluxo
-1. Ler `project-memory.md` + `AGENTS.md`
+1. Ler `project-memory.md` + `agents.md`
 2. Classificar tarefa → agente domínio
 3. Executar ciclo: domínio → validador-integracao → validador-qualidade
 4. Atualizar memória ao encerrar
