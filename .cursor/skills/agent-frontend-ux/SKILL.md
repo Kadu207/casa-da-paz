@@ -12,7 +12,10 @@ description: React Vite Tailwind Recharts, route guards, portal público, sync L
 
 ## Checklist
 - [ ] Mobile-first responsivo
-- [ ] Route guard por setor_acesso
+- [ ] Route guard por setor_acesso / resource
 - [ ] Portal público sem JWT
 - [ ] Recharts nos dashboards
 - [ ] Chatwoot widget em /public/contato
+- [ ] `/app/marketing` só para MARKETING/DIRETORIA (publicar eventos/livros)
+- [ ] Abas financeiro: contas, cobranças, transparência, assinaturas
+- [ ] Checkout público usa invoiceUrl Asaas (não Stripe)

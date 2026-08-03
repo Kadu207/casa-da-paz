@@ -41,9 +41,51 @@ paths:
     get:
       security: [{ bearerAuth: [] }]
       summary: Para N8N lembretes
+  /financeiro/contas:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Contas financeiras e saldos
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Criar conta
+  /financeiro/transparencia:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Transparência interna agregada (sem PII)
+  /cobrancas:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Listar cobranças Asaas
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Criar cobrança avulsa
+  /cobrancas/assinaturas:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Assinaturas médiuns
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Criar assinatura mensal
+  /marketing/resumo:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: KPIs publicação
+  /marketing/eventos:
+    get:
+      security: [{ bearerAuth: [] }]
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Publicar evento
+  /marketing/produtos:
+    get:
+      security: [{ bearerAuth: [] }]
   /eventos:
     get:
       security: [{ bearerAuth: [] }]
+  /eventos/{id}/inscricoes/{inscricaoId}/cobrar:
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Cobrança Asaas para inscrição
   /eventos/{id}/checkin:
     post:
       security: [{ bearerAuth: [] }]
@@ -59,9 +101,15 @@ paths:
   /public/agendamentos:
     post:
       summary: Agendar consulta (rate limit)
+  /public/livraria/pedidos:
+    post:
+      summary: Checkout público com cobrança Asaas
+  /webhooks/asaas:
+    post:
+      summary: Webhook Asaas (token asaas-access-token)
   /webhooks/pix:
     post:
-      summary: Conciliação PIX (stub)
+      summary: Conciliação PIX (stub legado)
   /webhooks/n8n/trigger:
     post:
       security: [{ bearerAuth: [] }]

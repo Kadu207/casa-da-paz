@@ -23,10 +23,50 @@ enum SetorAcesso {
   ADMIN
   DIRETORIA
   FINANCEIRO
+  MARKETING
   RECEPCAO
   LIVRARIA
   MEDIUM
   SUPORTE
+}
+
+enum TipoContaFinanceira {
+  CAIXA
+  BANCO
+  ASAAS
+}
+
+enum OrigemTransacao {
+  MANUAL
+  PDV
+  EVENTO
+  ECOMMERCE
+  ASSINATURA
+  IMPORT
+}
+
+enum AsaasBillingType {
+  BOLETO
+  PIX
+  CREDIT_CARD
+  UNDEFINED
+}
+
+enum AsaasCobrancaStatus {
+  PENDING
+  RECEIVED
+  CONFIRMED
+  OVERDUE
+  REFUNDED
+  DELETED
+  RECEIVED_IN_CASH
+}
+
+enum AsaasAssinaturaStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+  CANCELLED
 }
 
 enum TipoTransacao {
@@ -117,6 +157,8 @@ model Pessoa {
   inscricoes    Inscricao[]
   agendamentos  AgendamentoPublico[]
   responsaveis  PessoaResponsavel[]
+  asaasClientes AsaasCliente[]
+  asaasAssinaturas AsaasAssinatura[]
 
   @@map("pessoas")
 }
@@ -160,21 +202,43 @@ model UsuarioPolicy {
   @@map("usuario_policies")
 }
 
+model ContaFinanceira {
+  id            Int                 @id @default(autoincrement())
+  nome          String              @db.VarChar(100)
+  tipo          TipoContaFinanceira
+  saldoInicial  Decimal             @default(0) @map("saldo_inicial") @db.Decimal(12, 2)
+  ativa         Boolean             @default(true)
+  asaasWalletId String?             @map("asaas_wallet_id") @db.VarChar(80)
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+  transacoes    FinanceiroTransacao[]
+
+  @@map("contas_financeiras")
+}
+
 model FinanceiroTransacao {
-  id              Int              @id @default(autoincrement())
-  pessoaId        Int?             @map("pessoa_id")
-  tipo            TipoTransacao
-  categoria       String           @db.VarChar(50)
-  valor           Decimal          @db.Decimal(10, 2)
-  dataTransacao   DateTime         @map("data_transacao") @db.Date
-  vencimento      DateTime?        @db.Date
-  status          StatusTransacao
-  observacoes     String?
-  pessoa          Pessoa?          @relation(fields: [pessoaId], references: [id])
+  id                  Int              @id @default(autoincrement())
+  pessoaId            Int?             @map("pessoa_id")
+  contaId             Int?             @map("conta_id")
+  tipo                TipoTransacao
+  categoria           String           @db.VarChar(50)
+  valor               Decimal          @db.Decimal(10, 2)
+  dataTransacao       DateTime         @map("data_transacao") @db.Date
+  vencimento          DateTime?        @db.Date
+  status              StatusTransacao
+  observacoes         String?
+  origem              OrigemTransacao  @default(MANUAL)
+  asaasPaymentId      String?          @map("asaas_payment_id") @db.VarChar(80)
+  asaasSubscriptionId String?          @map("asaas_subscription_id") @db.VarChar(80)
+  pessoa              Pessoa?          @relation(fields: [pessoaId], references: [id])
+  conta               ContaFinanceira? @relation(fields: [contaId], references: [id])
+  asaasCobrancas      AsaasCobranca[]
 
   @@index([dataTransacao])
   @@index([vencimento])
   @@index([pessoaId])
+  @@index([contaId])
+  @@index([asaasPaymentId])
   @@map("financeiro_transacoes")
 }
 
@@ -275,6 +339,7 @@ model Inscricao {
   vencimento      DateTime?       @db.Date
   evento          Evento          @relation(fields: [eventoId], references: [id])
   pessoa          Pessoa          @relation(fields: [pessoaId], references: [id])
+  asaasCobrancas  AsaasCobranca[]
 
   @@unique([eventoId, pessoaId])
   @@map("inscricoes")
@@ -354,28 +419,106 @@ model EcommerceCliente {
   createdAt     DateTime              @default(now()) @map("created_at")
   updatedAt     DateTime              @updatedAt @map("updated_at")
   pedidos       EcommercePedido[]
+  asaasClientes AsaasCliente[]
 
   @@map("ecommerce_clientes")
 }
 
 model EcommercePedido {
-  id                    Int                    @id @default(autoincrement())
-  protocolo             String                 @unique @db.VarChar(32)
-  clienteId             Int                    @map("cliente_id")
-  status                StatusPedidoEcommerce  @default(PENDENTE_PAGAMENTO)
-  valorTotal            Decimal                @map("valor_total") @db.Decimal(10, 2)
-  stripeSessionId       String?                @map("stripe_session_id") @db.VarChar(120)
-  stripePaymentIntentId String?                @map("stripe_payment_intent_id") @db.VarChar(120)
-  aceiteLgpdEm          DateTime?              @map("aceite_lgpd_em")
-  aceiteLgpdVersao      String?                @map("aceite_lgpd_versao") @db.VarChar(20)
-  createdAt             DateTime               @default(now()) @map("created_at")
-  updatedAt             DateTime               @updatedAt @map("updated_at")
-  cliente               EcommerceCliente       @relation(fields: [clienteId], references: [id])
-  itens                 EcommerceItemPedido[]
+  id               Int                    @id @default(autoincrement())
+  protocolo        String                 @unique @db.VarChar(32)
+  clienteId        Int                    @map("cliente_id")
+  status           StatusPedidoEcommerce  @default(PENDENTE_PAGAMENTO)
+  valorTotal       Decimal                @map("valor_total") @db.Decimal(10, 2)
+  asaasPaymentId   String?                @map("asaas_payment_id") @db.VarChar(80)
+  asaasInvoiceUrl  String?                @map("asaas_invoice_url") @db.VarChar(500)
+  aceiteLgpdEm     DateTime?              @map("aceite_lgpd_em")
+  aceiteLgpdVersao String?                @map("aceite_lgpd_versao") @db.VarChar(20)
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+  cliente          EcommerceCliente       @relation(fields: [clienteId], references: [id])
+  itens            EcommerceItemPedido[]
+  asaasCobrancas   AsaasCobranca[]
 
   @@index([status])
   @@index([createdAt])
+  @@index([asaasPaymentId])
   @@map("ecommerce_pedidos")
+}
+
+model AsaasCliente {
+  id                 Int               @id @default(autoincrement())
+  asaasCustomerId    String            @unique @map("asaas_customer_id") @db.VarChar(80)
+  pessoaId           Int?              @map("pessoa_id")
+  ecommerceClienteId Int?              @map("ecommerce_cliente_id")
+  cpfCnpj            String?           @map("cpf_cnpj") @db.VarChar(18)
+  email              String?           @db.VarChar(150)
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  pessoa             Pessoa?           @relation(fields: [pessoaId], references: [id])
+  ecommerceCliente   EcommerceCliente? @relation(fields: [ecommerceClienteId], references: [id])
+
+  @@index([pessoaId])
+  @@index([ecommerceClienteId])
+  @@map("asaas_clientes")
+}
+
+model AsaasCobranca {
+  id              Int                 @id @default(autoincrement())
+  asaasPaymentId  String              @unique @map("asaas_payment_id") @db.VarChar(80)
+  status          AsaasCobrancaStatus @default(PENDING)
+  billingType     AsaasBillingType    @map("billing_type")
+  valor           Decimal             @db.Decimal(10, 2)
+  vencimento      DateTime            @db.Date
+  invoiceUrl      String?             @map("invoice_url") @db.VarChar(500)
+  pixQrCode       String?             @map("pix_qr_code")
+  pixCopiaCola    String?             @map("pix_copia_cola")
+  externalRef     String?             @map("external_ref") @db.VarChar(120)
+  transacaoId     Int?                @map("transacao_id")
+  pedidoId        Int?                @map("pedido_id")
+  inscricaoId     Int?                @map("inscricao_id")
+  assinaturaId    Int?                @map("assinatura_id")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+  transacao       FinanceiroTransacao? @relation(fields: [transacaoId], references: [id])
+  pedido          EcommercePedido?     @relation(fields: [pedidoId], references: [id])
+  inscricao       Inscricao?           @relation(fields: [inscricaoId], references: [id])
+  assinatura      AsaasAssinatura?     @relation(fields: [assinaturaId], references: [id])
+
+  @@index([status])
+  @@index([transacaoId])
+  @@index([pedidoId])
+  @@index([inscricaoId])
+  @@map("asaas_cobrancas")
+}
+
+model AsaasAssinatura {
+  id                    Int                   @id @default(autoincrement())
+  asaasSubscriptionId   String                @unique @map("asaas_subscription_id") @db.VarChar(80)
+  pessoaId              Int                   @map("pessoa_id")
+  valor                 Decimal               @db.Decimal(10, 2)
+  cycle                 String                @default("MONTHLY") @db.VarChar(20)
+  billingType           AsaasBillingType      @map("billing_type")
+  status                AsaasAssinaturaStatus @default(ACTIVE)
+  nextDueDate           DateTime?             @map("next_due_date") @db.Date
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+  pessoa                Pessoa                @relation(fields: [pessoaId], references: [id])
+  cobrancas             AsaasCobranca[]
+
+  @@index([pessoaId])
+  @@index([status])
+  @@map("asaas_assinaturas")
+}
+
+model AsaasWebhookEvent {
+  id          Int      @id @default(autoincrement())
+  eventId     String   @unique @map("event_id") @db.VarChar(120)
+  eventType   String   @map("event_type") @db.VarChar(80)
+  payload     Json
+  processedAt DateTime @default(now()) @map("processed_at")
+
+  @@map("asaas_webhook_events")
 }
 
 model EcommerceItemPedido {

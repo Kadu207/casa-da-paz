@@ -6,6 +6,7 @@ export type SetorAcesso =
   | 'ADMIN'
   | 'DIRETORIA'
   | 'FINANCEIRO'
+  | 'MARKETING'
   | 'RECEPCAO'
   | 'LIVRARIA'
   | 'MEDIUM'

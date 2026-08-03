@@ -6,11 +6,15 @@ import FinanceiroLancamentosPage from './pages/financeiro/FinanceiroLancamentosP
 import FinanceiroFluxoPage from './pages/financeiro/FinanceiroFluxoPage';
 import FinanceiroAtrasadosPage from './pages/financeiro/FinanceiroAtrasadosPage';
 import FinanceiroConciliacaoPage from './pages/financeiro/FinanceiroConciliacaoPage';
+import FinanceiroContasPage from './pages/financeiro/FinanceiroContasPage';
+import FinanceiroCobrancasPage from './pages/financeiro/FinanceiroCobrancasPage';
+import FinanceiroTransparenciaPage from './pages/financeiro/FinanceiroTransparenciaPage';
 import RecepcaoPage from './pages/RecepcaoPage';
 import LivrariaPage from './pages/LivrariaPage';
 import UsuariosPage from './pages/UsuariosPage';
 import PessoasPage from './pages/PessoasPage';
 import EventosPage from './pages/EventosPage';
+import MarketingPage from './pages/MarketingPage';
 import PublicHome from './pages/public/PublicHome';
 import PublicEventos from './pages/public/PublicEventos';
 import PublicAgendar from './pages/public/PublicAgendar';
@@ -31,13 +35,14 @@ function IntegracoesPage() {
     <div className="space-y-4 max-w-2xl">
       <h2 className="text-xl font-serif text-[var(--color-accent)]">Integrações</h2>
       <p className="text-white/80 text-sm leading-relaxed">
-        Área reservada ao perfil <strong>ADMIN</strong>: webhooks N8N, Chatwoot/WhatsApp e variáveis de
+        Área reservada ao perfil <strong>ADMIN</strong>: webhooks N8N, Asaas, Chatwoot/WhatsApp e variáveis de
         ambiente em produção. Consulte o runbook{' '}
         <code className="text-[var(--color-accent)]">docs/memory/runbooks/deploy-messaging-prod.md</code>.
       </p>
       <ul className="text-sm text-white/70 list-disc pl-5 space-y-1">
+        <li>POST /api/webhooks/asaas — conciliação Asaas (token)</li>
         <li>POST /api/webhooks/n8n/trigger — disparo manual (testes)</li>
-        <li>POST /api/webhooks/pix — conciliação PIX (secret)</li>
+        <li>POST /api/webhooks/pix — conciliação PIX legada (secret)</li>
         <li>Stack messaging na VPS — Chatwoot + N8N</li>
       </ul>
     </div>
@@ -87,6 +92,23 @@ export default function App() {
           <Route path="fluxo" element={<FinanceiroFluxoPage />} />
           <Route path="atrasados" element={<FinanceiroAtrasadosPage />} />
           <Route path="conciliacao" element={<FinanceiroConciliacaoPage />} />
+          <Route path="contas" element={<FinanceiroContasPage />} />
+          <Route
+            path="cobrancas"
+            element={
+              <RequireRole path="/app/financeiro/cobrancas">
+                <FinanceiroCobrancasPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="transparencia"
+            element={
+              <RequireRole path="/app/financeiro/transparencia">
+                <FinanceiroTransparenciaPage />
+              </RequireRole>
+            }
+          />
           <Route
             path="alertas"
             element={
@@ -96,6 +118,14 @@ export default function App() {
             }
           />
         </Route>
+        <Route
+          path="marketing"
+          element={
+            <RequireRole path="/app/marketing">
+              <MarketingPage />
+            </RequireRole>
+          }
+        />
         <Route
           path="recepcao"
           element={

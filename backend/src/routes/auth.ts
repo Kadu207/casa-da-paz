@@ -32,6 +32,7 @@ const loginSchema = z.object({
 const operationalSetorSchema = z.enum([
   'DIRETORIA',
   'FINANCEIRO',
+  'MARKETING',
   'RECEPCAO',
   'LIVRARIA',
   'MEDIUM',
@@ -133,6 +134,7 @@ router.get('/politicas/catalogo', authenticate, requireSupervisor, (_req, res) =
     defaults: {
       DIRETORIA: defaultGrantsForSetor('DIRETORIA'),
       FINANCEIRO: defaultGrantsForSetor('FINANCEIRO'),
+      MARKETING: defaultGrantsForSetor('MARKETING'),
       RECEPCAO: defaultGrantsForSetor('RECEPCAO'),
       LIVRARIA: defaultGrantsForSetor('LIVRARIA'),
       MEDIUM: defaultGrantsForSetor('MEDIUM'),

@@ -18,6 +18,10 @@ export const RBAC_RESOURCES = [
   'auditoria',
   'alertas',
   'manutencao',
+  'marketing',
+  'transparencia',
+  'contas',
+  'cobrancas',
 ] as const;
 
 export type Resource = (typeof RBAC_RESOURCES)[number];
@@ -27,6 +31,7 @@ export type PolicyGrants = Partial<Record<Resource, PolicyGrant>>;
 export const OPERATIONAL_ROLES: SetorAcesso[] = [
   'DIRETORIA',
   'FINANCEIRO',
+  'MARKETING',
   'RECEPCAO',
   'LIVRARIA',
   'MEDIUM',
@@ -65,6 +70,10 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     auditoria: 'write',
     alertas: 'write',
     manutencao: 'write',
+    marketing: 'write',
+    transparencia: 'read',
+    contas: 'write',
+    cobrancas: 'write',
   },
   ADMIN: {
     webhooks: 'write',
@@ -86,6 +95,10 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     ecommerce: 'write',
     auditoria: 'write',
     alertas: 'write',
+    marketing: 'write',
+    transparencia: 'read',
+    contas: 'write',
+    cobrancas: 'write',
   },
   FINANCEIRO: {
     pessoas: 'read',
@@ -93,6 +106,18 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     import: 'write',
     dashboard: 'read',
     alertas: 'write',
+    eventos: 'read',
+    livraria: 'read',
+    ecommerce: 'read',
+    transparencia: 'read',
+    contas: 'write',
+    cobrancas: 'write',
+  },
+  MARKETING: {
+    marketing: 'write',
+    eventos: 'write',
+    livraria: 'write',
+    ecommerce: 'write',
   },
   RECEPCAO: {
     pessoas: 'write',
@@ -110,6 +135,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
   MEDIUM: {
     financeiro: 'own',
     dashboard: 'own',
+    cobrancas: 'own',
   },
   SUPORTE: {
     pessoas: 'read',

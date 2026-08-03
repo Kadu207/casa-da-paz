@@ -32,7 +32,7 @@ export default function PublicLivraria() {
   const [loading, setLoading] = useState(true);
   const [comprando, setComprando] = useState<Produto | null>(null);
   const [quantidade, setQuantidade] = useState(1);
-  const [sucesso, setSucesso] = useState<{ protocolo: string } | null>(null);
+  const [sucesso, setSucesso] = useState<{ protocolo: string; invoiceUrl?: string | null; mensagem?: string } | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -51,7 +51,7 @@ export default function PublicLivraria() {
     if (!comprando) return;
     const res = await publicApi<{
       pedido: { protocolo: string };
-      pagamento: { mensagem: string; checkoutUrl: string | null };
+      pagamento: { mensagem: string; checkoutUrl: string | null; invoiceUrl?: string | null };
     }>('/public/livraria/pedidos', {
       method: 'POST',
       body: JSON.stringify({
@@ -65,7 +65,11 @@ export default function PublicLivraria() {
       }),
     });
     setComprando(null);
-    setSucesso({ protocolo: res.pedido.protocolo });
+    setSucesso({
+      protocolo: res.pedido.protocolo,
+      invoiceUrl: res.pagamento.invoiceUrl ?? res.pagamento.checkoutUrl,
+      mensagem: res.pagamento.mensagem,
+    });
   };
 
   const pago = searchParams.get('pago');
@@ -109,7 +113,17 @@ export default function PublicLivraria() {
             <p className="mt-1 text-foreground/85">
               {t('shop.protocol')}: <strong className="select-all">{sucesso.protocolo}</strong>
             </p>
-            <p className="mt-2 text-foreground/70">{t('shop.stripePending')}</p>
+            <p className="mt-2 text-foreground/70">{sucesso.mensagem ?? t('shop.asaasPending')}</p>
+            {sucesso.invoiceUrl && (
+              <a
+                href={sucesso.invoiceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-block text-primary underline underline-offset-2"
+              >
+                {t('shop.payNow')}
+              </a>
+            )}
           </div>
         )}
 

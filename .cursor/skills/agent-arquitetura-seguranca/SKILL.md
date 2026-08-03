@@ -16,6 +16,9 @@ description: RBAC, JWT, policies, isolamento multi-usuário, auditoria seguranç
 - [ ] JWT validado antes de handlers
 - [ ] Rotas públicas sem dados sensíveis
 - [ ] Rate limit em endpoints públicos
+- [ ] MARKETING sem acesso a financeiro/cobranças/contas
+- [ ] FINANCEIRO com write em cobrancas/contas; read em transparencia
+- [ ] Webhook Asaas valida token; secrets nunca no repositório
 
 ## Saída
 Matriz atualizada + testes de autorização

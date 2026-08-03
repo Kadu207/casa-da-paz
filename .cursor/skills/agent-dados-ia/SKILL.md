@@ -15,3 +15,5 @@ description: PostgreSQL Prisma migrations, import Excel, microsserviço Python I
 - [ ] Import Excel rollback total
 - [ ] Fuzzy dedup telefone/nome
 - [ ] 3 agentes Python documentados
+- [ ] ContaFinanceira + Asaas* models com índices
+- [ ] Stripe columns removidas/renomeadas para asaas_*

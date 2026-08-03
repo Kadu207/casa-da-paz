@@ -12,6 +12,39 @@ function validateSecret(req: Request, secret: string): boolean {
   return typeof header === 'string' && header === secret;
 }
 
+router.post('/asaas', async (req, res) => {
+  const token =
+    (typeof req.headers['asaas-access-token'] === 'string'
+      ? req.headers['asaas-access-token']
+      : undefined) ??
+    (typeof req.headers['x-webhook-secret'] === 'string' ? req.headers['x-webhook-secret'] : undefined);
+
+  const { validateAsaasWebhookToken, processAsaasWebhook } = await import(
+    '../services/asaas/webhooks.js'
+  );
+  if (!validateAsaasWebhookToken(token)) {
+    res.status(401).json({ error: 'Token Asaas inválido' });
+    return;
+  }
+
+  const body = req.body as { id?: string; event?: string; payment?: unknown };
+  if (!body?.event) {
+    res.status(400).json({ error: 'Payload inválido' });
+    return;
+  }
+
+  try {
+    const result = await processAsaasWebhook({
+      id: body.id,
+      event: body.event,
+      payment: body.payment as never,
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro webhook Asaas' });
+  }
+});
+
 router.post('/pix', async (req, res) => {
   const secret = process.env.PIX_WEBHOOK_SECRET ?? 'pix-dev-secret';
   if (!validateSecret(req, secret)) {

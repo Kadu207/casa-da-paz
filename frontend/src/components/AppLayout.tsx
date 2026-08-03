@@ -9,6 +9,7 @@ import type { ErpTranslationKey } from '../i18n/erp-pt-BR';
 const nav: { path: string; labelKey: ErpTranslationKey; resource: string }[] = [
   { path: '/app/dashboard', labelKey: 'erp.nav.dashboard', resource: 'dashboard' },
   { path: '/app/financeiro', labelKey: 'erp.nav.financeiro', resource: 'financeiro' },
+  { path: '/app/marketing', labelKey: 'erp.nav.marketing', resource: 'marketing' },
   { path: '/app/recepcao', labelKey: 'erp.nav.recepcao', resource: 'eventos' },
   { path: '/app/eventos', labelKey: 'erp.nav.eventos', resource: 'eventos' },
   { path: '/app/pessoas', labelKey: 'erp.nav.pessoas', resource: 'pessoas' },

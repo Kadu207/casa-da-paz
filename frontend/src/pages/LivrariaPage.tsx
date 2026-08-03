@@ -47,7 +47,10 @@ const emptyConteudo = {
 export default function LivrariaPage() {
   const { t, locale } = useI18n();
   const { user } = useAuth();
-  const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'LIVRARIA';
+  const canWrite =
+    user?.setorAcesso === 'DIRETORIA' ||
+    user?.setorAcesso === 'LIVRARIA' ||
+    user?.setorAcesso === 'MARKETING';
 
   const [aba, setAba] = useState<'catalogo' | 'conteudos' | 'pdv'>('catalogo');
   const [filtroTipo, setFiltroTipo] = useState<string>('LIVRO');

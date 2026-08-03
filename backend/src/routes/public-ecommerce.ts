@@ -9,6 +9,7 @@ import {
   normalizeClienteData,
 } from '../lib/ecommerce-schemas.js';
 import { LGPD_POLICY_VERSION } from '../lib/lgpd.js';
+import { createCobrancaForPedido } from '../services/asaas/index.js';
 
 const router = Router();
 
@@ -144,17 +145,41 @@ router.post('/livraria/pedidos', checkoutLimiter, async (req, res) => {
       return completo!;
     });
 
-    const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY);
+    const clienteFull = await prisma.ecommerceCliente.findUnique({ where: { id: result.cliente!.id } });
+    const doc = clienteFull?.cpf ?? clienteFull?.cnpj ?? '';
+
+    let pagamento;
+    try {
+      pagamento = await createCobrancaForPedido({
+        pedidoId: result.id,
+        ecommerceClienteId: clienteFull?.id,
+        customerName: clienteFull?.nomeCompleto ?? 'Cliente',
+        cpfCnpj: doc,
+        email: clienteFull?.email ?? '',
+        phone: clienteFull?.telefone ?? undefined,
+        value: Number(result.valorTotal),
+        description: `Pedido ${result.protocolo}`,
+      });
+    } catch (err) {
+      pagamento = {
+        configurado: false,
+        invoiceUrl: null,
+        paymentId: null,
+        mensagem: err instanceof Error ? err.message : 'Falha ao criar cobrança Asaas',
+      };
+    }
 
     res.status(201).json({
       pedido: result,
       pagamento: {
-        provider: 'stripe',
-        configurado: stripeConfigured,
-        checkoutUrl: null as string | null,
-        mensagem: stripeConfigured
-          ? 'Stripe será acionado em breve.'
-          : 'Pedido registrado. Pagamento via Stripe será habilitado em breve — guarde o protocolo.',
+        provider: 'asaas',
+        configurado: pagamento.configurado,
+        checkoutUrl: pagamento.invoiceUrl,
+        invoiceUrl: pagamento.invoiceUrl,
+        paymentId: pagamento.paymentId,
+        pixQrCode: 'pixQrCode' in pagamento ? pagamento.pixQrCode : null,
+        pixCopiaCola: 'pixCopiaCola' in pagamento ? pagamento.pixCopiaCola : null,
+        mensagem: pagamento.mensagem,
       },
     });
   } catch (err) {

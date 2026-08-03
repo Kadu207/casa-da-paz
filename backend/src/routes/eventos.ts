@@ -219,6 +219,58 @@ router.patch(
   }
 );
 
+router.post(
+  '/:id/inscricoes/:inscricaoId/cobrar',
+  authenticate,
+  authorize('cobrancas', 'write'),
+  async (req, res) => {
+    const eventoId = Number(req.params.id);
+    const inscricaoId = Number(req.params.inscricaoId);
+    const body = z
+      .object({
+        billingType: z.enum(['BOLETO', 'PIX', 'CREDIT_CARD', 'UNDEFINED']).default('PIX'),
+        cpfCnpj: z.string().min(11),
+        email: z.string().email().optional(),
+        dueDate: z.string().optional(),
+      })
+      .safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: body.error.flatten() });
+      return;
+    }
+
+    const inscricao = await prisma.inscricao.findFirst({
+      where: { id: inscricaoId, eventoId },
+      include: { pessoa: true, evento: true },
+    });
+    if (!inscricao) {
+      res.status(404).json({ error: 'Inscrição não encontrada' });
+      return;
+    }
+
+    try {
+      const { createCobrancaAvulsa } = await import('../services/asaas/index.js');
+      const result = await createCobrancaAvulsa({
+        pessoaId: inscricao.pessoaId,
+        customerName: inscricao.pessoa.nomeCompleto,
+        cpfCnpj: body.data.cpfCnpj,
+        email: body.data.email,
+        phone: inscricao.pessoa.telefone ?? undefined,
+        value: Number(inscricao.valor),
+        billingType: body.data.billingType,
+        categoria: 'EVENTOS',
+        dueDate: body.data.dueDate,
+        description: `Inscrição ${inscricao.evento.nomeEvento}`,
+        inscricaoId: inscricao.id,
+      });
+      res.status(201).json(result);
+    } catch (err) {
+      const status = (err as { status?: number }).status ?? 500;
+      res.status(status).json({ error: err instanceof Error ? err.message : 'Erro Asaas' });
+    }
+  }
+);
+
 router.post('/:id/checkin', authenticate, authorize('checkin', 'write'), async (req, res) => {
   const eventoId = Number(req.params.id);
   const body = z

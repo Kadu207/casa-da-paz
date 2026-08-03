@@ -15,6 +15,8 @@ import metricasRoutes from './routes/metricas.js';
 import auditoriaRoutes from './routes/auditoria.js';
 import alertasRoutes from './routes/alertas.js';
 import mediaRoutes from './routes/media.js';
+import cobrancasRoutes from './routes/cobrancas.js';
+import marketingRoutes from './routes/marketing.js';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
@@ -29,6 +31,8 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/pessoas', pessoasRoutes);
 app.use('/api/financeiro', financeiroRoutes);
+app.use('/api/cobrancas', cobrancasRoutes);
+app.use('/api/marketing', marketingRoutes);
 app.use('/api/eventos', eventosRoutes);
 app.use('/api/livraria', livrariaRoutes);
 app.use('/api/public', publicRoutes);

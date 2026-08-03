@@ -16,7 +16,7 @@ interface Pessoa {
   nomeCompleto: string;
 }
 
-const SETORES = ['DIRETORIA', 'FINANCEIRO', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'] as const;
+const SETORES = ['DIRETORIA', 'FINANCEIRO', 'MARKETING', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'] as const;
 const POLICY_RESOURCES = [
   'pessoas', 'financeiro', 'import', 'eventos', 'checkin', 'livraria', 'estoque',
   'dashboard', 'agendamentos', 'logs', 'ecommerce', 'auditoria', 'manutencao',

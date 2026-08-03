@@ -113,6 +113,40 @@ async function main() {
     },
   });
 
+  const pessoaMarketing = await prisma.pessoa.upsert({
+    where: { id: 12 },
+    update: {},
+    create: {
+      id: 12,
+      nomeCompleto: 'Comunicacao Marketing',
+      telefone: '31999990003',
+      tipoPerfil: 'FUNCIONARIO',
+      maiorDeIdade: true,
+    },
+  });
+
+  await prisma.usuario.upsert({
+    where: { login: 'marketing' },
+    update: { setorAcesso: 'MARKETING' },
+    create: {
+      login: 'marketing',
+      senhaHash: await bcrypt.hash('marketing123', 10),
+      setorAcesso: 'MARKETING',
+      pessoaId: pessoaMarketing.id,
+    },
+  });
+
+  await prisma.contaFinanceira.upsert({
+    where: { id: 1 },
+    update: {},
+    create: { id: 1, nome: 'Caixa físico', tipo: 'CAIXA', saldoInicial: 0, ativa: true },
+  });
+  await prisma.contaFinanceira.upsert({
+    where: { id: 2 },
+    update: {},
+    create: { id: 2, nome: 'Conta Asaas', tipo: 'ASAAS', saldoInicial: 0, ativa: true },
+  });
+
   const hoje = new Date();
   const mesPassado = new Date(hoje);
   mesPassado.setMonth(mesPassado.getMonth() - 1);
@@ -238,6 +272,7 @@ async function main() {
   console.log('Seed OK — admin / admin123 (DIRETORIA)');
   console.log('Seed OK — supervisor / supervisor123 (SUPERVISOR)');
   console.log('Seed OK — admin.integracoes / integra123 (ADMIN)');
+  console.log('Seed OK — marketing / marketing123 (MARKETING)');
   console.log('Seed OK — medium / medium123');
 }
 

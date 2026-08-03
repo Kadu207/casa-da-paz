@@ -41,6 +41,7 @@ const router = Router();
 
 const transacaoSchema = z.object({
   pessoaId: z.number().int().positive().optional(),
+  contaId: z.number().int().positive().optional(),
   tipo: z.enum(['RECEITA', 'DESPESA']),
   categoria: z.string(),
   valor: z.number().positive(),
@@ -48,6 +49,7 @@ const transacaoSchema = z.object({
   vencimento: z.string().optional(),
   status: z.enum(['PENDENTE', 'CONCLUIDO']).default('PENDENTE'),
   observacoes: z.string().optional(),
+  origem: z.enum(['MANUAL', 'PDV', 'EVENTO', 'ECOMMERCE', 'ASSINATURA', 'IMPORT']).optional(),
 });
 
 function parsePeriodoQuery(query: Record<string, unknown>): Periodo | string {
@@ -693,6 +695,149 @@ router.delete('/:id', authenticate, authorize('financeiro', 'write'), async (req
 
   await prisma.financeiroTransacao.delete({ where: { id } });
   res.status(204).send();
+});
+
+// --- Contas financeiras ---
+router.get('/contas', authenticate, authorize('contas', 'read'), async (_req, res) => {
+  const contas = await prisma.contaFinanceira.findMany({ orderBy: { id: 'asc' } });
+  const withSaldo = await Promise.all(
+    contas.map(async (c) => {
+      const agg = await prisma.financeiroTransacao.groupBy({
+        by: ['tipo', 'status'],
+        where: { contaId: c.id, status: 'CONCLUIDO' },
+        _sum: { valor: true },
+      });
+      let movimentado = 0;
+      for (const row of agg) {
+        const v = Number(row._sum.valor ?? 0);
+        movimentado += row.tipo === 'RECEITA' ? v : -v;
+      }
+      return {
+        ...c,
+        saldoInicial: Number(c.saldoInicial),
+        saldoCalculado: Number(c.saldoInicial) + movimentado,
+      };
+    })
+  );
+  res.json(withSaldo);
+});
+
+router.post('/contas', authenticate, authorize('contas', 'write'), async (req, res) => {
+  const body = z
+    .object({
+      nome: z.string().min(2).max(100),
+      tipo: z.enum(['CAIXA', 'BANCO', 'ASAAS']),
+      saldoInicial: z.number().default(0),
+      asaasWalletId: z.string().optional(),
+    })
+    .safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.flatten() });
+    return;
+  }
+  const conta = await prisma.contaFinanceira.create({ data: body.data });
+  res.status(201).json(conta);
+});
+
+router.patch('/contas/:id', authenticate, authorize('contas', 'write'), async (req, res) => {
+  const id = Number(req.params.id);
+  const body = z
+    .object({
+      nome: z.string().min(2).max(100).optional(),
+      ativa: z.boolean().optional(),
+      saldoInicial: z.number().optional(),
+      asaasWalletId: z.string().nullable().optional(),
+    })
+    .safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.flatten() });
+    return;
+  }
+  const conta = await prisma.contaFinanceira.update({ where: { id }, data: body.data });
+  res.json(conta);
+});
+
+router.post('/contas/sync-asaas', authenticate, authorize('contas', 'write'), async (_req, res) => {
+  const { syncAsaasBalanceToConta } = await import('../services/asaas/index.js');
+  try {
+    const result = await syncAsaasBalanceToConta();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : 'Erro sync Asaas' });
+  }
+});
+
+// --- Transparência interna (agregados, sem PII) ---
+router.get('/transparencia', authenticate, authorize('transparencia', 'read'), async (req, res) => {
+  const periodo = parsePeriodoQuery(req.query as Record<string, unknown>);
+  if (typeof periodo === 'string') {
+    res.status(400).json({ error: periodo });
+    return;
+  }
+
+  const transacoes = await prisma.financeiroTransacao.findMany({
+    where: {
+      dataTransacao: { gte: periodo.de, lte: periodo.ate },
+      status: 'CONCLUIDO',
+    },
+    select: {
+      tipo: true,
+      categoria: true,
+      valor: true,
+      contaId: true,
+      origem: true,
+    },
+  });
+
+  const porCategoria: Record<string, { receitas: number; despesas: number }> = {};
+  const porConta: Record<number, { receitas: number; despesas: number }> = {};
+  const porOrigem: Record<string, number> = {};
+  let receitas = 0;
+  let despesas = 0;
+
+  for (const t of transacoes) {
+    const v = Number(t.valor);
+    if (!porCategoria[t.categoria]) porCategoria[t.categoria] = { receitas: 0, despesas: 0 };
+    if (t.tipo === 'RECEITA') {
+      receitas += v;
+      porCategoria[t.categoria].receitas += v;
+      if (t.contaId) {
+        if (!porConta[t.contaId]) porConta[t.contaId] = { receitas: 0, despesas: 0 };
+        porConta[t.contaId].receitas += v;
+      }
+    } else {
+      despesas += v;
+      porCategoria[t.categoria].despesas += v;
+      if (t.contaId) {
+        if (!porConta[t.contaId]) porConta[t.contaId] = { receitas: 0, despesas: 0 };
+        porConta[t.contaId].despesas += v;
+      }
+    }
+    porOrigem[t.origem] = (porOrigem[t.origem] ?? 0) + v;
+  }
+
+  const contas = await prisma.contaFinanceira.findMany({
+    where: { id: { in: Object.keys(porConta).map(Number) } },
+    select: { id: true, nome: true, tipo: true },
+  });
+  const contaMap = new Map(contas.map((c) => [c.id, c]));
+
+  res.json({
+    periodo: {
+      de: periodo.de.toISOString().slice(0, 10),
+      ate: periodo.ate.toISOString().slice(0, 10),
+    },
+    totais: { receitas, despesas, saldo: receitas - despesas },
+    porCategoria: Object.entries(porCategoria).map(([categoria, v]) => ({ categoria, ...v })),
+    porConta: Object.entries(porConta).map(([id, v]) => ({
+      contaId: Number(id),
+      nome: contaMap.get(Number(id))?.nome ?? `Conta #${id}`,
+      tipo: contaMap.get(Number(id))?.tipo ?? null,
+      ...v,
+      saldo: v.receitas - v.despesas,
+    })),
+    porOrigem: Object.entries(porOrigem).map(([origem, valor]) => ({ origem, valor })),
+  });
 });
 
 export default router;
