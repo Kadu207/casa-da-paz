@@ -6,7 +6,7 @@
 
 | Item | Status |
 |------|--------|
-| Fase | Tesouraria 022–025 + contribuintes + policies no cadastro |
+| Fase | Materiais de estudo públicos (ervas/banhos) + Marketing |
 | Versão | 0.1.0-alpha |
 | Commit docs/código | `a040174`+ em `main` (GitHub/GitLab) |
 | Produção | https://casadapaz.inovatitech.com.br |
@@ -19,11 +19,9 @@
 | Spec | Status |
 |------|--------|
 | 020 RBAC + policies no cadastro | ✅ |
-| 022 contas a pagar | ✅ |
-| 023 recorrência mensalidade | ✅ |
-| 024 DRE / orçamento / centros | ✅ |
-| 025 OFX | ✅ |
-| Contribuintes (patrocínio/padrinho) | ✅ |
+| 022–025 tesouraria | ✅ |
+| Contribuintes / 026 | ✅ |
+| 027 materiais de estudo | ✅ |
 | 021 Asaas | Dormant até `ASAAS_API_KEY` |
 
 ## Documentação

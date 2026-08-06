@@ -36,6 +36,8 @@ export default function PublicHome() {
     {
       src: portalAssets.ervas,
       label: t('home.gallery.ervas'),
+      hint: t('home.gallery.ervasHint'),
+      to: '/public/estudos',
       w: 1024,
       h: 768,
       className: 'col-span-2 sm:col-span-2 aspect-[16/9] sm:aspect-auto',
@@ -128,6 +130,12 @@ export default function PublicHome() {
             {t('home.cta.schedule')}
           </Link>
           <Link
+            to="/public/estudos"
+            className="min-h-12 inline-flex items-center justify-center rounded-xl border border-primary text-primary font-medium px-6 py-3 hover:bg-primary/10 transition-colors"
+          >
+            {t('home.cta.studies')}
+          </Link>
+          <Link
             to="/public/livraria"
             className="min-h-12 inline-flex items-center justify-center rounded-xl border border-primary text-primary font-medium px-6 py-3 hover:bg-primary/10 transition-colors"
           >
@@ -164,6 +172,13 @@ export default function PublicHome() {
                 it.className
               }
             >
+              {'to' in it && it.to ? (
+                <Link
+                  to={it.to}
+                  className="absolute inset-0 z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-2xl"
+                  aria-label={`${it.label}. ${'hint' in it && it.hint ? it.hint : ''}`}
+                />
+              ) : null}
               <SafeImage
                 src={it.src}
                 alt={it.label}
@@ -175,8 +190,13 @@ export default function PublicHome() {
                 sizes={it.sizes}
               />
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/90 via-background/40 to-transparent pointer-events-none" />
-              <span className="absolute bottom-3 left-4 right-4 font-serif text-primary text-base sm:text-lg drop-shadow-lg">
+              <span className="absolute bottom-3 left-4 right-4 font-serif text-primary text-base sm:text-lg drop-shadow-lg pointer-events-none">
                 {it.label}
+                {'hint' in it && it.hint ? (
+                  <span className="block text-xs font-sans font-normal text-primary/80 mt-0.5">
+                    {it.hint}
+                  </span>
+                ) : null}
               </span>
             </li>
           ))}

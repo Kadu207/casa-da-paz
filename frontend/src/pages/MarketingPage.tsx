@@ -29,26 +29,63 @@ interface Conteudo {
   produto?: { id: number; nome: string } | null;
 }
 
+type CategoriaEstudo = 'ERVAS' | 'BANHOS' | 'DEFUMACAO' | 'OUTROS';
+
+interface MaterialEstudo {
+  id: number;
+  slug: string;
+  categoria: CategoriaEstudo;
+  titulo: string;
+  resumo: string;
+  corpo: string;
+  imagemUrl: string | null;
+  ordem: number;
+  publicado: boolean;
+}
+
+const CATEGORIAS: CategoriaEstudo[] = ['ERVAS', 'BANHOS', 'DEFUMACAO', 'OUTROS'];
+
+const emptyMaterial = {
+  categoria: 'ERVAS' as CategoriaEstudo,
+  titulo: '',
+  resumo: '',
+  corpo: '',
+  imagemUrl: '',
+  ordem: '0',
+  publicado: false,
+};
+
 export default function MarketingPage() {
   const { t } = useI18n();
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [conteudos, setConteudos] = useState<Conteudo[]>([]);
-  const [resumo, setResumo] = useState<{ eventosAbertos: number; produtosPublicados: number; conteudosPublicados: number } | null>(null);
+  const [materiais, setMateriais] = useState<MaterialEstudo[]>([]);
+  const [resumo, setResumo] = useState<{
+    eventosAbertos: number;
+    produtosPublicados: number;
+    conteudosPublicados: number;
+    materiaisEstudoPublicados?: number;
+  } | null>(null);
   const [nomeEvento, setNomeEvento] = useState('');
   const [dataEvento, setDataEvento] = useState('');
+  const [materialForm, setMaterialForm] = useState(emptyMaterial);
+  const [editMaterialId, setEditMaterialId] = useState<number | null>(null);
+  const [materialErro, setMaterialErro] = useState('');
 
   const load = useCallback(async () => {
-    const [r, e, p, c] = await Promise.all([
+    const [r, e, p, c, m] = await Promise.all([
       api<typeof resumo>('/marketing/resumo'),
       api<Evento[]>('/marketing/eventos'),
       api<Produto[]>('/marketing/produtos'),
       api<Conteudo[]>('/marketing/conteudos'),
+      api<MaterialEstudo[]>('/marketing/materiais-estudo'),
     ]);
     setResumo(r);
     setEventos(e);
     setProdutos(p);
     setConteudos(c);
+    setMateriais(m);
   }, []);
 
   useEffect(() => {
@@ -90,6 +127,59 @@ export default function MarketingPage() {
     await load();
   };
 
+  const salvarMaterial = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    setMaterialErro('');
+    const payload = {
+      categoria: materialForm.categoria,
+      titulo: materialForm.titulo.trim(),
+      resumo: materialForm.resumo.trim(),
+      corpo: materialForm.corpo.trim(),
+      imagemUrl: materialForm.imagemUrl.trim() || null,
+      ordem: Number(materialForm.ordem) || 0,
+      publicado: materialForm.publicado,
+    };
+    try {
+      if (editMaterialId) {
+        await api(`/marketing/materiais-estudo/${editMaterialId}`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await api('/marketing/materiais-estudo', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+      }
+      setMaterialForm(emptyMaterial);
+      setEditMaterialId(null);
+      await load();
+    } catch (err) {
+      setMaterialErro(err instanceof Error ? err.message : t('erp.marketing.studySaveError'));
+    }
+  };
+
+  const editarMaterial = (m: MaterialEstudo) => {
+    setEditMaterialId(m.id);
+    setMaterialForm({
+      categoria: m.categoria,
+      titulo: m.titulo,
+      resumo: m.resumo,
+      corpo: m.corpo,
+      imagemUrl: m.imagemUrl ?? '',
+      ordem: String(m.ordem),
+      publicado: m.publicado,
+    });
+  };
+
+  const toggleMaterial = async (m: MaterialEstudo) => {
+    await api(`/marketing/materiais-estudo/${m.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ publicado: !m.publicado }),
+    });
+    await load();
+  };
+
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
@@ -98,7 +188,7 @@ export default function MarketingPage() {
       </div>
 
       {resumo && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="p-4 rounded-lg bg-white/5 border border-white/10">
             <p className="text-xs text-white/50">{t('erp.marketing.kpi.events')}</p>
             <p className="text-2xl text-[var(--color-accent)]">{resumo.eventosAbertos}</p>
@@ -111,8 +201,121 @@ export default function MarketingPage() {
             <p className="text-xs text-white/50">{t('erp.marketing.kpi.content')}</p>
             <p className="text-2xl text-[var(--color-accent)]">{resumo.conteudosPublicados}</p>
           </div>
+          <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+            <p className="text-xs text-white/50">{t('erp.marketing.kpi.studies')}</p>
+            <p className="text-2xl text-[var(--color-accent)]">{resumo.materiaisEstudoPublicados ?? 0}</p>
+          </div>
         </div>
       )}
+
+      <section className="space-y-3">
+        <h3 className="text-lg text-white/90">{t('erp.marketing.studies')}</h3>
+        <p className="text-xs text-white/50">{t('erp.marketing.studiesHint')}</p>
+        <form onSubmit={salvarMaterial} className="space-y-2 p-4 rounded-xl bg-white/5 border border-white/10">
+          {materialErro && <p className="text-sm text-[var(--color-danger)]">{materialErro}</p>}
+          <div className="grid gap-2 sm:grid-cols-2">
+            <select
+              value={materialForm.categoria}
+              onChange={(e) =>
+                setMaterialForm({ ...materialForm, categoria: e.target.value as CategoriaEstudo })
+              }
+              className="px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+            >
+              {CATEGORIAS.map((c) => (
+                <option key={c} value={c}>
+                  {t(`studies.cat.${c}` as 'studies.cat.ERVAS')}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min={0}
+              value={materialForm.ordem}
+              onChange={(e) => setMaterialForm({ ...materialForm, ordem: e.target.value })}
+              placeholder={t('erp.marketing.studyOrder')}
+              className="px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+            />
+          </div>
+          <input
+            required
+            value={materialForm.titulo}
+            onChange={(e) => setMaterialForm({ ...materialForm, titulo: e.target.value })}
+            placeholder={t('erp.marketing.studyTitle')}
+            className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+          />
+          <input
+            required
+            value={materialForm.resumo}
+            onChange={(e) => setMaterialForm({ ...materialForm, resumo: e.target.value })}
+            placeholder={t('erp.marketing.studySummary')}
+            className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+          />
+          <textarea
+            required
+            rows={6}
+            value={materialForm.corpo}
+            onChange={(e) => setMaterialForm({ ...materialForm, corpo: e.target.value })}
+            placeholder={t('erp.marketing.studyBody')}
+            className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+          />
+          <input
+            value={materialForm.imagemUrl}
+            onChange={(e) => setMaterialForm({ ...materialForm, imagemUrl: e.target.value })}
+            placeholder={t('erp.marketing.studyImage')}
+            className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+          />
+          <label className="flex items-center gap-2 text-sm text-white/80">
+            <input
+              type="checkbox"
+              checked={materialForm.publicado}
+              onChange={(e) => setMaterialForm({ ...materialForm, publicado: e.target.checked })}
+            />
+            {t('erp.marketing.studyPublished')}
+          </label>
+          <div className="flex gap-2">
+            <button type="submit" className="px-4 py-2 rounded bg-[var(--color-accent)] text-black text-sm font-medium">
+              {editMaterialId ? t('erp.common.save') : t('erp.marketing.studyCreate')}
+            </button>
+            {editMaterialId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditMaterialId(null);
+                  setMaterialForm(emptyMaterial);
+                }}
+                className="px-4 py-2 rounded bg-white/10 text-sm"
+              >
+                {t('erp.common.cancel')}
+              </button>
+            )}
+          </div>
+        </form>
+        <ul className="space-y-2 text-sm">
+          {materiais.map((m) => (
+            <li key={m.id} className="flex flex-wrap justify-between gap-2 items-center border-b border-white/5 py-2">
+              <span>
+                [{m.categoria}] {m.titulo}{' '}
+                <span className="text-white/40">({m.slug})</span>
+              </span>
+              <div className="flex gap-2">
+                <button type="button" onClick={() => editarMaterial(m)} className="text-white/70 hover:underline">
+                  {t('erp.common.edit')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleMaterial(m)}
+                  className="text-[var(--color-accent)] hover:underline"
+                >
+                  {m.publicado ? t('erp.marketing.unpublish') : t('erp.marketing.publish')}
+                </button>
+              </div>
+            </li>
+          ))}
+          {materiais.length === 0 && (
+            <li className="text-white/50 py-2">{t('erp.marketing.studyEmpty')}</li>
+          )}
+        </ul>
+      </section>
 
       <section className="space-y-3">
         <h3 className="text-lg text-white/90">{t('erp.marketing.events')}</h3>

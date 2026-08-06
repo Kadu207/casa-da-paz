@@ -5,6 +5,7 @@ export const ptBR = {
   'nav.contact': 'Contato',
   'nav.internal': 'Área interna',
   'nav.shop': 'Livraria',
+  'nav.studies': 'Ervas & banhos',
   'site.documentTitle': 'Bem vindo a Casa da Paz',
   'home.title': 'Bem vindo a Casa da Paz',
   'home.subtitle':
@@ -16,6 +17,7 @@ export const ptBR = {
   'home.cta.schedule': 'Agendar consulta',
   'home.cta.contact': 'Falar com a Casa',
   'home.cta.shop': 'Livraria & ervas',
+  'home.cta.studies': 'Ervas, banhos e estudos',
   'home.shop.title': 'Livraria Casa da Paz',
   'home.shop.text':
     'Livros, ervas sagradas e artigos do terreiro. Compre online — entrega com carinho e respeito à tradição.',
@@ -28,6 +30,7 @@ export const ptBR = {
   'home.gallery.pretoVelho': 'Pretos Velhos',
   'home.gallery.atabaque': 'Atabaques sagrados',
   'home.gallery.ervas': 'Ervas e oferendas',
+  'home.gallery.ervasHint': 'Toque para ver materiais de estudo',
   'home.map.title': 'Onde nos encontrar',
   'home.map.directions': 'Traçar rota',
   'home.map.googleMaps': 'Abrir no Google Maps',
@@ -168,6 +171,22 @@ export const ptBR = {
   'footer.navigate': 'Navegar',
   'footer.copyright': 'Comunidade de Terreiro Afro-Indígena · Tradição Umbanda · © {year} Casa da Paz',
   'lang.switch': 'English',
+  'studies.eyebrow': 'Saberes da casa',
+  'studies.title': 'Ervas, banhos e defumação',
+  'studies.subtitle':
+    'Materiais de estudo sobre ervas sagradas, banhos de descarrego, defumação e cuidados da tradição — conteúdo público, cuidado pela equipe de comunicação.',
+  'studies.filterAll': 'Todos',
+  'studies.cat.ERVAS': 'Ervas',
+  'studies.cat.BANHOS': 'Banhos',
+  'studies.cat.DEFUMACAO': 'Defumação',
+  'studies.cat.OUTROS': 'Outros',
+  'studies.readMore': 'Ler mais',
+  'studies.empty': 'Em breve novos materiais de estudo.',
+  'studies.loadError': 'Não foi possível carregar os materiais.',
+  'studies.notFound': 'Material não encontrado ou ainda não publicado.',
+  'studies.back': 'Materiais de estudo',
+  'studies.updated': 'Atualizado em {date}',
+  'studies.loading': 'Carregando…',
 } as const;
 
 export type PortalTranslationKey = keyof typeof ptBR;

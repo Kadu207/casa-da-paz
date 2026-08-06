@@ -8,12 +8,18 @@ const router = Router();
 /** Painel marketing: publicar eventos e produtos (sem financeiro). */
 
 router.get('/resumo', authenticate, authorize('marketing', 'read'), async (_req, res) => {
-  const [eventosAbertos, produtosPublicados, conteudos] = await Promise.all([
+  const [eventosAbertos, produtosPublicados, conteudos, materiaisEstudo] = await Promise.all([
     prisma.evento.count({ where: { status: 'ABERTO' } }),
     prisma.produto.count({ where: { publicadoEcommerce: true } }),
     prisma.livrariaConteudo.count({ where: { publicado: true } }),
+    prisma.materialEstudo.count({ where: { publicado: true } }),
   ]);
-  res.json({ eventosAbertos, produtosPublicados, conteudosPublicados: conteudos });
+  res.json({
+    eventosAbertos,
+    produtosPublicados,
+    conteudosPublicados: conteudos,
+    materiaisEstudoPublicados: materiaisEstudo,
+  });
 });
 
 router.get('/eventos', authenticate, authorize('marketing', 'read'), async (_req, res) => {

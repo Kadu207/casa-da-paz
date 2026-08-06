@@ -14,6 +14,8 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/public/acompanhar/:protocolo` | Status do agendamento |
 | `/public/contato` | Contato |
 | `/public/livraria` | Catálogo / checkout (Asaas se configurado) |
+| `/public/estudos` | Materiais de estudo (ervas, banhos, defumação) |
+| `/public/estudos/:slug` | Detalhe do material |
 | `/public/termos` | Termos / LGPD |
 
 ## 3.2. ERP (`/app`)
@@ -41,7 +43,7 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/app/eventos` | eventos | Eventos ERP |
 | `/app/livraria` | livraria | PDV / estoque |
 | `/app/ecommerce` | ecommerce | Pedidos |
-| `/app/marketing` | marketing | Marketing |
+| `/app/marketing` | marketing | Marketing + materiais de estudo |
 | `/app/usuarios` | usuarios | Usuários + policies (SUPERVISOR) |
 | `/app/auditoria` | auditoria | Auditoria / export |
 

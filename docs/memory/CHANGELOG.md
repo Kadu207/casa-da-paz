@@ -6,6 +6,7 @@
 - **Refresh 2026-08-06:** `docs/00–09`, README, roadmap, playbooks, constitution IX, specs 022–026 status, OpenAPI/RBAC alinhados à stack Express/Vite (Lovable movido para `docs/reference/lovable/`)
 
 ### Adicionado
+- **027 Materiais de estudo:** portal `/public/estudos` (ervas/banhos/defumação); edição em Marketing; home galeria ervas → estudos
 - **Policies no cadastro de usuário:** `POST /auth/usuarios` cria `UsuarioPolicy` com snapshot do setor (+ overrides); UI define nível de acesso no ato
 - **Patrocínios / Padrinhos:** aba Financeiro + API `/contribuintes`; coluna mensalidade na lista de médiuns
 - **022–025 Tesouraria completa (sem Asaas):** contas a pagar, agenda a pagar, recorrência mensalidade, DRE/orçamento/centros, OFX; agentes ops em `agents.md`

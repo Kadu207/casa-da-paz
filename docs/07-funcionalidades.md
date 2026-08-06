@@ -4,6 +4,7 @@
 
 - Home institucional, eventos, agendamento com protocolo, contato, termos LGPD  
 - Livraria / checkout (Asaas se `ASAAS_API_KEY`; senão fluxo sem PSP)  
+- **Materiais de estudo** (`/public/estudos`): ervas, banhos, defumação — edição via Marketing  
 - Newsletter e consentimentos  
 
 ## 7.2. Cadastros (`/app/pessoas`)

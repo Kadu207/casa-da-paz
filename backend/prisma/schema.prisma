@@ -142,6 +142,13 @@ enum TipoLivrariaConteudo {
   DICA
 }
 
+enum CategoriaMaterialEstudo {
+  ERVAS
+  BANHOS
+  DEFUMACAO
+  OUTROS
+}
+
 enum TipoMovimentacao {
   ENTRADA
   SAIDA
@@ -490,6 +497,24 @@ model LivrariaConteudo {
 
   @@index([tipo, publicado, ordem])
   @@map("livraria_conteudos")
+}
+
+/// Materiais de estudo públicos (ervas, banhos, defumação) — edição MARKETING
+model MaterialEstudo {
+  id         Int                     @id @default(autoincrement())
+  slug       String                  @unique @db.VarChar(120)
+  categoria  CategoriaMaterialEstudo
+  titulo     String                  @db.VarChar(150)
+  resumo     String                  @db.VarChar(400)
+  corpo      String
+  imagemUrl  String?                 @map("imagem_url") @db.VarChar(500)
+  ordem      Int                     @default(0)
+  publicado  Boolean                 @default(false)
+  createdAt  DateTime                @default(now()) @map("created_at")
+  updatedAt  DateTime                @updatedAt @map("updated_at")
+
+  @@index([publicado, categoria, ordem])
+  @@map("materiais_estudo")
 }
 
 model EstoqueMovimentacao {

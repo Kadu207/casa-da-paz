@@ -28,6 +28,8 @@ import PublicContato from './pages/public/PublicContato';
 import PublicAcompanhar from './pages/public/PublicAcompanhar';
 import PublicEventoDetalhe from './pages/public/PublicEventoDetalhe';
 import PublicLivraria from './pages/public/PublicLivraria';
+import PublicEstudos from './pages/public/PublicEstudos';
+import PublicEstudoDetalhe from './pages/public/PublicEstudoDetalhe';
 import PublicTermos from './pages/public/PublicTermos';
 import EcommerceAdminPage from './pages/EcommerceAdminPage';
 import AuditoriaPage from './pages/AuditoriaPage';
@@ -64,6 +66,8 @@ export default function App() {
       <Route path="/public/agendar" element={<PublicAgendar />} />
       <Route path="/public/contato" element={<PublicContato />} />
       <Route path="/public/livraria" element={<PublicLivraria />} />
+      <Route path="/public/estudos" element={<PublicEstudos />} />
+      <Route path="/public/estudos/:slug" element={<PublicEstudoDetalhe />} />
       <Route path="/public/termos" element={<PublicTermos />} />
       <Route path="/public/acompanhar/:protocolo" element={<PublicAcompanhar />} />
       {/* aliases Lovable → rotas canônicas */}
