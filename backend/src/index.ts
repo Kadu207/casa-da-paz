@@ -25,12 +25,30 @@ import tesourariaDreRoutes from './routes/tesouraria-dre.js';
 import ofxRoutes from './routes/ofx.js';
 import contribuintesRoutes from './routes/contribuintes.js';
 import { gerarMensalidadesDoMes } from './jobs/gerar-mensalidades.js';
+import { isProductionRuntime } from './lib/runtime-env.js';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
 
-app.use(cors({ origin: process.env.CORS_ORIGIN ?? '*' }));
-app.use(express.json());
+const corsOrigin = process.env.CORS_ORIGIN?.trim();
+if (isProductionRuntime() && (!corsOrigin || corsOrigin === '*')) {
+  throw new Error('[security] Defina CORS_ORIGIN com a URL do frontend em produção (não use *).');
+}
+app.use(
+  cors({
+    origin: corsOrigin && corsOrigin !== '*' ? corsOrigin : isProductionRuntime() ? false : true,
+  })
+);
+
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('X-XSS-Protection', '0');
+  next();
+});
+
+app.use(express.json({ limit: '1mb' }));
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'casadapaz-backend' });

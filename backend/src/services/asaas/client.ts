@@ -3,7 +3,16 @@ export type AsaasEnv = 'sandbox' | 'production';
 export function getAsaasConfig() {
   const env = (process.env.ASAAS_ENV ?? 'sandbox').toLowerCase() as AsaasEnv;
   const apiKey = process.env.ASAAS_API_KEY ?? '';
-  const webhookToken = process.env.ASAAS_WEBHOOK_TOKEN ?? 'asaas-dev-webhook-token';
+  const rawWebhook = process.env.ASAAS_WEBHOOK_TOKEN?.trim() ?? '';
+  const isProd =
+    process.env.NODE_ENV === 'production' || process.env.CASADAPAZ_ENV === 'production';
+  // Em produção nunca aceitar default de desenvolvimento (fail-closed no validate).
+  const webhookToken =
+    rawWebhook && rawWebhook !== 'asaas-dev-webhook-token'
+      ? rawWebhook
+      : isProd
+        ? ''
+        : rawWebhook || 'asaas-dev-webhook-token';
   const walletId = process.env.ASAAS_WALLET_ID ?? '';
   const baseUrl =
     process.env.ASAAS_API_URL ??

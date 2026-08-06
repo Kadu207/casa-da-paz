@@ -4,12 +4,18 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { dispararN8n, type N8nWorkflow } from '../lib/n8n.js';
+import {
+  isDevDefaultSecret,
+  isProductionRuntime,
+  timingSafeEqualString,
+} from '../lib/runtime-env.js';
 
 const router = Router();
 
 function validateSecret(req: Request, secret: string): boolean {
   const header = req.headers['x-webhook-secret'];
-  return typeof header === 'string' && header === secret;
+  if (typeof header !== 'string' || !secret) return false;
+  return timingSafeEqualString(header, secret);
 }
 
 router.post('/asaas', async (req, res) => {
@@ -46,8 +52,13 @@ router.post('/asaas', async (req, res) => {
 });
 
 router.post('/pix', async (req, res) => {
-  const secret = process.env.PIX_WEBHOOK_SECRET ?? 'pix-dev-secret';
-  if (!validateSecret(req, secret)) {
+  const secret = process.env.PIX_WEBHOOK_SECRET?.trim() ?? '';
+  if (isProductionRuntime() && (!secret || isDevDefaultSecret(secret))) {
+    res.status(503).json({ error: 'PIX webhook não configurado' });
+    return;
+  }
+  const effective = secret || 'pix-dev-secret';
+  if (!validateSecret(req, effective)) {
     res.status(401).json({ error: 'Secret inválido' });
     return;
   }
@@ -59,6 +70,17 @@ router.post('/pix', async (req, res) => {
     .safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: body.error.flatten() });
+    return;
+  }
+  const atual = await prisma.financeiroTransacao.findUnique({
+    where: { id: body.data.transacaoId },
+  });
+  if (!atual) {
+    res.status(404).json({ error: 'Transação não encontrada' });
+    return;
+  }
+  if (atual.status === 'CONCLUIDO') {
+    res.json({ ok: true, transacaoId: atual.id, status: atual.status, duplicate: true });
     return;
   }
   const t = await prisma.financeiroTransacao.update({

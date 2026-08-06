@@ -5,11 +5,19 @@ import { canAccess } from '../policies/rbac.js';
 import type { SetorAcesso } from '@prisma/client';
 import type { PolicyGrants } from '../policies/rbac.js';
 import { prisma } from '../lib/prisma.js';
+import { resolveSecret } from '../lib/runtime-env.js';
 
-const JWT_SECRET = process.env.JWT_SECRET ?? 'dev-secret-change-me';
+let cachedJwtSecret: string | null = null;
+
+function jwtSecret(): string {
+  if (!cachedJwtSecret) {
+    cachedJwtSecret = resolveSecret('JWT_SECRET', 'dev-secret-change-me');
+  }
+  return cachedJwtSecret;
+}
 
 export function signToken(payload: JwtPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+  return jwt.sign(payload, jwtSecret(), { expiresIn: '8h' });
 }
 
 export async function authenticate(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -20,7 +28,7 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
   }
   try {
     const token = header.slice(7);
-    const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const payload = jwt.verify(token, jwtSecret()) as JwtPayload;
     let policies: PolicyGrants | null = null;
     if (payload.setorAcesso !== 'SUPERVISOR' && payload.setorAcesso !== 'ADMIN') {
       const row = await prisma.usuarioPolicy.findUnique({

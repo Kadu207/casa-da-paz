@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import rateLimit from 'express-rate-limit';
 import { prisma } from '../lib/prisma.js';
 import {
   authenticate,
@@ -18,6 +19,14 @@ import {
 } from '../policies/rbac.js';
 
 const router = Router();
+
+const loginRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Muitas tentativas de login. Aguarde e tente novamente.' },
+});
 
 const loginFieldSchema = z
   .string()
@@ -91,7 +100,7 @@ function serializeUsuario(u: {
   };
 }
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginRateLimit, async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.flatten() });

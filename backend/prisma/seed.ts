@@ -556,19 +556,40 @@ async function main() {
   console.log('Seed completo OK — usuários com policies + dados de exemplo');
 }
 
+function assertSeedGate(mode: 'destroy' | 'users' | 'portal' | 'supervisor') {
+  const isProd =
+    process.env.NODE_ENV === 'production' || process.env.CASADAPAZ_ENV === 'production';
+  if (!isProd) return;
+  if (mode === 'portal') return;
+  if (mode === 'users' || mode === 'supervisor') {
+    if (process.env.CONFIRM_SEED_USERS === 'yes') return;
+    throw new Error(
+      'Seed de usuários bloqueado em produção. Rode com CONFIRM_SEED_USERS=yes (senha padrão — troque depois).'
+    );
+  }
+  if (process.env.CONFIRM_SEED_DESTROY === 'yes') return;
+  throw new Error(
+    'Seed completo bloqueado em produção (apaga financeiro/produtos). Use CONFIRM_SEED_DESTROY=yes só com backup.'
+  );
+}
+
 if (process.argv.includes('--supervisor-only')) {
+  assertSeedGate('supervisor');
   seedSupervisorOnly()
     .catch(console.error)
     .finally(() => prisma.$disconnect());
 } else if (process.argv.includes('--portal-content')) {
+  assertSeedGate('portal');
   seedPortalContent()
     .catch(console.error)
     .finally(() => prisma.$disconnect());
 } else if (process.argv.includes('--users-only')) {
+  assertSeedGate('users');
   seedAllUsers()
     .catch(console.error)
     .finally(() => prisma.$disconnect());
 } else {
+  assertSeedGate('destroy');
   main()
     .catch(console.error)
     .finally(() => prisma.$disconnect());

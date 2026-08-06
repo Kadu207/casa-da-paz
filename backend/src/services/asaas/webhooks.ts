@@ -1,5 +1,6 @@
 import type { AsaasBillingType, AsaasCobrancaStatus, Prisma } from '@prisma/client';
 import { prisma } from '../../lib/prisma.js';
+import { timingSafeEqualString } from '../../lib/runtime-env.js';
 import { getAsaasConfig } from './client.js';
 import type { AsaasPayment } from './payments.js';
 
@@ -43,8 +44,8 @@ export function mapBillingType(billingType: string): AsaasBillingType {
 
 export function validateAsaasWebhookToken(headerValue: string | undefined): boolean {
   const token = getAsaasConfig().webhookToken;
-  if (!headerValue) return false;
-  return headerValue === token;
+  if (!headerValue || !token) return false;
+  return timingSafeEqualString(headerValue, token);
 }
 
 export interface AsaasWebhookPayload {
