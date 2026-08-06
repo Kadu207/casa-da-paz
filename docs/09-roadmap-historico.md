@@ -1,28 +1,30 @@
-# 9. Histórico de Evolução (Resumo)
+# 9. Histórico e Roadmap
 
-Funcionalidades entregues nas últimas iterações:
+## 9.1. Entregas recentes (2026)
 
-1. **Mapa e localização** — marcação da Casa da Paz (Rua Valério Eugênio, 570, Areal) com botões de abertura no Google Maps e Waze.
-2. **Página /admin/auditoria** — visualização do `admin_audit_log` com:
-   - Paginação server-side.
-   - Filtros por papel, rota, usuário.
-   - Ordenação multi-coluna (data, usuário, papel, rota).
-   - Estados de loading/empty/feedback.
-   - Exportação CSV e PDF.
-3. **Auditoria expandida** — registros de IP, rota e motivo para exportações e mutações de eventos/usuários.
-4. **Identidade umbandista** — imagens estratégicas (pretos velhos, atabaque, Iemanjá, ervas, velas) em galeria bento na home, banner em `/eventos`, backdrop no login.
-5. **Otimização de imagens** — `SafeImage` com:
-   - Lazy loading + `srcSet` responsivo + `sizes` mobile-first.
-   - Detecção de `img.complete` para imagens em cache.
-   - Telemetria de fallback (`image-telemetry.ts`).
-   - Preload + `fetchpriority="high"` em hero e banner.
-6. **Header simplificado** — removida linha de endereço sob "Casa da Paz", mantida mensagem principal.
+| Período | Entrega |
+|---------|---------|
+| Jun/2026 | Financeiro v2, portal público, dashboard v2, painel médium, auditoria v2, alertas |
+| Jun/2026 | RBAC hierárquico + `UsuarioPolicy` (020) |
+| Ago/2026 | Asaas + marketing (021) — código pronto, **dormant** sem chave |
+| Ago/2026 | Tesouraria 022–025 (AP, recorrência, DRE, OFX) sem Asaas |
+| Ago/2026 | Patrocínios/padrinhos + mensalidade na lista de médiuns |
+| Ago/2026 | Policies **no ato do cadastro** de usuário |
+| Ago/2026 | Harness `agents.md` + 5 agentes de operação pós-construção |
 
-## Próximos Passos Sugeridos
+Commit de referência tesouraria+policies: `a040174` (main).
 
-- Implementar i18n (pt-BR default; en opcional para visitantes).
-- Adicionar dashboard de métricas (eventos mais visualizados, taxa de inscrição).
-- Newsletter integrada a `eventos`.
-- PWA / instalação no celular.
-- Internacionalizar `admin_audit_log` (tradução de `rota`/`motivo`).
-- Substituir CDN atual por uma com resize on-the-fly (Cloudflare Images / Supabase Storage transformations) para aproveitar 100% do `srcSet`.
+## 9.2. Estado atual
+
+Ver [`.specify/memory/project-memory.md`](../.specify/memory/project-memory.md) e [roadmap operacional](./memory/roadmap-cronograma.md).
+
+## 9.3. Próximos passos
+
+1. Deploy VPS do `main` atual (gate humano — SSH no terminal do usuário se o agente não tiver chave)  
+2. Ativar Asaas sandbox/produção **somente** com chave e confirmação  
+3. Chatwoot/N8N polish (tokens Meta / widget)  
+4. Next.js (016) — bloqueado por ADR-008 até aprovação  
+
+## 9.4. Referência Lovable
+
+O protótipo Lovable/Supabase permanece em `docs/reference/lovable/` apenas como histórico visual — **não** descreve a stack em produção.

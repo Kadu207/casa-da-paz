@@ -1,83 +1,60 @@
 # 4. Banco de Dados
 
-Backend Postgres gerenciado pelo Lovable Cloud. Todas as tabelas em `public` possuem RLS habilitado e GRANTs explícitos.
+**Fonte de verdade:** `backend/prisma/schema.prisma` + migrations em `backend/prisma/migrations/`.
 
-## 4.1. Tabelas
+SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Supabase).
 
-### `profiles`
-Perfil do usuário, espelha (via trigger) `auth.users`.
+## 4.1. Domínios principais
 
-| Coluna | Tipo | Notas |
-| --- | --- | --- |
-| `id` | `uuid` | PK, referencia `auth.users.id` |
-| `nome` | `text` | |
-| `email` | `text` | |
-| `created_at` | `timestamptz` | default `now()` |
-| `updated_at` | `timestamptz` | trigger atualiza |
+| Domínio | Models chave |
+|---------|----------------|
+| Pessoas / auth | `Pessoa`, `PessoaResponsavel`, `Usuario`, `UsuarioPolicy` |
+| Financeiro ledger | `FinanceiroTransacao`, `ContaFinanceira`, `FinanceiroFechamentoMensal` |
+| Contas a pagar (022) | `Fornecedor`, `ContaPagar`, `ContaPagarParcela` |
+| Recorrência (023) | `MensalidadePlano` |
+| DRE / orçamento (024) | `CentroCusto`, `OrcamentoLinha` (+ `centroCustoId` em transações) |
+| OFX (025) | `OfxImport`, `OfxMovimento` |
+| Contribuintes | `Contribuinte` (`PATROCINIO` \| `PADRINHO`) |
+| Asaas (021, opcional) | `AsaasCliente`, `AsaasCobranca`, `AsaasAssinatura`, `AsaasWebhookEvent` |
+| Eventos | `Evento`, `Inscricao`, `Presenca` |
+| Livraria / ecommerce | produtos, estoque, `EcommercePedido` |
+| Portal | `AgendamentoPublico`, newsletter, consentimentos LGPD |
+| Ops | `Alerta`, auditoria, marketing |
 
-**RLS**: usuário lê/atualiza apenas o próprio profile; admin lê todos.
+## 4.2. Enums relevantes (tesouraria)
 
-### `user_roles`
-Roles do usuário (tabela separada — nunca colocar role em `profiles`).
+- `StatusContaPagar`: PENDENTE / PARCIAL / PAGO / CANCELADO  
+- `StatusParcela`: PENDENTE / PAGO / CANCELADO  
+- `StatusOfxMovimento`: PENDENTE / CONCILIADO / IGNORADO  
+- `TipoContribuinte`: PATROCINIO / PADRINHO  
+- `OrigemTransacao`: inclui `RECORRENCIA`, `CONTA_PAGAR`, `OFX`, …  
+- `SetorAcesso`: SUPERVISOR, ADMIN, DIRETORIA, FINANCEIRO, MARKETING, RECEPCAO, LIVRARIA, MEDIUM, SUPORTE  
 
-| Coluna | Tipo | Notas |
-| --- | --- | --- |
-| `id` | `uuid` | PK |
-| `user_id` | `uuid` | FK `auth.users` ON DELETE CASCADE |
-| `role` | `app_role` (enum: `admin`, `moderator`, `user`) | |
-| `created_at` | `timestamptz` | |
+## 4.3. Regras de dados
 
-Constraint única `(user_id, role)`.
+| Regra | Detalhe |
+|-------|---------|
+| Adimplência | Derivada de lançamentos (ADR-003) — não persistir status duplicado |
+| Baixa de parcela | Cria `FinanceiroTransacao` DESPESA CONCLUIDO e liga `transacaoId` |
+| Mensalidade | Um `MensalidadePlano` por `pessoaId`; job gera lançamento do mês se ausente |
+| Policy | `UsuarioPolicy.grants` JSON — snapshot no cadastro do usuário |
+| Import Excel | Transação atômica com rollback total |
 
-**Função `has_role(_user_id uuid, _role app_role) returns boolean`** — `SECURITY DEFINER`, usada por RLS de outras tabelas para evitar recursão.
+## 4.4. Migrations recentes
 
-### `eventos`
-Eventos públicos (giras, festas).
+| Migration | Conteúdo |
+|-----------|----------|
+| `20260803000000_financeiro_asaas_gestor` | Contas + Asaas + MARKETING |
+| `20260806120000_tesouraria_022_025` | Contas a pagar, planos, DRE, OFX |
+| `20260806140000_contribuintes_patrocinio_padrinho` | Contribuintes |
 
-| Coluna | Tipo | Notas |
-| --- | --- | --- |
-| `id` | `uuid` | PK |
-| `slug` | `text` | único, usado na URL |
-| `nome_evento` | `text` | |
-| `data_evento` | `timestamptz` | |
-| `local` | `text` | |
-| `resumo` | `text` | |
-| `descricao` | `text[]` | parágrafos |
-| `recomendacoes` | `text[]` | itens (vestimenta, idade etc.) |
-| `capacidade_max` | `int` | nullable |
-| `inscricoes` | `int` | default 0 |
-| `publicado` | `bool` | default false |
-| `ordem` | `int` | ordenação custom |
-| `created_at` / `updated_at` | `timestamptz` | |
-
-**RLS**:
-- SELECT: público quando `publicado = true`; admin lê tudo.
-- INSERT/UPDATE/DELETE: apenas `has_role(auth.uid(), 'admin')`.
-
-### `admin_audit_log`
-Registro de ações administrativas relevantes.
-
-| Coluna | Tipo | Notas |
-| --- | --- | --- |
-| `id` | `uuid` | PK |
-| `user_id` | `uuid` | nullable (caso ação anônima/sistema) |
-| `papel` | `text` | role no momento da ação |
-| `rota` | `text` | rota/ação (ex.: `admin.eventos.update`, `admin.auditoria.export.csv`) |
-| `motivo` | `text` | descrição livre |
-| `ip` | `text` | extraído do request |
-| `user_agent` | `text` | |
-| `created_at` | `timestamptz` | default `now()`, indexado |
-
-**RLS**: SELECT/INSERT apenas para admin. Inserções via serverFn com `supabaseAdmin` ou client autenticado.
-
-## 4.2. GRANTs (padrão de cada migration)
-
-```sql
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.<tabela> TO authenticated;
-GRANT ALL ON public.<tabela> TO service_role;
--- GRANT SELECT ON public.<tabela> TO anon;  -- apenas para tabelas públicas (ex.: eventos publicados)
+```bash
+cd backend
+npx prisma migrate deploy
+npx prisma generate
 ```
 
-## 4.3. Migrations
+## 4.5. Porta local
 
-Pasta: `supabase/migrations/`. Estado atual: 4 migrations criando enum, tabelas, RLS, função `has_role`, trigger de profile e seeds de admin.
+- Compose padrão (`infra/docker-compose.yml`): host **5433** → container 5432  
+- Alguns ambientes (ex. messaging): **5437** — conferir `DATABASE_URL` em `backend/.env`

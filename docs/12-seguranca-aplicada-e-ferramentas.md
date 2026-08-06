@@ -1,31 +1,42 @@
-# 12 - Seguranca aplicada e ferramentas
+# 12 — Segurança aplicada e ferramentas
 
-## # Objetivo
-Definir um baseline pratico para procurar, priorizar e corrigir vulnerabilidades em codigo, dependencias e aplicacao em execucao.
+## Objetivo
 
-## # Camadas de defesa
+Baseline prático para vulnerabilidades em código, dependências e runtime (stack Node/React).
 
-### SCA (dependencias)
-- Composer Audit
-- NPM Audit
-- Dependabot/Renovate
-- Snyk (opcional)
+## Camadas
 
-### SAST (codigo-fonte)
-- Larastan/PHPStan
-- SonarQube (opcional corporativo)
-- Semgrep (opcional)
+### SCA (dependências)
+- `npm audit` em `backend/` e `frontend/`
+- Dependabot / Renovate (GitHub)
+- Sonatype / Snyk (opcional)
 
-### DAST (aplicacao em execucao)
-- OWASP ZAP em ambiente de homologacao
+### SAST
+- TypeScript (`tsc --noEmit`)
+- ESLint
+- Semgrep / Sonar (opcional)
 
-## # Regra de priorizacao
-- Critico/Alto: corrigir antes de merge em `main`.
-- Medio: corrigir na sprint atual com prazo definido.
-- Baixo: backlog com dono e data.
+### DAST
+- OWASP ZAP em homologação (opcional)
+- Smoke auth/RBAC pós-deploy
 
-## # Regras nao negociaveis
-- Nunca commitar segredo real.
-- Nunca usar senha default em scripts de exemplo.
-- Nunca usar tag Docker `latest` para artefato critico.
-- Sempre registrar excecao de risco (quem aprovou, prazo, mitigacao).
+## RBAC / secrets (Casa da Paz)
+
+- Autorização no Express (`authorize`) — ver `docs/05-auth-seguranca.md`
+- Policies no cadastro de usuário
+- Sem secrets no Git; `.env.production` só na VPS
+- Asaas / webhooks com token validado
+- MEDIUM isolado por `pessoa_id`
+
+## Priorização
+
+- Crítico/Alto: antes de merge em `main`
+- Médio: sprint atual
+- Baixo: backlog com dono
+
+## Não negociável
+
+- Nunca commitar segredo real  
+- Trocar senha seed em produção  
+- Deploy VPS só com confirmação  
+- Não ativar Asaas produção sem chave + confirmação  

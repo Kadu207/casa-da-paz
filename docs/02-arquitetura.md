@@ -1,81 +1,59 @@
 # 2. Arquitetura
 
-## 2.1. Estrutura de Pastas
+## 2.1. Monorepo
 
 ```
-src/
-├── assets/                 # Imagens da identidade umbandista (Iemanjá, pretos velhos, atabaque, ervas, velas)
-├── components/
-│   ├── EventoForm.tsx      # Formulário criar/editar evento (admin)
-│   ├── PublicLayout.tsx    # Layout do site público (header/footer)
-│   ├── RouteFallbacks.tsx  # Skeletons e estados vazios
-│   ├── SafeImage.tsx       # <img> tolerante a falha de CDN, com srcSet/lazy/telemetria
-│   ├── ShareEvento.tsx     # Compartilhamento de evento
-│   ├── Turnstile.tsx       # Captcha Cloudflare
-│   └── ui/                 # shadcn/ui (botão, card, dialog, table, etc.)
-├── data/                   # Dados estáticos (fallback de eventos)
-├── hooks/                  # Hooks customizados
-├── integrations/supabase/  # Clients gerados (NÃO EDITAR)
-│   ├── client.ts           # Browser client (anon key, RLS aplicado)
-│   ├── client.server.ts    # Admin client (service role, BYPASS RLS)
-│   ├── auth-middleware.ts  # requireSupabaseAuth para serverFn
-│   ├── auth-attacher.ts    # Anexa Bearer token nas RPC
-│   └── types.ts            # Tipos gerados do schema
-├── lib/
-│   ├── agendar-schema.ts   # Zod schema do agendamento
-│   ├── auditoria.functions.ts  # ServerFn para o admin_audit_log
-│   ├── auth.functions.ts   # ServerFn de login/logout/role-check
-│   ├── eventos-store.ts    # CRUD de eventos via serverFn
-│   ├── ics.ts              # Geração de arquivo .ics (calendário)
-│   ├── image-telemetry.ts  # Métricas de fallback de imagens
-│   ├── rate-limit.server.ts# Rate limit por IP
-│   ├── turnstile.functions.ts/.server.ts  # Validação do captcha
-│   └── utils.ts            # cn() e helpers
-├── routes/                 # File-based routing (ver seção 3)
-│   ├── __root.tsx          # Layout raiz (HTML/head/body)
-│   ├── _authenticated.tsx  # Layout protegido (gate /admin/*)
-│   ├── api/public/         # Endpoints públicos (webhooks/health)
-│   └── ... rotas públicas e admin
-├── routeTree.gen.ts        # Auto-gerado — NÃO editar
-├── router.tsx              # Configuração do router (QueryClient, fallbacks)
-├── server.ts / start.ts    # Entradas SSR
-└── styles.css              # Tokens de design (oklch), Tailwind v4
+Casa da Paz/
+├── agents.md                 # Orquestração de agentes (canônico)
+├── frontend/                 # React ERP + portal público
+├── backend/                  # Express + Prisma
+├── ai-service/               # Python FastAPI
+├── infra/                    # Docker, Nginx, deploy
+├── specs/                    # Specs SDD por feature
+├── .specify/memory/          # Memória viva Spec Kit
+├── .cursor/skills/           # Skills de agentes
+└── docs/                     # Documentação e contratos
 ```
 
 ## 2.2. Camadas
 
-### Frontend (React 19 + TanStack Router)
-- Renderização SSR por padrão.
-- Rotas declaradas como arquivos; `routeTree.gen.ts` gerado pelo plugin Vite.
-- Estado de servidor via TanStack Query (preload no loader → `useSuspenseQuery` no componente).
+```mermaid
+flowchart LR
+  Browser[Browser] --> FE[Frontend Vite]
+  FE -->|JWT Bearer| API[Express API]
+  API --> PG[(PostgreSQL)]
+  API --> Asaas[Asaas opcional]
+  API --> N8N[N8N webhooks]
+  N8N --> Chatwoot[Chatwoot]
+  CF[Cloudflare Tunnel] --> Nginx[Nginx :9080]
+  Nginx --> FE
+  Nginx --> API
+```
 
-### Server Functions (`createServerFn`)
-- Toda lógica de servidor da aplicação (CRUD, auth) usa `createServerFn` do `@tanstack/react-start`.
-- Protegidas por middleware `requireSupabaseAuth` quando exigem sessão.
-- Lêem secrets via `process.env` dentro do `.handler()`.
+### Frontend
+- SPA React Router: `/public/*` (anônimo) e `/app/*` (autenticado)
+- i18n pt-BR / en (`frontend/src/i18n/`)
+- UI oculta recursos sem grant — **autorização real no backend**
 
-### Server Routes (`src/routes/api/public/`)
-- Endpoints HTTP públicos (ex.: health-check, webhooks).
-- Validam input com Zod, verificam assinaturas quando aplicável.
+### Backend
+- Rotas em `backend/src/routes/`
+- Policies em `backend/src/policies/rbac.ts`
+- Jobs (ex.: geração de mensalidades) no boot Express
+- Migrations Prisma em `backend/prisma/migrations/`
 
-### Backend (Lovable Cloud / Supabase)
-- Postgres com Row Level Security em todas as tabelas.
-- Auth via email/senha + Google OAuth.
-- Roles armazenadas em tabela separada `user_roles` (nunca em `profiles`) — função `has_role()` SECURITY DEFINER.
+### Integrações
+| Sistema | Uso |
+|---------|-----|
+| Asaas | Cobranças/assinaturas — **dormant** sem chave |
+| N8N | Alertas, agendamentos, lembretes |
+| Chatwoot | Atendimento WhatsApp |
+| Cloudflare Images | Upload portal (quando tokens presentes) |
 
-## 2.3. Fluxo de Dados (read)
+## 2.3. Princípios (constitution)
 
-1. Usuário navega para rota.
-2. `loader` chama `queryClient.ensureQueryData(queryOptions)`.
-3. Componente usa `useSuspenseQuery(queryOptions)` — dados já em cache.
-4. ServerFn é invocada com `Authorization: Bearer <token>` injetado por `attachSupabaseAuth`.
-5. Middleware valida sessão, instancia `supabase` client autenticado, executa query (RLS aplica).
-
-## 2.4. Fluxo de Imagens (CDN + Fallback)
-
-Componente `SafeImage` (`src/components/SafeImage.tsx`):
-- Lazy loading por padrão (`loading="lazy"`).
-- `srcSet` responsivo (320/640/960/1280px) via helper `buildSrcSet(url, widths)`.
-- `useEffect` checa `img.complete`/`naturalWidth` no mount para imagens em cache.
-- Em falha (`onError`): renderiza placeholder com gradiente temático e reporta via `reportImageFallback`.
-- Imagens above-the-fold (hero, banner) usam `<link rel="preload" fetchpriority="high">` no `head()` da rota.
+1. Spec antes de código (SDD)
+2. Autorização no backend sempre
+3. Adimplência derivada (ADR-003) — não duplicar status
+4. Import Excel atômico
+5. Deploy VPS só com confirmação humana
+6. Tesouraria **não depende** de Asaas

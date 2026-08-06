@@ -2,6 +2,10 @@ openapi: 3.0.3
 info:
   title: Casa da Paz API
   version: 0.1.0
+  description: >
+    Contrato parcial da API Express. Stack: JWT + RBAC.
+    Tesouraria 022–025 e contribuintes não dependem de Asaas.
+    POST /auth/usuarios cria UsuarioPolicy (snapshot de grants) no ato do cadastro.
 servers:
   - url: /api
 paths:
@@ -15,13 +19,24 @@ paths:
     get:
       security: [{ bearerAuth: [] }]
       summary: Usuário atual
+  /auth/politicas/catalogo:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Catálogo de resources/grants e defaults por setor (SUPERVISOR)
   /auth/usuarios:
     get:
       security: [{ bearerAuth: [] }]
-      summary: Listar usuários (DIRETORIA)
+      summary: Listar usuários
     post:
       security: [{ bearerAuth: [] }]
-      summary: Criar usuário
+      summary: Criar usuário com UsuarioPolicy (grants opcionais → snapshot do setor)
+  /auth/usuarios/{id}/politicas:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Ler policies do usuário
+    put:
+      security: [{ bearerAuth: [] }]
+      summary: Atualizar policies do usuário
   /pessoas:
     get:
       security: [{ bearerAuth: [] }]

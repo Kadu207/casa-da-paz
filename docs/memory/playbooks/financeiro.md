@@ -1,22 +1,49 @@
 # Playbook — Módulo Financeiro
 
+**Atualizado:** 2026-08-06
+
+## Escopo operacional
+
+Tesouraria interna completa **sem Asaas**. PSP (021) só se houver chave.
+
 ## Tarefas recorrentes
-- Conciliação mensalidades (FINANCEIRO)
-- Agenda **pagamentos a fazer** (saídas) — separado de atrasados
-- Contas a pagar / fornecedores / baixas
-- Gerar mensalidades (`/mensalidade-planos/gerar` ou job 6h)
-- DRE e orçamento mensal
-- Import OFX e conciliação
-- Revisão atrasados (receber) → N8N lembrete WhatsApp
-- Cobranças Asaas — **opcional** (dormant sem chave)
 
-## PSP
-- Asaas (ADR-009) — opcional; sandbox quando houver chave
-- Tesouraria **não depende** do Asaas
+| Tarefa | Onde | Agente ops |
+|--------|------|------------|
+| Lançamentos / conciliação | Financeiro → Lançamentos / Conciliação | `agent-tesouraria-ops` |
+| Atrasados (receber) | Atrasados → N8N lembrete | `agent-alertas-financeiros` |
+| Agenda a pagar | A pagar / Contas a pagar | `agent-tesouraria-ops` |
+| Mensalidades | Recorrência ou coluna na lista de Médiuns | `agent-recorrencia-mensalidade` |
+| Patrocínios / padrinhos | Patrocínios / Padrinhos | `agent-tesouraria-ops` |
+| DRE / orçamento | DRE | `agent-relatorios-dre` |
+| Extrato bancário | Extrato OFX | `agent-conciliacao-bancaria` |
+| Cobranças Asaas | Cobranças — **opcional** | — |
 
-## Agentes
-Construção: `agent-backend-api` + `agent-frontend-ux`  
-Ops: `agent-tesouraria-ops`, `agent-recorrencia-mensalidade`, `agent-conciliacao-bancaria`, `agent-relatorios-dre`
+## Separação importante
+
+- **Atrasados** = recebíveis (mensalidades)  
+- **A pagar** = saídas / ContaPagar  
+
+## Cadastro de usuários (impacto financeiro)
+
+SUPERVISOR define `setorAcesso` + policies (`financeiro`, `contas_pagar`, `recorrencia`, `dre`, `conciliacao_bancaria`, `contribuintes`, …) **no ato do cadastro**.
+
+## APIs
+
+| Path | Uso |
+|------|-----|
+| `/api/financeiro/*` | Ledger, fluxo, atrasados, DRE, OFX… |
+| `/api/contas-pagar`, `/api/fornecedores` | AP |
+| `/api/mensalidade-planos` | Planos + `/gerar` |
+| `/api/contribuintes` | Patrocínio / padrinho |
+| `/api/cobrancas` | Asaas opcional |
 
 ## Specs
-022–025 (tesouraria), 021 (Asaas dormant)
+
+022–025, contribuintes, 021 (dormant), ADR-003, ADR-009
+
+## Smoke
+
+```powershell
+.\scripts\test-tesouraria-022.ps1
+```

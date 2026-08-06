@@ -11,6 +11,7 @@ Toda pessoa humana registrada passa por `Pessoas`. Usuários autenticados refere
 - Bloqueio no backend (JWT middleware + policies)
 - Ocultação de rotas no frontend (defesa em profundidade)
 - MEDIUM vê apenas próprios dados
+- Policies de usuários operacionais definidas **no ato do cadastro** (`UsuarioPolicy`)
 
 ### III. Transações atômicas
 Importações Excel e operações em lote usam `BEGIN/COMMIT/ROLLBACK`. Erro em uma linha = rollback total.
@@ -19,7 +20,7 @@ Importações Excel e operações em lote usam `BEGIN/COMMIT/ROLLBACK`. Erro em 
 Mobile-first Tailwind. Diretoria desktop, equipe mobile, público web.
 
 ### V. API separada do Lovable
-Backend sempre em `backend/`. Lovable apenas protótipo exportável.
+Backend sempre em `backend/`. Lovable apenas protótipo exportável (docs em `docs/reference/lovable/`).
 
 ### VI. Deploy com gate humano
 Nenhum deploy VPS automático. Agente A5 prepara; usuário confirma execução.
@@ -29,6 +30,9 @@ Decisões em ADRs. Estado em `project-memory.md`. Nunca depender só do chat.
 
 ### VIII. Spec Before Code
 Features não-triviais passam por `specs/<feature>/` (spec → plan → tasks → implement).
+
+### IX. Tesouraria independente de PSP
+Fluxos financeiros internos (022–025, contribuintes) **não** dependem de Asaas. PSP é opcional (ADR-009).
 
 ## Governança
 Alterações nesta constituição exigem ADR + aprovação do usuário.

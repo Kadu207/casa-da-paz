@@ -1,45 +1,59 @@
 # 5. Autenticação e Segurança
 
-## 5.1. Auth
+## 5.1. Autenticação
 
-- **Provedores**: email/senha e Google OAuth (Supabase Auth gerenciado via Lovable Cloud).
-- **Confirmação de email**: ativa (usuário precisa verificar email antes de logar). Não usar auto-confirm.
-- **Sessão**: persistida em `localStorage` pelo browser client.
-- **Bearer token**: `attachSupabaseAuth` (registrado em `src/start.ts` como `functionMiddleware`) anexa `Authorization: Bearer <access_token>` em toda chamada `createServerFn`.
-- **Gate de rota**: `_authenticated.tsx` valida sessão no `beforeLoad` → redireciona para `/login` se ausente. Subpastas `/admin` validam role `admin`.
+- Login: `POST /api/auth/login` com `login` + `senha` (não e-mail)
+- Token: JWT Bearer (payload: `userId`, `pessoaId`, `setorAcesso`, `login`)
+- Sessão no cliente: `localStorage` (`token`)
+- Alteração de senha: `PUT /api/auth/me/senha`
 
-## 5.2. Roles e Autorização
+Seed padrão local/prod inicial: `admin` / `admin123` — **trocar imediatamente** em produção.
 
-- Roles em `public.user_roles` (enum `app_role`).
-- Função `public.has_role(uuid, app_role)` `SECURITY DEFINER` usada em policies RLS.
-- Verificação client-side é apenas UX — toda decisão real é feita por RLS no Postgres.
+## 5.2. Autorização (RBAC backend-first)
 
-## 5.3. Rate Limit e Captcha
+1. Middleware `authenticate` valida JWT  
+2. `authorize(resource, action)` consulta grants efetivos  
+3. Frontend só esconde UI (`hasPermission`) — **nunca** é a única barreira  
 
-- `src/lib/rate-limit.server.ts`: rate limit em memória por IP para endpoints sensíveis (login, agendamento).
-- `src/lib/turnstile.server.ts` + `Turnstile.tsx`: Cloudflare Turnstile no formulário de agendamento e contato.
+Matriz canônica: [`docs/contracts/rbac-matrix.md`](./contracts/rbac-matrix.md)  
+Implementação: `backend/src/policies/rbac.ts`
 
-## 5.4. Auditoria
+### Papéis
 
-Ações que geram registro em `admin_audit_log`:
+| Papel | Escopo |
+|-------|--------|
+| SUPERVISOR | Master operacional (usuários + policies); não write em integrações |
+| ADMIN | Integrações (webhooks, N8N), logs |
+| Operacionais | DIRETORIA, FINANCEIRO, MARKETING, RECEPCAO, LIVRARIA, MEDIUM, SUPORTE |
 
-| Ação | `rota` | Quando |
-| --- | --- | --- |
-| Login admin | `admin.login` | sucesso de login com role admin |
-| Criar evento | `admin.eventos.create` | POST de novo evento |
-| Atualizar evento | `admin.eventos.update` | PATCH em evento |
-| Excluir evento | `admin.eventos.delete` | DELETE de evento |
-| Alterar role de usuário | `admin.usuarios.role.update` | mudança de role |
-| Exportar CSV | `admin.auditoria.export.csv` | download CSV |
-| Exportar PDF | `admin.auditoria.export.pdf` | download PDF |
+### Policies no cadastro (obrigatório operacional)
 
-Cada registro contém `user_id`, `papel`, `rota`, `motivo`, `ip`, `user_agent`, `created_at`.
+No **ato do cadastro** (`POST /api/auth/usuarios`):
 
-## 5.5. Boas práticas adotadas
+1. SUPERVISOR escolhe setor + ajusta grants na UI  
+2. Backend cria `Usuario` **e** `UsuarioPolicy` na mesma transação  
+3. Grants = snapshot do padrão do setor + overrides (`snapshotGrantsForSetor`)  
 
-- Nenhum secret/service-role em código cliente.
-- `client.server.ts` (admin) só importado em servidor.
-- Validação Zod em todo input de servidor (`min`/`max`/regex).
-- Sem CHECK constraints com `now()` — validações temporais via trigger.
-- Smart quotes e XML entities preservados em conteúdo gerado.
-- Sem armazenamento de role em `profiles` (evita escalonamento de privilégio).
+Edição posterior: `GET/PUT /api/auth/usuarios/:id/politicas`  
+Catálogo: `GET /api/auth/politicas/catalogo`
+
+Usuários antigos sem policy continuam com defaults do setor até o SUPERVISOR salvar policies.
+
+### Isolamento MEDIUM
+
+Médiuns só enxergam dados ligados ao próprio `pessoa_id` (financeiro own, painel próprio).
+
+## 5.3. Webhooks e secrets
+
+- Webhooks N8N / Asaas: validação de secret/token  
+- Secrets **nunca** no repositório (`.env.production` só na VPS)  
+- Asaas produção exige chave + confirmação explícita  
+
+## 5.4. Auditoria e LGPD
+
+- Auditoria ERP com filtros e export CSV/PDF  
+- Portal: consentimentos, termos, DSAR — ver `docs/contracts/lgpd-checklist.md` e runbook `dsar-lgpd.md`  
+
+## 5.5. Spec
+
+`specs/020-rbac-hierarquia-policies/spec.md` · ADR-002

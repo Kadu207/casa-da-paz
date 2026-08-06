@@ -1,37 +1,52 @@
-# Casa da Paz — Documentação do Projeto
+# 1. Visão Geral
 
-## 1. Visão Geral
+## 1.1. Propósito
 
-**Casa da Paz** é uma aplicação web para uma casa de Umbanda localizada em Conselheiro Lafaiete - MG (Rua Valério Eugênio, 570, Bairro Areal). O sistema oferece divulgação de eventos espirituais, agendamento de atendimentos, mapa de localização e área administrativa para gestão de eventos, usuários e auditoria.
+O **Casa da Paz Management System Cloud** apoia a gestão do terreiro e a presença pública:
 
-### 1.1. Propósito
+- Cadastros por função (Presidência, Diretoria, Tesouraria, Médiuns, Consulentes, etc.)
+- Tesouraria completa **sem depender de PSP** (lançamentos, atrasados, contas a pagar, DRE, OFX, patrocínios/padrinhos, recorrência de mensalidade)
+- Recepção / check-in, eventos e inscrições
+- Livraria (PDV/estoque) e ecommerce
+- Portal público (eventos, agendamento, livraria, LGPD)
+- Marketing institucional (papel MARKETING)
+- Cobranças Asaas **opcionais** (dormant até `ASAAS_API_KEY` — ADR-009)
+- Alertas e automações via N8N / Chatwoot
 
-- Apresentar a Casa da Paz ao público, com elementos visuais que conectam o visitante à espiritualidade umbandista (imagens de pretos velhos, atabaques, Iemanjá, ervas, velas e oferendas).
-- Permitir consulta pública aos eventos (giras, festas de orixás, palestras).
-- Permitir agendamento de atendimentos com acompanhamento por protocolo.
-- Oferecer um painel administrativo seguro para gestão de conteúdo e usuários.
-- Auditar ações administrativas críticas (login, alterações em eventos/usuários, exportações).
-
-### 1.2. Stack Técnica
+## 1.2. Stack técnica (canônica)
 
 | Camada | Tecnologia |
-| --- | --- |
-| Framework | TanStack Start v1 (React 19 + Vite 7, SSR/SSG) |
-| Roteamento | TanStack Router (file-based em `src/routes/`) |
-| Estado servidor | TanStack Query 5 |
-| Estilização | Tailwind CSS v4 (tokens em `src/styles.css`, formato `oklch`) |
-| UI | shadcn/ui + Radix UI |
-| Backend | Lovable Cloud (Supabase gerenciado) — Postgres + Auth + RLS |
-| Server logic | `createServerFn` (TanStack) e server routes em `src/routes/api/` |
-| Runtime servidor | Cloudflare Workers (nodejs_compat) |
-| Validação | Zod |
-| Formulários | react-hook-form + @hookform/resolvers |
-| Captcha | Cloudflare Turnstile |
+|--------|------------|
+| Frontend ERP + portal | React + Vite + TypeScript + Tailwind + React Router |
+| Backend API | Node.js + Express + Zod + Prisma |
+| Banco | PostgreSQL 16 |
+| AuthZ | JWT + RBAC backend-first + `usuario_policies` |
+| IA | Python FastAPI (Executor / Validador / Qualidade) |
+| Mensageria | Chatwoot + N8N |
+| Infra | Docker Compose, Nginx, Hetzner VPS, Cloudflare Tunnel |
+| PSP (opcional) | Asaas (sandbox por padrão) |
 
-### 1.3. Endereço Físico
+## 1.3. Ambientes
 
-**Casa da Paz**
-Rua Valério Eugênio, 570 — Bairro Areal
-Conselheiro Lafaiete — MG
+| Ambiente | URL / notas |
+|----------|-------------|
+| Local API | http://localhost:3000 |
+| Local app | http://localhost:5173 (`/app`, `/public`) |
+| Produção | https://casadapaz.inovatitech.com.br |
+| Health | `/health` (API) e proxy público |
 
-Localização marcada no mapa da home com botões de abertura no Google Maps e Waze.
+## 1.4. Endereço físico
+
+**Casa da Paz**  
+Rua Valério Eugênio, 570 — Bairro Areal  
+Conselheiro Lafaiete — MG  
+
+## 1.5. Fontes de verdade
+
+| Tema | Onde ler |
+|------|----------|
+| Estado atual | `.specify/memory/project-memory.md` |
+| Agentes | `agents.md` |
+| Specs SDD | `specs/<feature>/` |
+| RBAC | `docs/contracts/rbac-matrix.md` |
+| Schema | `backend/prisma/schema.prisma` |

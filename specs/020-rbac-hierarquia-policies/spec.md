@@ -1,6 +1,6 @@
 # Feature 020 — RBAC hierárquico + policies configuráveis
 
-**Status:** ✅ V1 implementada | **Data:** 2026-06-26
+**Status:** ✅ V1 implementada | **Data:** 2026-06-26 | **Atualizado:** 2026-08-06 (policies no ato do cadastro)
 
 ## Hierarquia
 

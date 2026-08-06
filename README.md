@@ -2,79 +2,85 @@
 
 ERP/CRM para o terreiro de Umbanda afroindígena Casa da Paz (Conselheiro Lafaiete, MG).
 
+**Produção:** https://casadapaz.inovatitech.com.br
+
 ## Repositórios
 
-- GitHub: https://github.com/kadu207/casa-da-paz
-- GitLab: https://gitlab.com/kadu207/casa-da-paz
+- GitHub: https://github.com/kadu207/casa-da-paz  
+- GitLab: https://gitlab.com/kadu207/casa-da-paz  
 
 ## Stack
 
-- **Frontend:** React + Vite + TypeScript + Tailwind + Recharts
-- **Backend:** Node.js + Express + Prisma + PostgreSQL 16
-- **IA:** Python FastAPI (Executor, Validador, Qualidade)
-- **Mensageria:** Chatwoot + N8N
-- **Infra:** Docker, Nginx, Hetzner, Cloudflare
+- **Frontend:** React + Vite + TypeScript + Tailwind  
+- **Backend:** Node.js + Express + Prisma + PostgreSQL 16  
+- **IA:** Python FastAPI  
+- **Mensageria:** Chatwoot + N8N  
+- **Infra:** Docker, Nginx, Hetzner, Cloudflare  
+- **PSP (opcional):** Asaas — dormant sem `ASAAS_API_KEY`  
 
 ## Início rápido (PowerShell — Windows)
 
-> **Pré-requisitos:** Docker Desktop + Node.js LTS.
-> Se `npm` não for reconhecido: `winget install OpenJS.NodeJS.LTS` e **feche/reabra o terminal**.
-> Postgres do projeto: porta **5433** (evita conflito com PostgreSQL local na 5432).
+> **Pré-requisitos:** Docker Desktop + Node.js LTS.  
+> Postgres: porta **5433** no `infra/docker-compose.yml` (alguns `.env` usam **5437** — alinhar `DATABASE_URL`).
 
-### Opção A — Scripts (recomendado)
+### Opção A — Scripts
 
 ```powershell
 Set-Location "C:\Projetos DEV\Casa da Paz"
-
-# Terminal 1 — Backend + banco
-.\scripts\start-backend.ps1
-
-# Terminal 2 — Frontend (abra outro PowerShell)
-Set-Location "C:\Projetos DEV\Casa da Paz"
-.\scripts\start-frontend.ps1
+.\scripts\start-backend.ps1    # Terminal 1
+.\scripts\start-frontend.ps1   # Terminal 2
 ```
 
-### Opção B — Manual (com PATH corrigido)
+### Opção B — Manual
 
 ```powershell
-Set-Location "C:\Projetos DEV\Casa da Paz"
-. .\scripts\setup-path.ps1
-
-Set-Location infra
+Set-Location "C:\Projetos DEV\Casa da Paz\infra"
 docker compose up -d db
 
 Set-Location ..\backend
 Copy-Item .env.example .env -ErrorAction SilentlyContinue
-npm install
+npm ci
 npx prisma migrate deploy
 npm run db:seed
 npm run dev
 ```
 
-Em **outro terminal**, repita `setup-path.ps1` e depois:
-
 ```powershell
-Set-Location "C:\Projetos DEV\Casa da Paz"
-. .\scripts\setup-path.ps1
-Set-Location frontend
-npm install
+Set-Location "C:\Projetos DEV\Casa da Paz\frontend"
+npm ci
 npm run dev
 ```
 
-- API: http://localhost:3000
-- App: http://localhost:5173
-- Portal público: http://localhost:5173/public
-- Admin seed: `admin` / `admin123` (trocar em produção via **Alterar senha** ou **Usuários**)
+- API: http://localhost:3000  
+- ERP: http://localhost:5173/app  
+- Portal: http://localhost:5173/public  
+- Seed: `admin` / `admin123` (trocar em produção)
 
 ## Documentação
 
-- [Requisitos consolidados](docs/analise-requisitos-consolidada.md)
-- [Agentes](agents.md)
-- [ADRs](docs/memory/decisions/)
+| Documento | Link |
+|-----------|------|
+| Índice completo | [docs/00-index.md](docs/00-index.md) |
+| Requisitos | [docs/analise-requisitos-consolidada.md](docs/analise-requisitos-consolidada.md) |
+| Agentes | [agents.md](agents.md) |
+| Memória viva | [.specify/memory/memory.md](.specify/memory/memory.md) |
+| RBAC | [docs/contracts/rbac-matrix.md](docs/contracts/rbac-matrix.md) |
+| CHANGELOG | [docs/memory/CHANGELOG.md](docs/memory/CHANGELOG.md) |
+| ADRs | [docs/memory/decisions/](docs/memory/decisions/) |
+| Deploy | [docs/memory/runbooks/deploy.md](docs/memory/runbooks/deploy.md) |
+
+## Features financeiras (resumo)
+
+- Tesouraria **022–025** completa sem Asaas (contas a pagar, recorrência, DRE, OFX)  
+- Patrocínios / padrinhos + mensalidade na lista de médiuns  
+- Policies de acesso definidas **no cadastro** do usuário  
+- Asaas 021 opcional  
 
 ## Deploy
 
-**Requer confirmação do usuário.** Ver `infra/scripts/deploy.sh` e `docs/memory/runbooks/deploy.md`.
+**Requer confirmação explícita do usuário.**  
+`CASADAPAZ_DEPLOY_CONFIRMED=yes ./infra/scripts/deploy.sh`  
+Guia: `docs/memory/runbooks/deploy-vps-passo-a-passo.md`
 
 ## Push dual
 

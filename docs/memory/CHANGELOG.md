@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Documentação
+- **Refresh 2026-08-06:** `docs/00–09`, README, roadmap, playbooks, constitution IX, specs 022–026 status, OpenAPI/RBAC alinhados à stack Express/Vite (Lovable movido para `docs/reference/lovable/`)
+
 ### Adicionado
 - **Policies no cadastro de usuário:** `POST /auth/usuarios` cria `UsuarioPolicy` com snapshot do setor (+ overrides); UI define nível de acesso no ato
 - **Patrocínios / Padrinhos:** aba Financeiro + API `/contribuintes`; coluna mensalidade na lista de médiuns
@@ -24,6 +27,7 @@
 - `FinanceiroPage.tsx` legado (substituído pelas 4 telas)
 
 ### Validado
+- Smoke local tesouraria 022–025 + contribuintes + migrate (2026-08-06)
 - Deploy VPS + smoke manual produção (2026-06-09)
 - Smoke local 017–019 + alertas reenvio N8N (2026-06-29)
 - Unit tests Asaas webhook mappers (2026-08-02)

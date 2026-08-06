@@ -1,70 +1,82 @@
 # 8. Desenvolvimento
 
-## 8.1. Scripts
+## 8.1. Pré-requisitos
 
-```bash
-bun install          # instalar deps
-bun run dev          # vite dev
-bun run build        # build de produção
-bun run build:dev    # build dev (com source maps)
-bun run preview      # preview do build
-bun run lint         # eslint
-bun run test         # vitest run
-bun run format       # prettier
+- Docker Desktop  
+- Node.js LTS  
+- PowerShell (Windows) ou bash  
+
+## 8.2. Subir local (recomendado)
+
+```powershell
+Set-Location "C:\Projetos DEV\Casa da Paz"
+
+# Terminal 1 — DB + API
+.\scripts\start-backend.ps1
+
+# Terminal 2 — Frontend
+.\scripts\start-frontend.ps1
 ```
 
-## 8.2. Variáveis de Ambiente
+Manual:
 
-### Cliente (`import.meta.env.VITE_*`) — em `.env`, gerenciado pelo Cloud
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_PUBLISHABLE_KEY`
-- `VITE_SUPABASE_PROJECT_ID`
+```powershell
+cd infra; docker compose up -d db
+cd ..\backend
+copy .env.example .env   # se necessário
+npm ci
+npx prisma migrate deploy
+npm run db:seed
+npm run dev
 
-### Servidor (`process.env.*`) — runtime no Worker
-- `SUPABASE_URL`
-- `SUPABASE_PUBLISHABLE_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` (nunca expor)
-- `TURNSTILE_SECRET_KEY` (captcha)
-
-## 8.3. Convenções de Código
-
-- **Server functions**: arquivos `*.functions.ts` em `src/lib/`, helpers servidor em `*.server.ts`. Nunca importar `*.server.ts` em código cliente.
-- **Rotas**: nomeação ponto-separada (`_authenticated.admin.eventos.tsx`). Plugin Vite gera `routeTree.gen.ts` automaticamente — **nunca editar à mão**.
-- **Imports**: usar `@tanstack/react-router` (não `react-router-dom`).
-- **Hooks**: `useRouter()` standalone, nunca `Route.useRouter()`.
-- **Imagens**: sempre `<SafeImage>`, nunca `<img>` direto em telas críticas.
-- **Cores**: apenas tokens semânticos do `styles.css`.
-
-## 8.4. Testes
-
-`vitest` em `tests/`. Executar com `bun run test`.
-
-## 8.5. Deploy
-
-- Lovable Cloud gerencia deploy automaticamente.
-- URLs estáveis:
-  - Produção: `project--aaacf821-2ee4-4d25-8c43-cfa7e3b27388.lovable.app`
-  - Preview: `project--aaacf821-2ee4-4d25-8c43-cfa7e3b27388-dev.lovable.app`
-- Edge functions Supabase **não são usadas** — toda lógica de servidor é `createServerFn` no TanStack.
-
-## 8.6. Migrations
-
-Adicionar nova migration via tool de migração do ambiente (gera SQL aprovado pelo usuário). Estrutura obrigatória de toda nova tabela em `public`:
-
-```sql
-CREATE TABLE public.<nome> (...);
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.<nome> TO authenticated;
-GRANT ALL ON public.<nome> TO service_role;
-ALTER TABLE public.<nome> ENABLE ROW LEVEL SECURITY;
-CREATE POLICY ... ;
+# outro terminal
+cd frontend
+npm ci
+npm run dev
 ```
 
-## 8.7. Arquivos NUNCA editar manualmente
+- API: http://localhost:3000/health  
+- App: http://localhost:5173  
 
-- `src/integrations/supabase/client.ts`
-- `src/integrations/supabase/client.server.ts`
-- `src/integrations/supabase/auth-middleware.ts`
-- `src/integrations/supabase/auth-attacher.ts`
-- `src/integrations/supabase/types.ts`
-- `.env`
-- `src/routeTree.gen.ts`
+## 8.3. Scripts úteis
+
+| Script | Uso |
+|--------|-----|
+| `scripts/test-tesouraria-022.ps1` | Smoke tesouraria 022–025 |
+| `scripts/test-financeiro-asaas.ps1` | Smoke Asaas (configured ou não) |
+| `scripts/build-frontend-prod.ps1` | Build produção FE |
+| `scripts/sync-frontend-vps.ps1` | Envia `dist` à VPS |
+| `infra/scripts/deploy.sh` | Deploy containers (**gate** `CASADAPAZ_DEPLOY_CONFIRMED=yes`) |
+
+## 8.4. Variáveis (resumo)
+
+### Backend (`backend/.env`)
+- `DATABASE_URL`  
+- `JWT_SECRET`  
+- `CORS_ORIGIN`  
+- `ASAAS_API_KEY` / `ASAAS_ENV` — opcional  
+
+### Frontend
+- `VITE_API_URL` (ou proxy Vite)  
+- Tokens Chatwoot / Turnstile / Cloudflare Images quando aplicável  
+
+Nunca commitar `.env.production`.
+
+## 8.5. Testes
+
+```powershell
+cd backend; npm test
+cd ..\frontend; npx tsc --noEmit
+```
+
+## 8.6. Git dual
+
+```powershell
+git push origin main
+git push gitlab main
+```
+
+## 8.7. Deploy
+
+Ver `docs/memory/runbooks/deploy.md` e `deploy-vps-passo-a-passo.md`.  
+**Só com confirmação explícita do usuário.**

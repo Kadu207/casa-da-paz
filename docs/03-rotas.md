@@ -1,50 +1,64 @@
 # 3. Rotas
 
-## 3.1. Rotas Públicas
+Base: React Router em `frontend/src/App.tsx`.  
+API: prefixo `/api` no Express (`backend/src/index.ts`).
 
-| Arquivo | URL | Descrição |
-| --- | --- | --- |
-| `index.tsx` | `/` | Home: hero com Casa da Paz, galeria umbandista (bento grid), mapa com botões Google Maps/Waze, prévia de eventos |
-| `eventos.tsx` | `/eventos` | Lista pública de eventos publicados, banner com `velasAltar`, filtros |
-| `eventos.$eventoId.tsx` | `/eventos/:id` | Detalhe de evento + compartilhamento + .ics |
-| `agendar.tsx` | `/agendar` | Formulário de agendamento de atendimento (com Turnstile) |
-| `acompanhar.$protocolo.tsx` | `/acompanhar/:protocolo` | Acompanhamento de agendamento por protocolo |
-| `contato.tsx` | `/contato` | Página de contato |
-| `termos.tsx` | `/termos` | Termos de uso |
-| `login.tsx` | `/login` | Login (email/senha + Google) |
-| `recuperar-senha.tsx` | `/recuperar-senha` | Solicitação de reset |
-| `redefinir-senha.tsx` | `/redefinir-senha` | Confirmação de novo password |
-| `acesso-negado.tsx` | `/acesso-negado` | Tela 403 para não-admins |
-| `health.tsx` | `/health` | Health-check público |
+## 3.1. Portal público
 
-## 3.2. Rotas Protegidas (admin)
+| URL | Descrição |
+|-----|-----------|
+| `/public` | Home |
+| `/public/eventos` | Lista de eventos |
+| `/public/eventos/:id` | Detalhe + inscrição |
+| `/public/agendar` | Agendamento de atendimento |
+| `/public/acompanhar/:protocolo` | Status do agendamento |
+| `/public/contato` | Contato |
+| `/public/livraria` | Catálogo / checkout (Asaas se configurado) |
+| `/public/termos` | Termos / LGPD |
 
-Todas vivem sob o layout `_authenticated.tsx`, que redireciona para `/login` se não há sessão e para `/acesso-negado` se o usuário não possui role `admin`.
+## 3.2. ERP (`/app`)
 
-| Arquivo | URL | Descrição |
-| --- | --- | --- |
-| `_authenticated.admin.index.tsx` | `/admin` | Dashboard administrativo |
-| `_authenticated.admin.eventos.tsx` | `/admin/eventos` | Listagem/ordenação/exclusão de eventos |
-| `_authenticated.admin.eventos.novo.tsx` | `/admin/eventos/novo` | Criação de evento |
-| `_authenticated.admin.eventos.$eventoId.tsx` | `/admin/eventos/:id` | Edição de evento |
-| `_authenticated.admin.usuarios.tsx` | `/admin/usuarios` | Gestão de usuários e roles |
-| `_authenticated.admin.auditoria.tsx` | `/admin/auditoria` | Visualização de `admin_audit_log` (filtros, ordenação multi-coluna, paginação, export CSV/PDF) |
+| URL | Recurso RBAC típico | Descrição |
+|-----|---------------------|-----------|
+| `/app/login` | — | Login JWT |
+| `/app` | dashboard | Dashboard / painel médium |
+| `/app/financeiro/lancamentos` | financeiro | Lançamentos |
+| `/app/financeiro/fluxo` | financeiro | Fluxo de caixa |
+| `/app/financeiro/atrasados` | financeiro | Recebíveis atrasados |
+| `/app/financeiro/pagamentos` | contas_pagar | Agenda a pagar |
+| `/app/financeiro/contas-pagar` | contas_pagar | Contas a pagar / fornecedores |
+| `/app/financeiro/recorrencia` | recorrencia | Planos de mensalidade |
+| `/app/financeiro/contribuintes` | contribuintes | Patrocínios / padrinhos |
+| `/app/financeiro/dre` | dre | DRE / orçamento / centros |
+| `/app/financeiro/ofx` | conciliacao_bancaria | Extrato OFX |
+| `/app/financeiro/conciliacao` | financeiro | Conciliação operacional |
+| `/app/financeiro/contas` | contas | Contas financeiras |
+| `/app/financeiro/cobrancas` | cobrancas | Cobranças Asaas (opcional) |
+| `/app/financeiro/transparencia` | transparencia | Transparência interna |
+| `/app/financeiro/alertas` | alertas | Alertas financeiros |
+| `/app/pessoas` | pessoas | Cadastros por função (+ mensalidade nos médiuns) |
+| `/app/recepcao` | checkin | Recepção / check-in |
+| `/app/eventos` | eventos | Eventos ERP |
+| `/app/livraria` | livraria | PDV / estoque |
+| `/app/ecommerce` | ecommerce | Pedidos |
+| `/app/marketing` | marketing | Marketing |
+| `/app/usuarios` | usuarios | Usuários + policies (SUPERVISOR) |
+| `/app/auditoria` | auditoria | Auditoria / export |
 
-### Página de Auditoria (detalhes)
+## 3.3. API (principais)
 
-- **Filtros**: papel, rota, usuário (texto livre), intervalo de datas.
-- **Ordenação**: data, usuário, papel, rota (asc/desc) — combinável com filtros e paginação.
-- **Paginação**: server-side, 25 registros por página por padrão.
-- **Estados**: loading skeleton, empty state ("nenhum registro encontrado"), feedback ao aplicar filtros.
-- **Export**: CSV e PDF respeitando filtros ativos; a exportação gera linha em `admin_audit_log` com `rota`, `motivo`, `ip`, `user_id`.
+| Método | Path | Notas |
+|--------|------|-------|
+| POST | `/api/auth/login` | JWT |
+| GET/POST | `/api/auth/usuarios` | Cria usuário **com** `UsuarioPolicy` |
+| GET/PUT | `/api/auth/usuarios/:id/politicas` | Policies (SUPERVISOR) |
+| GET | `/api/auth/politicas/catalogo` | Defaults por setor |
+| CRUD | `/api/pessoas` | Inclui `mensalidadePlano` |
+| * | `/api/financeiro/*` | Ledger, fluxo, atrasados, DRE, OFX… |
+| * | `/api/fornecedores`, `/api/contas-pagar` | Contas a pagar |
+| * | `/api/mensalidade-planos` | Recorrência |
+| * | `/api/contribuintes` | Patrocínios / padrinhos |
+| * | `/api/cobrancas`, `/api/webhooks/asaas` | Asaas (se chave) |
+| * | `/api/public/*` | Portal anônimo |
 
-## 3.3. Server Routes (HTTP público)
-
-`src/routes/api/public/*` — usados para health-check e potenciais webhooks. Verificam assinatura quando aplicável.
-
-## 3.4. Convenções
-
-- Naming: ponto-separado (`segmento.subsegmento.tsx`), não pastas aninhadas.
-- `$param` para parâmetros dinâmicos.
-- `_authenticated` é layout pathless (não aparece na URL) com gate de sessão.
-- Cada rota define `head()` com `title`, `description`, `og:title`, `og:description`.
+Contrato parcial: [`docs/contracts/openapi.yaml`](./contracts/openapi.yaml).

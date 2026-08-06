@@ -1,62 +1,59 @@
 # 7. Funcionalidades
 
-## 7.1. Públicas
+## 7.1. Portal público (`/public`)
 
-### Home (`/`)
-- Hero com nome **Casa da Paz** + mensagem de boas-vindas (endereço removido por preferência do usuário).
-- Galeria umbandista em bento grid.
-- **Mapa** marcando Rua Valério Eugênio, 570 — Bairro Areal — Conselheiro Lafaiete - MG.
-- **Botões**: "Abrir no Google Maps" e "Abrir no Waze" (`target="_blank"`).
-- Prévia dos próximos eventos.
+- Home institucional, eventos, agendamento com protocolo, contato, termos LGPD  
+- Livraria / checkout (Asaas se `ASAAS_API_KEY`; senão fluxo sem PSP)  
+- Newsletter e consentimentos  
 
-### Eventos (`/eventos` e `/eventos/:id`)
-- Listagem com banner (velas/altar).
-- Filtros e busca.
-- Detalhe com descrição, recomendações, capacidade, compartilhamento e botão "Adicionar ao calendário" (gera `.ics`).
+## 7.2. Cadastros (`/app/pessoas`)
 
-### Agendamento (`/agendar`)
-- Formulário validado por Zod.
-- Captcha Turnstile.
-- Rate-limit por IP.
-- Retorna protocolo para acompanhamento via `/acompanhar/:protocolo`.
+Listas por função: Presidente, Diretoria, Tesouraria, Conselheiro, **Médium**, Consulente, Suporte TI.  
+Menores: `PessoaResponsavel`.  
+**Médiuns:** coluna Mensalidade (edição por quem tem `recorrencia` write).
 
-### Login (`/login`)
-- Email/senha + Google OAuth.
-- Links para recuperação de senha.
-- Backdrop com imagem de velas/altar.
+## 7.3. Tesouraria (`/app/financeiro`)
 
-## 7.2. Admin
+| Aba | Função |
+|-----|--------|
+| Lançamentos | CRUD ledger |
+| Fluxo de caixa | Entradas/saídas no período |
+| Atrasados | Recebíveis (mensalidades) |
+| A pagar | Agenda de saídas (`/pagamentos-a-fazer`) |
+| Contas a pagar | Fornecedores, parcelas, baixas → ledger |
+| Recorrência | Planos + job gerar mensalidades |
+| Patrocínios / Padrinhos | Nome + valor da contribuição |
+| DRE | Orçado vs realizado / centros de custo |
+| Extrato OFX | Import, match ±2 dias, ignorar |
+| Conciliação | Checklist operacional |
+| Contas | Contas financeiras (caixa/banco/Asaas) |
+| Cobranças | Asaas — opcional/dormant |
+| Transparência | Agregados internos (sem PII) |
+| Alertas | Pendências → N8N |
 
-### Dashboard (`/admin`)
-- Acesso rápido às áreas administrativas.
+**Decisão:** tesouraria completa **sem conta Asaas**.
 
-### Eventos (`/admin/eventos`, `/admin/eventos/novo`, `/admin/eventos/:id`)
-- CRUD completo com formulário `EventoForm`.
-- Toggle de publicação.
-- Reordenação via campo `ordem`.
-- Toda mutação gera registro em `admin_audit_log`.
+## 7.4. Outros módulos ERP
 
-### Usuários (`/admin/usuarios`)
-- Listagem de usuários com role atual.
-- Alteração de role (gera auditoria).
+| Módulo | Descrição |
+|--------|-----------|
+| Dashboard | KPIs por período; painel próprio para MEDIUM |
+| Recepção | Check-in / presença |
+| Eventos | Gestão + inscrições |
+| Livraria | PDV e estoque |
+| Ecommerce | Pedidos |
+| Marketing | Conteúdo / campanhas (papel MARKETING) |
+| Usuários | SUPERVISOR: criar com policies no ato |
+| Auditoria | Filtros + export CSV/PDF |
 
-### Auditoria (`/admin/auditoria`)
-- Tabela paginada (25/pág) do `admin_audit_log`.
-- Filtros: papel, rota, usuário (busca), intervalo de datas.
-- Ordenação clicável: data, usuário, papel, rota (asc/desc).
-- Estados de loading (skeleton), empty ("Nenhum registro encontrado") e toast ao aplicar filtro.
-- Exportação CSV/PDF respeitando filtros — cada export gera nova linha de auditoria com `rota=admin.auditoria.export.{csv|pdf}`, `motivo`, `ip`, `user_id`.
+## 7.5. Specs de referência
 
-## 7.3. Telemetria de Imagens
-
-- `src/lib/image-telemetry.ts`: contador em memória + `localStorage` (`window.__imageFallbackStats`).
-- Cada fallback é debounced por `src` e reportado via `reportLovableError` com severidade `warning`.
-- Helpers: `getImageFallbackStats()`, `resetImageFallbackStats()`.
-
-## 7.4. Performance
-
-- SSR + hidratação.
-- `preload` com `fetchpriority="high"` em hero e banner.
-- `srcSet` responsivo (320/640/960/1280) + `sizes` mobile-first.
-- `loading="lazy"` em imagens below-the-fold.
-- Cache de CDN agressivo (URLs imutáveis com `asset_id`).
+| Spec | Status |
+|------|--------|
+| 020 RBAC + policies | ✅ |
+| 021 Asaas + marketing | ✅ código; **dormant** sem chave |
+| 022 Contas a pagar | ✅ |
+| 023 Recorrência mensalidade | ✅ |
+| 024 DRE / orçamento / centros | ✅ |
+| 025 Conciliação OFX | ✅ |
+| Contribuintes (patrocínio/padrinho) | ✅ (junto ao ciclo tesouraria) |

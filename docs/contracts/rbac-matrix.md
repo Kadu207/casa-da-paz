@@ -33,8 +33,8 @@
 | Alertas | ✅ | ✅ | ❌ | 👁️ | ❌ | ❌ | 👁️ |
 | Logs/Manutenção | 👁️ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
-**SUPERVISOR** gerencia usuários operacionais e sobrescreve permissões via `usuario_policies.grants` (JSON).
+**SUPERVISOR** gerencia usuários operacionais e define `usuario_policies.grants` **no ato do cadastro** (snapshot do setor + overrides). Edição posterior via UI Políticas.
 
 Legenda: ✅ total | 👁️ leitura/limitado | ❌ negado
 
-Specs: `specs/020-rbac-hierarquia-policies/spec.md`, `specs/021-financeiro-asaas-gestor/spec.md`, `specs/022-contas-a-pagar/` … `025-conciliacao-ofx/`
+Specs: `specs/020-rbac-hierarquia-policies/spec.md`, `specs/021-financeiro-asaas-gestor/spec.md`, `specs/022-contas-a-pagar/` … `025-conciliacao-ofx/`, `specs/026-contribuintes-patrocinio-padrinho/`

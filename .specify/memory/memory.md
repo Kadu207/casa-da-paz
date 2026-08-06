@@ -10,6 +10,16 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | [project-memory.md](project-memory.md) | Estado atual |
 | [memory.md](memory.md) | Este índice |
 
+## Documentação do produto
+
+| Arquivo | Função |
+|---------|--------|
+| [docs/00-index.md](../../docs/00-index.md) | Índice da documentação |
+| [docs/memory/CHANGELOG.md](../../docs/memory/CHANGELOG.md) | Changelog |
+| [docs/memory/roadmap-cronograma.md](../../docs/memory/roadmap-cronograma.md) | Roadmap |
+| [docs/contracts/rbac-matrix.md](../../docs/contracts/rbac-matrix.md) | RBAC |
+| [docs/memory/playbooks/financeiro.md](../../docs/memory/playbooks/financeiro.md) | Ops tesouraria |
+
 ## Agentes
 
 | Arquivo | Função |
@@ -25,11 +35,14 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 023-recorrencia-mensalidade | ✅ Implementado |
 | 024-dre-orcamento-centros | ✅ Implementado |
 | 025-conciliacao-ofx | ✅ Implementado |
+| Contribuintes (patrocínio/padrinho) | ✅ Implementado |
+| 020 policies no cadastro | ✅ Snapshot no POST usuários |
 | 021 Asaas | **Dormant** até chave |
+| 026 contribuintes | ✅ (spec dedicada) |
 
 ## ADRs
 
-001–009 em `docs/memory/decisions/` — 009 Asaas opcional.
+001–009 em `docs/memory/decisions/` — 002 (RBAC+policies), 009 Asaas opcional.
 
 ## Regras
 
@@ -37,3 +50,4 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 2. Encerrar → project-memory + CHANGELOG  
 3. Deploy VPS → gate humano  
 4. Tesouraria **não** depende de Asaas  
+5. Documentação canônica em `docs/00-index.md` (não usar refs Lovable como stack atual)  

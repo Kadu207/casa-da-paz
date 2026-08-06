@@ -37,7 +37,11 @@ Usuário → agent-orquestrador → agente-domínio → validador-integracao →
 | Spec | Tema | Asaas |
 |------|------|-------|
 | 022–025 | Tesouraria completa | **Não depende** |
+| 026 | Patrocínios / padrinhos | **Não depende** |
+| 020 | Policies no cadastro de usuário | — |
 | 021 | Asaas PSP | Dormant até `ASAAS_API_KEY` |
+
+Docs: [`docs/00-index.md`](docs/00-index.md)
 
 ## Memória obrigatória
 
