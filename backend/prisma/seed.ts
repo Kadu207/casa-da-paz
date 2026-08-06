@@ -131,11 +131,16 @@ A defumação não substitui higiene, organização nem o cuidado mútuo entre o
   ];
 
   for (const e of eventos) {
-    const existing = await prisma.evento.findFirst({ where: { nomeEvento: e.nomeEvento } });
+    const existing =
+      (await prisma.evento.findFirst({ where: { nomeEvento: e.nomeEvento } })) ??
+      (e.nomeEvento === 'Oficina de Ervas Sagradas'
+        ? await prisma.evento.findFirst({ where: { nomeEvento: 'Oficina de Ervas' } })
+        : null);
     if (existing) {
       await prisma.evento.update({
         where: { id: existing.id },
         data: {
+          nomeEvento: e.nomeEvento,
           dataEvento: e.dataEvento,
           tipo: e.tipo,
           status: e.status,
@@ -146,6 +151,12 @@ A defumação não substitui higiene, organização nem o cuidado mútuo entre o
       await prisma.evento.create({ data: e });
     }
   }
+
+  // Corrige oficinas antigas sem tipo OFICINA
+  await prisma.evento.updateMany({
+    where: { nomeEvento: { contains: 'Oficina' }, tipo: 'GIRA' },
+    data: { tipo: 'OFICINA' },
+  });
 
   console.log('Seed portal — 3 materiais de estudo + giras/oficinas de exemplo');
 }
