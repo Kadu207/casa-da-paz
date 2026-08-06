@@ -126,6 +126,11 @@ enum StatusEvento {
   ENCERRADO
 }
 
+enum TipoEvento {
+  GIRA
+  OFICINA
+}
+
 enum TipoPresenca {
   MEDIUM
   CONSULENTE
@@ -445,12 +450,14 @@ model Evento {
   id            Int           @id @default(autoincrement())
   nomeEvento    String        @map("nome_evento") @db.VarChar(100)
   dataEvento    DateTime      @map("data_evento") @db.Date
+  tipo          TipoEvento    @default(GIRA)
   status        StatusEvento  @default(ABERTO)
   capacidadeMax Int?          @map("capacidade_max")
   visualizacoes Int           @default(0)
   presencas     Presenca[]
   inscricoes    Inscricao[]
 
+  @@index([tipo, status, dataEvento])
   @@map("eventos")
 }
 

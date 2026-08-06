@@ -35,6 +35,7 @@ router.post('/eventos', authenticate, authorize('marketing', 'write'), async (re
     .object({
       nomeEvento: z.string().min(2).max(100),
       dataEvento: z.string(),
+      tipo: z.enum(['GIRA', 'OFICINA']).default('GIRA'),
       capacidadeMax: z.number().int().positive().optional(),
     })
     .safeParse(req.body);
@@ -46,6 +47,7 @@ router.post('/eventos', authenticate, authorize('marketing', 'write'), async (re
     data: {
       nomeEvento: body.data.nomeEvento,
       dataEvento: new Date(body.data.dataEvento),
+      tipo: body.data.tipo,
       capacidadeMax: body.data.capacidadeMax,
       status: 'ABERTO',
     },
@@ -59,6 +61,7 @@ router.patch('/eventos/:id', authenticate, authorize('marketing', 'write'), asyn
     .object({
       nomeEvento: z.string().min(2).max(100).optional(),
       dataEvento: z.string().optional(),
+      tipo: z.enum(['GIRA', 'OFICINA']).optional(),
       status: z.enum(['ABERTO', 'ENCERRADO']).optional(),
       capacidadeMax: z.number().int().positive().nullable().optional(),
     })

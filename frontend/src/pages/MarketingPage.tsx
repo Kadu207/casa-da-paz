@@ -7,6 +7,7 @@ interface Evento {
   nomeEvento: string;
   dataEvento: string;
   status: string;
+  tipo?: string;
   capacidadeMax: number | null;
   _count: { inscricoes: number };
 }
@@ -69,6 +70,7 @@ export default function MarketingPage() {
   } | null>(null);
   const [nomeEvento, setNomeEvento] = useState('');
   const [dataEvento, setDataEvento] = useState('');
+  const [tipoEvento, setTipoEvento] = useState<'GIRA' | 'OFICINA'>('GIRA');
   const [materialForm, setMaterialForm] = useState(emptyMaterial);
   const [editMaterialId, setEditMaterialId] = useState<number | null>(null);
   const [materialErro, setMaterialErro] = useState('');
@@ -96,10 +98,11 @@ export default function MarketingPage() {
     ev.preventDefault();
     await api('/marketing/eventos', {
       method: 'POST',
-      body: JSON.stringify({ nomeEvento, dataEvento }),
+      body: JSON.stringify({ nomeEvento, dataEvento, tipo: tipoEvento }),
     });
     setNomeEvento('');
     setDataEvento('');
+    setTipoEvento('GIRA');
     await load();
   };
 
@@ -327,6 +330,14 @@ export default function MarketingPage() {
             required
             className="px-3 py-2 rounded bg-white/5 border border-white/10 flex-1 min-w-[12rem]"
           />
+          <select
+            value={tipoEvento}
+            onChange={(e) => setTipoEvento(e.target.value as 'GIRA' | 'OFICINA')}
+            className="px-3 py-2 rounded bg-white/5 border border-white/10"
+          >
+            <option value="GIRA">{t('events.tipo.GIRA')}</option>
+            <option value="OFICINA">{t('events.tipo.OFICINA')}</option>
+          </select>
           <input
             type="date"
             value={dataEvento}
@@ -342,7 +353,7 @@ export default function MarketingPage() {
           {eventos.map((e) => (
             <li key={e.id} className="flex flex-wrap justify-between gap-2 items-center border-b border-white/5 py-2">
               <span>
-                {e.nomeEvento}{' '}
+                [{e.tipo === 'OFICINA' ? t('events.tipo.OFICINA') : t('events.tipo.GIRA')}] {e.nomeEvento}{' '}
                 <span className="text-white/40">
                   ({new Date(e.dataEvento).toLocaleDateString('pt-BR')} · {e.status})
                 </span>

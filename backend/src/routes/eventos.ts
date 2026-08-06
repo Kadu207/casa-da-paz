@@ -72,6 +72,7 @@ router.post('/', authenticate, authorize('eventos', 'write'), async (req, res) =
     .object({
       nomeEvento: z.string().min(2),
       dataEvento: z.string(),
+      tipo: z.enum(['GIRA', 'OFICINA']).default('GIRA'),
       capacidadeMax: z.number().int().positive().optional(),
     })
     .safeParse(req.body);
@@ -83,6 +84,7 @@ router.post('/', authenticate, authorize('eventos', 'write'), async (req, res) =
     data: {
       nomeEvento: body.data.nomeEvento,
       dataEvento: new Date(body.data.dataEvento),
+      tipo: body.data.tipo,
       capacidadeMax: body.data.capacidadeMax,
       status: 'ABERTO',
     },

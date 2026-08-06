@@ -29,13 +29,21 @@ router.get('/portal-config', (_req, res) => {
   });
 });
 
-router.get('/eventos', async (_req, res) => {
+router.get('/eventos', async (req, res) => {
+  const tipoRaw = typeof req.query.tipo === 'string' ? req.query.tipo : undefined;
+  const tipo =
+    tipoRaw === 'GIRA' || tipoRaw === 'OFICINA' ? tipoRaw : undefined;
   const eventos = await prisma.evento.findMany({
-    where: { status: 'ABERTO', dataEvento: { gte: new Date() } },
+    where: {
+      status: 'ABERTO',
+      dataEvento: { gte: new Date() },
+      ...(tipo ? { tipo } : {}),
+    },
     select: {
       id: true,
       nomeEvento: true,
       dataEvento: true,
+      tipo: true,
       capacidadeMax: true,
       visualizacoes: true,
       _count: { select: { inscricoes: true } },
@@ -57,6 +65,7 @@ router.get('/eventos/:id', async (req, res) => {
       id: true,
       nomeEvento: true,
       dataEvento: true,
+      tipo: true,
       capacidadeMax: true,
       visualizacoes: true,
       _count: { select: { inscricoes: true } },
@@ -73,7 +82,10 @@ router.get('/eventos/:id', async (req, res) => {
   res.json({
     ...evento,
     local: 'Rua Valério Eugênio, 570 — Bairro Areal, Conselheiro Lafaiete, MG',
-    resumo: 'Gira aberta à comunidade na Casa da Paz.',
+    resumo:
+      evento.tipo === 'OFICINA'
+        ? 'Oficina aberta à comunidade na Casa da Paz.'
+        : 'Gira aberta à comunidade na Casa da Paz.',
   });
 });
 

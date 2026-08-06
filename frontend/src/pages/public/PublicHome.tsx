@@ -35,7 +35,7 @@ export default function PublicHome() {
     },
     {
       src: portalAssets.ervas,
-      label: t('home.gallery.ervas'),
+      label: t('home.cta.studies'),
       hint: t('home.gallery.ervasHint'),
       to: '/public/estudos',
       w: 1024,
@@ -89,30 +89,30 @@ export default function PublicHome() {
       </section>
 
       <section className="max-w-4xl mx-auto px-4 pb-10">
-        <div className="rounded-2xl border border-primary/25 overflow-hidden bg-card shadow-xl grid md:grid-cols-2">
+        <Link
+          to="/public/estudos"
+          className="block rounded-2xl border border-primary/25 overflow-hidden bg-card shadow-xl grid md:grid-cols-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary group"
+        >
           <div className="relative min-h-[200px] md:min-h-0">
             <SafeImage
               src={portalAssets.ervas}
               alt=""
               width={640}
               height={400}
-              fallbackLabel={t('home.shop.title')}
-              className="cover-fill"
+              fallbackLabel={t('home.cta.studies')}
+              className="cover-fill transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-card/90 hidden md:block" />
           </div>
           <div className="p-6 sm:p-8 flex flex-col justify-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-primary/80">{t('nav.shop')}</p>
-            <h2 className="mt-2 font-serif text-2xl text-primary">{t('home.shop.title')}</h2>
-            <p className="mt-3 text-foreground/80 leading-relaxed">{t('home.shop.text')}</p>
-            <Link
-              to="/public/livraria"
-              className="mt-5 min-h-12 inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground font-medium px-6 hover:bg-primary/90 transition-colors w-fit"
-            >
-              {t('home.cta.shop')}
-            </Link>
+            <p className="text-xs uppercase tracking-[0.2em] text-primary/80">{t('nav.studies')}</p>
+            <h2 className="mt-2 font-serif text-2xl text-primary">{t('home.cta.studies')}</h2>
+            <p className="mt-3 text-foreground/80 leading-relaxed">{t('home.studies.text')}</p>
+            <span className="mt-5 min-h-12 inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground font-medium px-6 w-fit">
+              {t('home.cta.studiesOpen')}
+            </span>
           </div>
-        </div>
+        </Link>
       </section>
 
       <section className="max-w-2xl mx-auto px-4 pb-12">
@@ -128,12 +128,6 @@ export default function PublicHome() {
             className="min-h-12 inline-flex items-center justify-center rounded-xl border border-primary text-primary font-medium px-6 py-3 hover:bg-primary/10 transition-colors"
           >
             {t('home.cta.schedule')}
-          </Link>
-          <Link
-            to="/public/estudos"
-            className="min-h-12 inline-flex items-center justify-center rounded-xl border border-primary text-primary font-medium px-6 py-3 hover:bg-primary/10 transition-colors"
-          >
-            {t('home.cta.studies')}
           </Link>
           <Link
             to="/public/livraria"

@@ -6,10 +6,13 @@ import { portalAssets } from '../../lib/portal-assets';
 import { api } from '../../lib/api';
 import { useI18n } from '../../i18n/I18nContext';
 
+type TipoEvento = 'GIRA' | 'OFICINA';
+
 interface Evento {
   id: number;
   nomeEvento: string;
   dataEvento: string;
+  tipo: TipoEvento;
   capacidadeMax: number | null;
   visualizacoes?: number;
   _count: { inscricoes: number };
@@ -22,11 +25,13 @@ function EventoCard({
   ev,
   labelSubs,
   labelDetails,
+  labelTipo,
   dateLocale,
 }: {
   ev: Evento;
   labelSubs: string;
   labelDetails: string;
+  labelTipo: string;
   dateLocale: string;
 }) {
   useEffect(() => {
@@ -35,7 +40,8 @@ function EventoCard({
 
   return (
     <li className="rounded-2xl bg-card border border-border/60 p-5 sm:p-6 shadow-sm">
-      <h2 className="font-serif text-xl sm:text-2xl text-primary">{ev.nomeEvento}</h2>
+      <p className="text-xs uppercase tracking-[0.2em] text-primary/70">{labelTipo}</p>
+      <h2 className="mt-1 font-serif text-xl sm:text-2xl text-primary">{ev.nomeEvento}</h2>
       <p className="mt-1 text-foreground/85 capitalize">
         {new Date(ev.dataEvento).toLocaleDateString(dateLocale, {
           weekday: 'long',
@@ -62,6 +68,9 @@ function EventoCard({
 export default function PublicEventos() {
   const { t, dateLocale } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
+  const tab = (searchParams.get('tab') === 'oficinas' ? 'oficinas' : 'eventos') as
+    | 'eventos'
+    | 'oficinas';
   const q = searchParams.get('q') ?? '';
   const de = searchParams.get('de') ?? '';
   const ate = searchParams.get('ate') ?? '';
@@ -74,32 +83,38 @@ export default function PublicEventos() {
 
   useEffect(() => {
     setVisiveis(PAGE_SIZE);
-  }, [q, de, ate]);
+  }, [q, de, ate, tab]);
 
   const filtrados = useMemo(() => {
     const term = q.trim().toLowerCase();
     const inicio = de ? new Date(de + 'T00:00:00').getTime() : null;
     const fim = ate ? new Date(ate + 'T23:59:59').getTime() : null;
+    const tipoFiltro: TipoEvento = tab === 'oficinas' ? 'OFICINA' : 'GIRA';
     return eventos.filter((ev) => {
+      if ((ev.tipo ?? 'GIRA') !== tipoFiltro) return false;
       const dataMs = new Date(ev.dataEvento).getTime();
       if (inicio !== null && dataMs < inicio) return false;
       if (fim !== null && dataMs > fim) return false;
       if (term && !ev.nomeEvento.toLowerCase().includes(term)) return false;
       return true;
     });
-  }, [q, de, ate, eventos]);
+  }, [q, de, ate, eventos, tab]);
 
   const visiveisLista = filtrados.slice(0, visiveis);
   const hasMore = visiveis < filtrados.length;
   const hasFilter = Boolean(q || de || ate);
 
-  const updateSearch = (patch: { q?: string; de?: string; ate?: string }) => {
+  const updateSearch = (patch: { q?: string; de?: string; ate?: string; tab?: string }) => {
     const next = new URLSearchParams(searchParams);
     Object.entries(patch).forEach(([k, v]) => {
       if (v) next.set(k, v);
       else next.delete(k);
     });
     setSearchParams(next, { replace: true });
+  };
+
+  const setTab = (next: 'eventos' | 'oficinas') => {
+    updateSearch({ tab: next === 'oficinas' ? 'oficinas' : '' });
   };
 
   return (
@@ -120,9 +135,48 @@ export default function PublicEventos() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background" />
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-3xl mx-auto w-full px-4 pb-5">
-            <h1 className="font-serif text-3xl sm:text-4xl text-primary">{t('events.title')}</h1>
-            <p className="text-foreground/80 text-sm mt-1">{t('events.subtitle')}</p>
+            <h1 className="font-serif text-3xl sm:text-4xl text-primary">
+              {tab === 'oficinas' ? t('events.tab.oficinas') : t('events.title')}
+            </h1>
+            <p className="text-foreground/80 text-sm mt-1">
+              {tab === 'oficinas' ? t('events.subtitleOficinas') : t('events.subtitle')}
+            </p>
           </div>
+        </div>
+      </section>
+
+      <section className="max-w-3xl mx-auto px-4 pt-6">
+        <div
+          role="tablist"
+          aria-label={t('events.tabsAria')}
+          className="flex gap-1 p-1 rounded-xl bg-card border border-border/60"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'eventos'}
+            onClick={() => setTab('eventos')}
+            className={`flex-1 min-h-11 rounded-lg text-sm font-medium transition-colors ${
+              tab === 'eventos'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-foreground/80 hover:bg-background/60'
+            }`}
+          >
+            {t('events.tab.eventos')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'oficinas'}
+            onClick={() => setTab('oficinas')}
+            className={`flex-1 min-h-11 rounded-lg text-sm font-medium transition-colors ${
+              tab === 'oficinas'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-foreground/80 hover:bg-background/60'
+            }`}
+          >
+            {t('events.tab.oficinas')}
+          </button>
         </div>
       </section>
 
@@ -180,7 +234,11 @@ export default function PublicEventos() {
               </p>
               <button
                 type="button"
-                onClick={() => setSearchParams({}, { replace: true })}
+                onClick={() => {
+                  const next = new URLSearchParams();
+                  if (tab === 'oficinas') next.set('tab', 'oficinas');
+                  setSearchParams(next, { replace: true });
+                }}
                 className="min-h-9 text-sm text-primary hover:underline px-2"
               >
                 {t('events.filter.clear')}
@@ -193,7 +251,9 @@ export default function PublicEventos() {
       <section className="max-w-3xl mx-auto px-4 pb-8">
         {filtrados.length === 0 ? (
           <div className="rounded-2xl bg-card border border-border/60 p-8 text-center text-foreground/85">
-            <p className="font-serif text-lg text-primary">{t('events.empty')}</p>
+            <p className="font-serif text-lg text-primary">
+              {tab === 'oficinas' ? t('events.emptyOficinas') : t('events.empty')}
+            </p>
             <p className="mt-2 text-sm text-foreground/75">{t('events.filter.adjustHint')}</p>
           </div>
         ) : (
@@ -208,6 +268,9 @@ export default function PublicEventos() {
                   ev={ev}
                   labelSubs={t('events.subscribers')}
                   labelDetails={t('events.detail.viewDetails')}
+                  labelTipo={
+                    ev.tipo === 'OFICINA' ? t('events.tipo.OFICINA') : t('events.tipo.GIRA')
+                  }
                   dateLocale={dateLocale}
                 />
               ))}
