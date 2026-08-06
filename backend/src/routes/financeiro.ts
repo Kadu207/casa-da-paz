@@ -697,6 +697,49 @@ router.delete('/:id', authenticate, authorize('financeiro', 'write'), async (req
   res.status(204).send();
 });
 
+/** Agenda de pagamentos a fazer (parcelas ContaPagar) — separada de atrasados (receber). */
+router.get('/pagamentos-a-fazer', authenticate, authorize('contas_pagar', 'read'), async (req, res) => {
+  const ateDias = req.query.ateDias ? Number(req.query.ateDias) : 30;
+  const limite = new Date();
+  limite.setUTCDate(limite.getUTCDate() + ateDias);
+
+  const parcelas = await prisma.contaPagarParcela.findMany({
+    where: {
+      status: 'PENDENTE',
+      vencimento: { lte: limite },
+    },
+    include: {
+      contaPagar: {
+        include: { fornecedor: { select: { id: true, nome: true } } },
+      },
+    },
+    orderBy: { vencimento: 'asc' },
+    take: 200,
+  });
+
+  const hoje = new Date();
+  hoje.setUTCHours(0, 0, 0, 0);
+
+  res.json(
+    parcelas.map((p) => {
+      const venc = new Date(p.vencimento);
+      const dias = Math.floor((venc.getTime() - hoje.getTime()) / (24 * 60 * 60 * 1000));
+      return {
+        parcelaId: p.id,
+        contaPagarId: p.contaPagarId,
+        numero: p.numero,
+        valor: Number(p.valor),
+        vencimento: p.vencimento,
+        diasParaVencer: dias,
+        vencido: dias < 0,
+        descricao: p.contaPagar.descricao,
+        categoria: p.contaPagar.categoria,
+        fornecedor: p.contaPagar.fornecedor,
+      };
+    })
+  );
+});
+
 // --- Contas financeiras ---
 router.get('/contas', authenticate, authorize('contas', 'read'), async (_req, res) => {
   const contas = await prisma.contaFinanceira.findMany({ orderBy: { id: 'asc' } });

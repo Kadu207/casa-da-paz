@@ -17,6 +17,13 @@ import alertasRoutes from './routes/alertas.js';
 import mediaRoutes from './routes/media.js';
 import cobrancasRoutes from './routes/cobrancas.js';
 import marketingRoutes from './routes/marketing.js';
+import fornecedoresRoutes from './routes/fornecedores.js';
+import contasPagarRoutes from './routes/contas-pagar.js';
+import mensalidadePlanosRoutes from './routes/mensalidade-planos.js';
+import tesourariaDreRoutes from './routes/tesouraria-dre.js';
+import ofxRoutes from './routes/ofx.js';
+import contribuintesRoutes from './routes/contribuintes.js';
+import { gerarMensalidadesDoMes } from './jobs/gerar-mensalidades.js';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
@@ -31,8 +38,14 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/pessoas', pessoasRoutes);
 app.use('/api/financeiro', financeiroRoutes);
+app.use('/api/financeiro', tesourariaDreRoutes);
+app.use('/api/financeiro/ofx', ofxRoutes);
 app.use('/api/cobrancas', cobrancasRoutes);
 app.use('/api/marketing', marketingRoutes);
+app.use('/api/fornecedores', fornecedoresRoutes);
+app.use('/api/contas-pagar', contasPagarRoutes);
+app.use('/api/mensalidade-planos', mensalidadePlanosRoutes);
+app.use('/api/contribuintes', contribuintesRoutes);
 app.use('/api/eventos', eventosRoutes);
 app.use('/api/livraria', livrariaRoutes);
 app.use('/api/public', publicRoutes);
@@ -48,6 +61,16 @@ app.use('/api/media', mediaRoutes);
 
 app.listen(PORT, () => {
   console.log(`Casa da Paz API rodando na porta ${PORT}`);
+  // Job recorrência (sem Asaas) — a cada 6h
+  const run = () => {
+    gerarMensalidadesDoMes()
+      .then((n) => {
+        if (n > 0) console.log(`[recorrencia] ${n} mensalidade(s) gerada(s)`);
+      })
+      .catch((e) => console.error('[recorrencia]', e));
+  };
+  run();
+  setInterval(run, 6 * 60 * 60 * 1000);
 });
 
 export default app;

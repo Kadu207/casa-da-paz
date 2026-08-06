@@ -14,6 +14,9 @@ const router = Router();
 
 const pessoaInclude = {
   responsaveis: { orderBy: { id: 'asc' as const } },
+  mensalidadePlano: {
+    select: { id: true, valor: true, diaVencimento: true, ativo: true },
+  },
 } satisfies Prisma.PessoaInclude;
 
 async function findTelefoneDuplicado(telefone: string, excludeId?: number) {

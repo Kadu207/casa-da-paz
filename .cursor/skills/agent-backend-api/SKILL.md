@@ -16,6 +16,7 @@ description: Express Prisma REST API, Zod, transações, webhooks Asaas/N8N/PIX 
 - [ ] OpenAPI atualizado
 - [ ] Transações atômicas em lote
 - [ ] Webhooks com secret validation
-- [ ] Asaas sandbox por padrão (`ASAAS_ENV=sandbox`)
+- [ ] Asaas sandbox por padrão (`ASAAS_ENV=sandbox`) — opcional/dormant
+- [ ] Tesouraria 022–025 sem depender de Asaas
 - [ ] Webhook Asaas idempotente (`AsaasWebhookEvent`)
 - [ ] Conciliação ledger ↔ pedido ↔ inscrição atômica

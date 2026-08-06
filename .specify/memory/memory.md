@@ -1,63 +1,39 @@
 # Memória — índice vivo (Casa da Paz)
 
-Ponto de entrada da memória do projeto. Atualizar `project-memory.md` ao encerrar cada tarefa.
+Atualizar `project-memory.md` ao encerrar cada tarefa.
 
-## Núcleo Spec Kit
+## Núcleo
 
 | Arquivo | Função |
 |---------|--------|
-| [constitution.md](constitution.md) | Princípios imutáveis |
-| [project-memory.md](project-memory.md) | Estado atual, fases, próximos passos |
+| [constitution.md](constitution.md) | Princípios |
+| [project-memory.md](project-memory.md) | Estado atual |
 | [memory.md](memory.md) | Este índice |
 
-## Agentes / Harness
+## Agentes
 
 | Arquivo | Função |
 |---------|--------|
-| [agents.md](../../agents.md) | Orquestração de agentes + índice de skills |
-| [.cursor/skills/](../../.cursor/skills/) | 8 skills de domínio |
+| [agents.md](../../agents.md) | Construção + pós-operação |
+| [.cursor/skills/](../../.cursor/skills/) | Skills domínio + ops |
 
-## Contratos e requisitos
-
-| Arquivo | Função |
-|---------|--------|
-| [docs/contracts/rbac-matrix.md](../../docs/contracts/rbac-matrix.md) | Matriz RBAC hierárquica |
-| [docs/analise-requisitos-consolidada.md](../../docs/analise-requisitos-consolidada.md) | Escopo de negócio |
-| [docs/contracts/openapi.yaml](../../docs/contracts/openapi.yaml) | Contrato API |
-
-## ADRs (`docs/memory/decisions/`)
-
-| ADR | Tema |
-|-----|------|
-| 001 | Lovable híbrido |
-| 002 | JWT + RBAC |
-| 003 | Adimplência derivada |
-| 004 | Estoque / inscrições |
-| 005 | Portal público MVP |
-| 006 | WhatsApp Chatwoot/N8N |
-| 007 | Repositórios dual Git |
-| 008 | Deferir Next.js |
-| 009 | **Asaas como PSP** (substitui Stripe) |
-
-## Playbooks / Runbooks
-
-- Playbooks: `docs/memory/playbooks/` (financeiro, portal, recepção, chatwoot-n8n)
-- Runbooks: `docs/memory/runbooks/` (deploy, import, LGPD, messaging)
-- Roadmap: `docs/memory/roadmap-cronograma.md`
-- Changelog: `docs/memory/CHANGELOG.md`
-
-## Specs ativas
+## Specs tesouraria (sem Asaas)
 
 | Spec | Status |
 |------|--------|
-| 021-financeiro-asaas-gestor | Em implementação |
-| 020-rbac-hierarquia-policies | ✅ V1 |
-| 003-financeiro-v2 | ✅ Produção (estendido por 021) |
-| 012-chatwoot-n8n | 🔄 Widget no ar |
+| 022-contas-a-pagar | ✅ Implementado |
+| 023-recorrencia-mensalidade | ✅ Implementado |
+| 024-dre-orcamento-centros | ✅ Implementado |
+| 025-conciliacao-ofx | ✅ Implementado |
+| 021 Asaas | **Dormant** até chave |
 
-## Regras de atualização
+## ADRs
 
-1. Toda feature não-trivial → `specs/<feature>/` antes do código
-2. Ao encerrar → `project-memory.md` + `CHANGELOG.md`
-3. Mudança de segurança/RBAC → matriz + ADR se necessário
-4. Deploy VPS → acionar usuário (nunca automático)
+001–009 em `docs/memory/decisions/` — 009 Asaas opcional.
+
+## Regras
+
+1. Spec antes de código  
+2. Encerrar → project-memory + CHANGELOG  
+3. Deploy VPS → gate humano  
+4. Tesouraria **não** depende de Asaas  

@@ -2,18 +2,21 @@
 
 ## Tarefas recorrentes
 - Conciliação mensalidades (FINANCEIRO)
-- Revisão atrasados → N8N lembrete WhatsApp
-- Dashboard semanal (DIRETORIA)
-- Cobranças Asaas (PIX/boleto/cartão) + assinaturas médiuns
-- Contas (caixa/banco/Asaas) e transparência interna
-- Webhook Asaas: verificar idempotência e status ledger
+- Agenda **pagamentos a fazer** (saídas) — separado de atrasados
+- Contas a pagar / fornecedores / baixas
+- Gerar mensalidades (`/mensalidade-planos/gerar` ou job 6h)
+- DRE e orçamento mensal
+- Import OFX e conciliação
+- Revisão atrasados (receber) → N8N lembrete WhatsApp
+- Cobranças Asaas — **opcional** (dormant sem chave)
 
 ## PSP
-- **Asaas** (ADR-009) — sandbox padrão; produção só com confirmação
-- Env: `ASAAS_API_KEY`, `ASAAS_ENV`, `ASAAS_WEBHOOK_TOKEN`, `ASAAS_WALLET_ID`
+- Asaas (ADR-009) — opcional; sandbox quando houver chave
+- Tesouraria **não depende** do Asaas
 
-## Agente líder
-`agent-backend-api` + `agent-frontend-ux` (+ `agent-arquitetura-seguranca` para policies)
+## Agentes
+Construção: `agent-backend-api` + `agent-frontend-ux`  
+Ops: `agent-tesouraria-ops`, `agent-recorrencia-mensalidade`, `agent-conciliacao-bancaria`, `agent-relatorios-dre`
 
-## Spec
-`specs/021-financeiro-asaas-gestor/`
+## Specs
+022–025 (tesouraria), 021 (Asaas dormant)

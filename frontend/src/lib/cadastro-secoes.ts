@@ -15,6 +15,12 @@ export interface PessoaCadastro {
   tipoPerfil: TipoPerfil;
   dataCadastro: string;
   responsaveis?: PessoaResponsavel[];
+  mensalidadePlano?: {
+    id: number;
+    valor: string;
+    diaVencimento: number;
+    ativo: boolean;
+  } | null;
 }
 
 export interface CadastroSecaoConfig {

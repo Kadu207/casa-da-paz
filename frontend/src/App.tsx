@@ -9,6 +9,12 @@ import FinanceiroConciliacaoPage from './pages/financeiro/FinanceiroConciliacaoP
 import FinanceiroContasPage from './pages/financeiro/FinanceiroContasPage';
 import FinanceiroCobrancasPage from './pages/financeiro/FinanceiroCobrancasPage';
 import FinanceiroTransparenciaPage from './pages/financeiro/FinanceiroTransparenciaPage';
+import FinanceiroPagamentosPage from './pages/financeiro/FinanceiroPagamentosPage';
+import FinanceiroContasPagarPage from './pages/financeiro/FinanceiroContasPagarPage';
+import FinanceiroRecorrenciaPage from './pages/financeiro/FinanceiroRecorrenciaPage';
+import FinanceiroDrePage from './pages/financeiro/FinanceiroDrePage';
+import FinanceiroOfxPage from './pages/financeiro/FinanceiroOfxPage';
+import FinanceiroContribuintesPage from './pages/financeiro/FinanceiroContribuintesPage';
 import RecepcaoPage from './pages/RecepcaoPage';
 import LivrariaPage from './pages/LivrariaPage';
 import UsuariosPage from './pages/UsuariosPage';
@@ -91,6 +97,12 @@ export default function App() {
           <Route path="lancamentos" element={<FinanceiroLancamentosPage />} />
           <Route path="fluxo" element={<FinanceiroFluxoPage />} />
           <Route path="atrasados" element={<FinanceiroAtrasadosPage />} />
+          <Route path="pagamentos" element={<FinanceiroPagamentosPage />} />
+          <Route path="contas-pagar" element={<FinanceiroContasPagarPage />} />
+          <Route path="recorrencia" element={<FinanceiroRecorrenciaPage />} />
+          <Route path="contribuintes" element={<FinanceiroContribuintesPage />} />
+          <Route path="dre" element={<FinanceiroDrePage />} />
+          <Route path="ofx" element={<FinanceiroOfxPage />} />
           <Route path="conciliacao" element={<FinanceiroConciliacaoPage />} />
           <Route path="contas" element={<FinanceiroContasPage />} />
           <Route

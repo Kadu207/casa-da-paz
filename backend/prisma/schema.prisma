@@ -43,6 +43,9 @@ enum OrigemTransacao {
   ECOMMERCE
   ASSINATURA
   IMPORT
+  RECORRENCIA
+  CONTA_PAGAR
+  OFX
 }
 
 enum AsaasBillingType {
@@ -67,6 +70,30 @@ enum AsaasAssinaturaStatus {
   INACTIVE
   EXPIRED
   CANCELLED
+}
+
+enum StatusContaPagar {
+  PENDENTE
+  PARCIAL
+  PAGO
+  CANCELADO
+}
+
+enum StatusParcela {
+  PENDENTE
+  PAGO
+  CANCELADO
+}
+
+enum TipoContribuinte {
+  PATROCINIO
+  PADRINHO
+}
+
+enum StatusOfxMovimento {
+  PENDENTE
+  CONCILIADO
+  IGNORADO
 }
 
 enum TipoTransacao {
@@ -159,6 +186,7 @@ model Pessoa {
   responsaveis  PessoaResponsavel[]
   asaasClientes AsaasCliente[]
   asaasAssinaturas AsaasAssinatura[]
+  mensalidadePlano MensalidadePlano?
 
   @@map("pessoas")
 }
@@ -212,14 +240,156 @@ model ContaFinanceira {
   createdAt     DateTime            @default(now()) @map("created_at")
   updatedAt     DateTime            @updatedAt @map("updated_at")
   transacoes    FinanceiroTransacao[]
+  ofxImports    OfxImport[]
 
   @@map("contas_financeiras")
+}
+
+model CentroCusto {
+  id        Int      @id @default(autoincrement())
+  codigo    String   @unique @db.VarChar(30)
+  nome      String   @db.VarChar(100)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  transacoes FinanceiroTransacao[]
+  orcamentos OrcamentoLinha[]
+  contasPagar ContaPagar[]
+
+  @@map("centros_custo")
+}
+
+model Fornecedor {
+  id         Int      @id @default(autoincrement())
+  nome       String   @db.VarChar(150)
+  documento  String?  @db.VarChar(18)
+  telefone   String?  @db.VarChar(20)
+  ativo      Boolean  @default(true)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  contasPagar ContaPagar[]
+
+  @@map("fornecedores")
+}
+
+/// Patrocínios e padrinhos — contribuição periódica (cadastro tesouraria)
+model Contribuinte {
+  id         Int              @id @default(autoincrement())
+  tipo       TipoContribuinte
+  nome       String           @db.VarChar(150)
+  valor      Decimal          @db.Decimal(12, 2)
+  telefone   String?          @db.VarChar(20)
+  ativo      Boolean          @default(true)
+  observacao String?
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+
+  @@index([tipo, ativo])
+  @@map("contribuintes")
+}
+
+model ContaPagar {
+  id            Int              @id @default(autoincrement())
+  fornecedorId  Int?             @map("fornecedor_id")
+  centroCustoId Int?             @map("centro_custo_id")
+  descricao     String           @db.VarChar(200)
+  categoria     String           @db.VarChar(50)
+  valorTotal    Decimal          @map("valor_total") @db.Decimal(12, 2)
+  vencimento    DateTime         @db.Date
+  status        StatusContaPagar @default(PENDENTE)
+  observacoes   String?
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+  fornecedor    Fornecedor?      @relation(fields: [fornecedorId], references: [id])
+  centroCusto   CentroCusto?     @relation(fields: [centroCustoId], references: [id])
+  parcelas      ContaPagarParcela[]
+
+  @@index([status])
+  @@index([vencimento])
+  @@map("contas_pagar")
+}
+
+model ContaPagarParcela {
+  id           Int           @id @default(autoincrement())
+  contaPagarId Int           @map("conta_pagar_id")
+  numero       Int
+  valor        Decimal       @db.Decimal(12, 2)
+  vencimento   DateTime      @db.Date
+  status       StatusParcela @default(PENDENTE)
+  pagoEm       DateTime?     @map("pago_em")
+  transacaoId  Int?          @unique @map("transacao_id")
+  contaPagar   ContaPagar    @relation(fields: [contaPagarId], references: [id], onDelete: Cascade)
+  transacao    FinanceiroTransacao? @relation(fields: [transacaoId], references: [id])
+
+  @@unique([contaPagarId, numero])
+  @@index([status, vencimento])
+  @@map("contas_pagar_parcelas")
+}
+
+model MensalidadePlano {
+  id             Int       @id @default(autoincrement())
+  pessoaId       Int       @map("pessoa_id")
+  valor          Decimal   @db.Decimal(10, 2)
+  diaVencimento  Int       @map("dia_vencimento")
+  ativo          Boolean   @default(true)
+  proximaGeracao DateTime? @map("proxima_geracao") @db.Date
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  pessoa         Pessoa    @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+
+  @@unique([pessoaId])
+  @@index([ativo])
+  @@map("mensalidade_planos")
+}
+
+model OrcamentoLinha {
+  id             Int           @id @default(autoincrement())
+  ano            Int
+  mes            Int
+  tipo           TipoTransacao
+  categoria      String        @db.VarChar(50)
+  centroCustoId  Int?          @map("centro_custo_id")
+  valorPlanejado Decimal       @map("valor_planejado") @db.Decimal(12, 2)
+  centroCusto    CentroCusto?  @relation(fields: [centroCustoId], references: [id])
+
+  @@unique([ano, mes, tipo, categoria, centroCustoId])
+  @@map("orcamento_linhas")
+}
+
+model OfxImport {
+  id         Int              @id @default(autoincrement())
+  contaId    Int              @map("conta_id")
+  filename   String           @db.VarChar(200)
+  importedAt DateTime         @default(now()) @map("imported_at")
+  qtd        Int              @default(0)
+  conta      ContaFinanceira  @relation(fields: [contaId], references: [id])
+  movimentos OfxMovimento[]
+
+  @@map("ofx_imports")
+}
+
+model OfxMovimento {
+  id          Int                @id @default(autoincrement())
+  importId    Int                @map("import_id")
+  fitId       String             @unique @map("fit_id") @db.VarChar(120)
+  data        DateTime           @db.Date
+  valor       Decimal            @db.Decimal(12, 2)
+  tipo        TipoTransacao
+  memo        String?
+  status      StatusOfxMovimento @default(PENDENTE)
+  transacaoId Int?               @unique @map("transacao_id")
+  import      OfxImport          @relation(fields: [importId], references: [id], onDelete: Cascade)
+  transacao   FinanceiroTransacao? @relation(fields: [transacaoId], references: [id])
+
+  @@index([status])
+  @@index([data])
+  @@map("ofx_movimentos")
 }
 
 model FinanceiroTransacao {
   id                  Int              @id @default(autoincrement())
   pessoaId            Int?             @map("pessoa_id")
   contaId             Int?             @map("conta_id")
+  centroCustoId       Int?             @map("centro_custo_id")
   tipo                TipoTransacao
   categoria           String           @db.VarChar(50)
   valor               Decimal          @db.Decimal(10, 2)
@@ -232,12 +402,16 @@ model FinanceiroTransacao {
   asaasSubscriptionId String?          @map("asaas_subscription_id") @db.VarChar(80)
   pessoa              Pessoa?          @relation(fields: [pessoaId], references: [id])
   conta               ContaFinanceira? @relation(fields: [contaId], references: [id])
+  centroCusto         CentroCusto?     @relation(fields: [centroCustoId], references: [id])
   asaasCobrancas      AsaasCobranca[]
+  parcelaPagar        ContaPagarParcela?
+  ofxMovimento        OfxMovimento?
 
   @@index([dataTransacao])
   @@index([vencimento])
   @@index([pessoaId])
   @@index([contaId])
+  @@index([centroCustoId])
   @@index([asaasPaymentId])
   @@map("financeiro_transacoes")
 }

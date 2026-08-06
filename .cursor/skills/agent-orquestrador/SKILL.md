@@ -19,6 +19,11 @@ description: Orquestrador central Casa da Paz. Roteia tarefas para agentes de do
 | UI, Lovable, responsivo | agent-frontend-ux |
 | Excel, IA, schema, migration | agent-dados-ia |
 | Docker, CI, deploy, Cloudflare | agent-infra-devops |
+| contas a pagar, baixas, agenda | agent-tesouraria-ops |
+| mensalidade recorrente | agent-recorrencia-mensalidade |
+| OFX, extrato | agent-conciliacao-bancaria |
+| DRE, orçamento | agent-relatorios-dre |
+| alertas financeiros | agent-alertas-financeiros |
 
 ## Gate deploy
 Se tarefa envolve VPS → parar e acionar usuário.

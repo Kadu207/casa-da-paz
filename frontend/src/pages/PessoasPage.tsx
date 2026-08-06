@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../lib/api';
-import { useAuth } from '../context/AuthContext';
+import { hasPermission, useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { labelEnum } from '../i18n/helpers';
 import CadastroSecaoTable from '../components/cadastros/CadastroSecaoTable';
@@ -32,7 +32,8 @@ const emptyForm = {
 export default function PessoasPage() {
   const { t } = useI18n();
   const { user } = useAuth();
-  const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'RECEPCAO';
+  const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'RECEPCAO' || user?.setorAcesso === 'SUPERVISOR';
+  const canEditMensalidade = hasPermission(user, 'recorrencia', 'write');
 
   const [pessoas, setPessoas] = useState<PessoaCadastro[]>([]);
   const [busca, setBusca] = useState('');
@@ -185,6 +186,19 @@ export default function PessoasPage() {
     } catch (err) {
       alert(err instanceof Error ? err.message : t('erp.pessoas.deleteError'));
     }
+  };
+
+  const salvarMensalidade = async (pessoaId: number, valor: number, diaVencimento: number) => {
+    await api('/mensalidade-planos', {
+      method: 'POST',
+      body: JSON.stringify({
+        pessoaId,
+        valor,
+        diaVencimento,
+        ativo: true,
+      }),
+    });
+    await carregar();
   };
 
   const atualizarResponsavel = (index: number, field: keyof ResponsavelForm, value: string) => {
@@ -361,9 +375,11 @@ export default function PessoasPage() {
               secao={secao}
               pessoas={pessoasPorPerfil.get(secao.perfil) ?? []}
               canWrite={canWrite}
+              canEditMensalidade={canEditMensalidade}
               onEdit={abrirEditar}
               onDelete={excluir}
               onAdd={abrirNovo}
+              onSaveMensalidade={salvarMensalidade}
             />
           ))}
           {legado.length > 0 && (

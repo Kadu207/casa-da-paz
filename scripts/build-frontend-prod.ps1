@@ -32,7 +32,13 @@ if (-not (Test-Path ".env.production")) {
 }
 
 Write-Host "npm run build" -ForegroundColor Cyan
-npm.cmd run build
+npm.cmd exec -- tsc -b
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "Build falhou no TypeScript. Pare o Vite (Ctrl+C no terminal do npm run dev) e rode:" -ForegroundColor Yellow
+  Write-Host "  Remove-Item -Recurse -Force node_modules; npm ci" -ForegroundColor Yellow
+  throw "tsc falhou (node_modules incompleto ou arquivo bloqueado no Windows)"
+}
+npm.cmd exec -- vite build
 
 if (-not (Test-Path "dist\index.html")) {
     throw "Build falhou: dist\index.html nao gerado"

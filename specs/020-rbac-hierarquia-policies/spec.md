@@ -12,6 +12,7 @@
 
 ## API
 
+- `POST /api/auth/usuarios` — cria usuário **e** `UsuarioPolicy` (snapshot do setor + overrides opcionais em `grants`)
 - `GET/PUT /api/auth/usuarios/:id/politicas` (SUPERVISOR)
 - `GET /api/auth/politicas/catalogo` (SUPERVISOR)
 

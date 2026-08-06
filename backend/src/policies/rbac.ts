@@ -22,6 +22,11 @@ export const RBAC_RESOURCES = [
   'transparencia',
   'contas',
   'cobrancas',
+  'contas_pagar',
+  'recorrencia',
+  'dre',
+  'conciliacao_bancaria',
+  'contribuintes',
 ] as const;
 
 export type Resource = (typeof RBAC_RESOURCES)[number];
@@ -51,6 +56,14 @@ export function canManageTargetUser(actor: SetorAcesso, target: SetorAcesso): bo
   return isOperationalRole(target);
 }
 
+const treasuryWrite = {
+  contas_pagar: 'write' as const,
+  recorrencia: 'write' as const,
+  dre: 'write' as const,
+  conciliacao_bancaria: 'write' as const,
+  contribuintes: 'write' as const,
+};
+
 const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
   SUPERVISOR: {
     usuarios: 'write',
@@ -74,6 +87,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     transparencia: 'read',
     contas: 'write',
     cobrancas: 'write',
+    ...treasuryWrite,
   },
   ADMIN: {
     webhooks: 'write',
@@ -99,6 +113,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     transparencia: 'read',
     contas: 'write',
     cobrancas: 'write',
+    ...treasuryWrite,
   },
   FINANCEIRO: {
     pessoas: 'read',
@@ -112,6 +127,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     transparencia: 'read',
     contas: 'write',
     cobrancas: 'write',
+    ...treasuryWrite,
   },
   MARKETING: {
     marketing: 'write',
@@ -157,6 +173,14 @@ export function defaultGrantsForSetor(setor: SetorAcesso): PolicyGrants {
   return { ...matrix[setor] };
 }
 
+/** Congela a matriz do setor + overrides no ato do cadastro/edição. */
+export function snapshotGrantsForSetor(
+  setor: SetorAcesso,
+  overrides?: PolicyGrants | null
+): PolicyGrants {
+  return { ...defaultGrantsForSetor(setor), ...(overrides ?? {}) };
+}
+
 export function canAccess(
   setor: SetorAcesso,
   resource: Resource,
@@ -167,7 +191,6 @@ export function canAccess(
   if (custom !== undefined) {
     return grantAllows(custom, action);
   }
-
   const perm = matrix[setor]?.[resource];
   if (!perm) return false;
   return grantAllows(perm, action);

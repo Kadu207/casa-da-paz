@@ -52,6 +52,39 @@ paths:
     get:
       security: [{ bearerAuth: [] }]
       summary: Transparência interna agregada (sem PII)
+  /financeiro/pagamentos-a-fazer:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Agenda de pagamentos a fazer (saídas)
+  /financeiro/dre:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: DRE orçado vs realizado
+  /financeiro/ofx/import:
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Import extrato OFX
+  /fornecedores:
+    get:
+      security: [{ bearerAuth: [] }]
+    post:
+      security: [{ bearerAuth: [] }]
+  /contas-pagar:
+    get:
+      security: [{ bearerAuth: [] }]
+    post:
+      security: [{ bearerAuth: [] }]
+  /mensalidade-planos:
+    get:
+      security: [{ bearerAuth: [] }]
+    post:
+      security: [{ bearerAuth: [] }]
+  /contribuintes:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Patrocínios e padrinhos
+    post:
+      security: [{ bearerAuth: [] }]
   /cobrancas:
     get:
       security: [{ bearerAuth: [] }]

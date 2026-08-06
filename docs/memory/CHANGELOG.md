@@ -3,9 +3,12 @@
 ## [Unreleased]
 
 ### Adicionado
-- **021 Financeiro Asaas + Marketing:** ContaFinanceira, cobranças/assinaturas Asaas, webhook idempotente, transparência interna ERP, papel MARKETING (`/app/marketing`), checkout público via Asaas (ADR-009)
-- Harness: `agents.md`, `.specify/memory/memory.md`, skills atualizadas
-- Smoke: `scripts/test-financeiro-asaas.ps1`
+- **Policies no cadastro de usuário:** `POST /auth/usuarios` cria `UsuarioPolicy` com snapshot do setor (+ overrides); UI define nível de acesso no ato
+- **Patrocínios / Padrinhos:** aba Financeiro + API `/contribuintes`; coluna mensalidade na lista de médiuns
+- **022–025 Tesouraria completa (sem Asaas):** contas a pagar, agenda a pagar, recorrência mensalidade, DRE/orçamento/centros, OFX; agentes ops em `agents.md`
+- **021 Financeiro Asaas + Marketing:** ContaFinanceira, cobranças/assinaturas Asaas, webhook idempotente, transparência interna ERP, papel MARKETING (`/app/marketing`), checkout público via Asaas (ADR-009) — dormant até chave
+- Harness: `agents.md`, `.specify/memory/memory.md`, skills atualizadas + 5 agentes pós-construção
+- Smoke: `scripts/test-financeiro-asaas.ps1`, `scripts/test-tesouraria-022.ps1`
 - **Cadastros por função:** seções Presidente/Diretoria/Tesouraria/etc.; `PessoaResponsavel` para menores
 - **Alertas UI (014 S1–S3):** API `/api/alertas`, página Financeiro, badge pendências, workflow N8N `lembrete_atraso`
 - Scripts smoke: `test-alertas-reenviar.ps1`, `test-dashboard-v2.ps1`, `test-painel-medium.ps1`, `test-agendamento-n8n-prod.ps1`

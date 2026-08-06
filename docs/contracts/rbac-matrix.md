@@ -17,6 +17,11 @@
 | Cobranças Asaas | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
 | Contas | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Transparência | 👁️ | 👁️ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Contas a pagar | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Recorrência | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Patrocínios / Padrinhos | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| DRE / orçamento | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Conciliação OFX | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Marketing | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Import Excel | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Eventos / check-in | ✅ | 👁️ | ✅ (publicar) | ✅ | ❌ | ❌ | ❌ |
@@ -32,4 +37,4 @@
 
 Legenda: ✅ total | 👁️ leitura/limitado | ❌ negado
 
-Specs: `specs/020-rbac-hierarquia-policies/spec.md`, `specs/021-financeiro-asaas-gestor/spec.md`
+Specs: `specs/020-rbac-hierarquia-policies/spec.md`, `specs/021-financeiro-asaas-gestor/spec.md`, `specs/022-contas-a-pagar/` … `025-conciliacao-ofx/`

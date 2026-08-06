@@ -13,6 +13,7 @@ import {
   canManageTargetUser,
   defaultGrantsForSetor,
   effectiveGrants,
+  snapshotGrantsForSetor,
   type PolicyGrants,
 } from '../policies/rbac.js';
 
@@ -39,15 +40,17 @@ const operationalSetorSchema = z.enum([
   'SUPORTE',
 ]);
 
+const grantSchema = z.enum(['read', 'write', 'own', 'none']);
+const policyGrantsSchema = z.record(z.enum(RBAC_RESOURCES), grantSchema);
+
 const usuarioSchema = z.object({
   login: loginFieldSchema,
   senha: z.string().min(6),
   setorAcesso: operationalSetorSchema,
   pessoaId: z.number().int().positive(),
+  /** Políticas definidas no ato do cadastro (opcional → snapshot do setor). */
+  grants: policyGrantsSchema.optional(),
 });
-
-const grantSchema = z.enum(['read', 'write', 'own', 'none']);
-const policyGrantsSchema = z.record(z.enum(RBAC_RESOURCES), grantSchema);
 
 const alterarSenhaSchema = z.object({
   senhaAtual: z.string().min(1),
@@ -177,15 +180,15 @@ router.put('/usuarios/:id/politicas', authenticate, requireSupervisor, async (re
     where: { usuarioId: id },
     create: {
       usuarioId: id,
-      grants: parsed.data,
+      grants: snapshotGrantsForSetor(usuario.setorAcesso, parsed.data),
       atualizadoPorId: req.user!.userId,
     },
     update: {
-      grants: parsed.data,
+      grants: snapshotGrantsForSetor(usuario.setorAcesso, parsed.data),
       atualizadoPorId: req.user!.userId,
     },
   });
-  res.json({ ok: true, grants: parsed.data });
+  res.json({ ok: true, grants: snapshotGrantsForSetor(usuario.setorAcesso, parsed.data) });
 });
 
 router.put('/me/senha', authenticate, async (req, res) => {
@@ -227,12 +230,32 @@ router.post('/usuarios', authenticate, authorize('usuarios', 'write'), async (re
     res.status(400).json({ error: parsed.error.flatten() });
     return;
   }
-  const { login, senha, setorAcesso, pessoaId } = parsed.data;
+  const { login, senha, setorAcesso, pessoaId, grants } = parsed.data;
+  if (!canManageTargetUser(req.user!.setorAcesso, setorAcesso)) {
+    res.status(403).json({ error: 'Sem permissão para criar usuário neste setor' });
+    return;
+  }
+
+  const grantsSnapshot = snapshotGrantsForSetor(setorAcesso, grants ?? null);
   const senhaHash = await bcrypt.hash(senha, 10);
-  const usuario = await prisma.usuario.create({
-    data: { login, senhaHash, setorAcesso, pessoaId },
-    include: { pessoa: true, policy: true },
+
+  const usuario = await prisma.$transaction(async (tx) => {
+    const created = await tx.usuario.create({
+      data: { login, senhaHash, setorAcesso, pessoaId },
+    });
+    await tx.usuarioPolicy.create({
+      data: {
+        usuarioId: created.id,
+        grants: grantsSnapshot,
+        atualizadoPorId: req.user!.userId,
+      },
+    });
+    return tx.usuario.findUniqueOrThrow({
+      where: { id: created.id },
+      include: { pessoa: true, policy: true },
+    });
   });
+
   res.status(201).json(serializeUsuario(usuario));
 });
 
