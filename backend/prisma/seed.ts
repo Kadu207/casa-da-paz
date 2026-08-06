@@ -1,7 +1,217 @@
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, type SetorAcesso, type TipoPerfil } from '@prisma/client';
+import { snapshotGrantsForSetor } from '../src/policies/rbac.js';
 
 const prisma = new PrismaClient();
+
+type SeedUserInput = {
+  pessoaId: number;
+  nomeCompleto: string;
+  telefone: string;
+  tipoPerfil: TipoPerfil;
+  login: string;
+  senha: string;
+  setorAcesso: SetorAcesso;
+};
+
+/** Upsert pessoa + usuário + policy (snapshot da matriz RBAC do setor). */
+async function ensureUsuarioWithPolicy(input: SeedUserInput) {
+  const pessoa = await prisma.pessoa.upsert({
+    where: { id: input.pessoaId },
+    update: {
+      nomeCompleto: input.nomeCompleto,
+      telefone: input.telefone,
+      tipoPerfil: input.tipoPerfil,
+      maiorDeIdade: true,
+    },
+    create: {
+      id: input.pessoaId,
+      nomeCompleto: input.nomeCompleto,
+      telefone: input.telefone,
+      tipoPerfil: input.tipoPerfil,
+      maiorDeIdade: true,
+    },
+  });
+
+  const senhaHash = await bcrypt.hash(input.senha, 10);
+  const byLogin = await prisma.usuario.findUnique({ where: { login: input.login } });
+  const byPessoa = await prisma.usuario.findUnique({ where: { pessoaId: pessoa.id } });
+
+  let usuario;
+  if (byLogin) {
+    usuario = await prisma.usuario.update({
+      where: { id: byLogin.id },
+      data: { senhaHash, setorAcesso: input.setorAcesso, pessoaId: pessoa.id },
+    });
+  } else if (byPessoa) {
+    usuario = await prisma.usuario.update({
+      where: { id: byPessoa.id },
+      data: { login: input.login, senhaHash, setorAcesso: input.setorAcesso },
+    });
+  } else {
+    usuario = await prisma.usuario.create({
+      data: {
+        login: input.login,
+        senhaHash,
+        setorAcesso: input.setorAcesso,
+        pessoaId: pessoa.id,
+      },
+    });
+  }
+
+  const grants = snapshotGrantsForSetor(input.setorAcesso);
+  await prisma.usuarioPolicy.upsert({
+    where: { usuarioId: usuario.id },
+    create: { usuarioId: usuario.id, grants },
+    update: { grants },
+  });
+
+  return usuario;
+}
+
+/** Renomeia login legado `marketing` → `marketing01` se necessário. */
+async function migrateMarketingLogin() {
+  const old = await prisma.usuario.findUnique({ where: { login: 'marketing' } });
+  const neu = await prisma.usuario.findUnique({ where: { login: 'marketing01' } });
+  if (old && !neu) {
+    await prisma.usuario.update({ where: { id: old.id }, data: { login: 'marketing01' } });
+  } else if (old && neu && old.id !== neu.id) {
+    await prisma.usuarioPolicy.deleteMany({ where: { usuarioId: old.id } });
+    await prisma.usuario.delete({ where: { id: old.id } });
+  }
+}
+
+async function seedAllUsers() {
+  await migrateMarketingLogin();
+
+  const users: SeedUserInput[] = [
+    {
+      pessoaId: 1,
+      nomeCompleto: 'Administrador Casa da Paz',
+      telefone: '31999990000',
+      tipoPerfil: 'DIRETORIA',
+      login: 'admin',
+      senha: 'admin123',
+      setorAcesso: 'DIRETORIA',
+    },
+    {
+      pessoaId: 10,
+      nomeCompleto: 'Supervisor Casa da Paz',
+      telefone: '31999990001',
+      tipoPerfil: 'DIRETORIA',
+      login: 'supervisor',
+      senha: 'supervisor123',
+      setorAcesso: 'SUPERVISOR',
+    },
+    {
+      pessoaId: 11,
+      nomeCompleto: 'Admin Integrações',
+      telefone: '31999990002',
+      tipoPerfil: 'FUNCIONARIO',
+      login: 'admin.integracoes',
+      senha: 'integra123',
+      setorAcesso: 'ADMIN',
+    },
+    {
+      pessoaId: 3,
+      nomeCompleto: 'João Medium Teste',
+      telefone: '31977776666',
+      tipoPerfil: 'MEDIUM',
+      login: 'medium',
+      senha: 'medium123',
+      setorAcesso: 'MEDIUM',
+    },
+    {
+      pessoaId: 30,
+      nomeCompleto: 'Mãe de Santo Casa da Paz',
+      telefone: '31999990030',
+      tipoPerfil: 'DIRETORIA',
+      login: 'maedesanto',
+      senha: 'maedesanto123',
+      setorAcesso: 'DIRETORIA',
+    },
+    {
+      pessoaId: 12,
+      nomeCompleto: 'Marketing 01',
+      telefone: '31999990012',
+      tipoPerfil: 'FUNCIONARIO',
+      login: 'marketing01',
+      senha: 'marketing123',
+      setorAcesso: 'MARKETING',
+    },
+    {
+      pessoaId: 13,
+      nomeCompleto: 'Marketing 02',
+      telefone: '31999990013',
+      tipoPerfil: 'FUNCIONARIO',
+      login: 'marketing02',
+      senha: 'marketing123',
+      setorAcesso: 'MARKETING',
+    },
+    {
+      pessoaId: 14,
+      nomeCompleto: 'Marketing 03',
+      telefone: '31999990014',
+      tipoPerfil: 'FUNCIONARIO',
+      login: 'marketing03',
+      senha: 'marketing123',
+      setorAcesso: 'MARKETING',
+    },
+    {
+      pessoaId: 15,
+      nomeCompleto: 'Marketing 04',
+      telefone: '31999990015',
+      tipoPerfil: 'FUNCIONARIO',
+      login: 'marketing04',
+      senha: 'marketing123',
+      setorAcesso: 'MARKETING',
+    },
+    {
+      pessoaId: 20,
+      nomeCompleto: 'Tesouraria 01',
+      telefone: '31999990020',
+      tipoPerfil: 'TESOURARIA',
+      login: 'tesouraria01',
+      senha: 'tesouraria123',
+      setorAcesso: 'FINANCEIRO',
+    },
+    {
+      pessoaId: 21,
+      nomeCompleto: 'Tesouraria 02',
+      telefone: '31999990021',
+      tipoPerfil: 'TESOURARIA',
+      login: 'tesouraria02',
+      senha: 'tesouraria123',
+      setorAcesso: 'FINANCEIRO',
+    },
+    {
+      pessoaId: 22,
+      nomeCompleto: 'Tesouraria 03',
+      telefone: '31999990022',
+      tipoPerfil: 'TESOURARIA',
+      login: 'tesouraria03',
+      senha: 'tesouraria123',
+      setorAcesso: 'FINANCEIRO',
+    },
+    {
+      pessoaId: 23,
+      nomeCompleto: 'Tesouraria 04',
+      telefone: '31999990023',
+      tipoPerfil: 'TESOURARIA',
+      login: 'tesouraria04',
+      senha: 'tesouraria123',
+      setorAcesso: 'FINANCEIRO',
+    },
+  ];
+
+  for (const u of users) {
+    await ensureUsuarioWithPolicy(u);
+  }
+
+  console.log('Seed users OK — policies por setor (DIRETORIA/FINANCEIRO/MARKETING/…)');
+  console.log('Logins: admin, supervisor, admin.integracoes, medium, maedesanto,');
+  console.log('        marketing01–04, tesouraria01–04');
+}
 
 /** Conteúdo público de exemplo (estudos + giras/oficinas). Seguro para prod: só upsert, não apaga financeiro. */
 async function seedPortalContent() {
@@ -162,135 +372,40 @@ A defumação não substitui higiene, organização nem o cuidado mútuo entre o
 }
 
 async function seedSupervisorOnly() {
-  const pessoaSupervisor = await prisma.pessoa.upsert({
-    where: { id: 10 },
-    update: {},
-    create: {
-      id: 10,
-      nomeCompleto: 'Supervisor Casa da Paz',
-      telefone: '31999990001',
-      tipoPerfil: 'DIRETORIA',
-      maiorDeIdade: true,
-    },
+  await ensureUsuarioWithPolicy({
+    pessoaId: 10,
+    nomeCompleto: 'Supervisor Casa da Paz',
+    telefone: '31999990001',
+    tipoPerfil: 'DIRETORIA',
+    login: 'supervisor',
+    senha: 'supervisor123',
+    setorAcesso: 'SUPERVISOR',
   });
-
-  await prisma.usuario.upsert({
-    where: { login: 'supervisor' },
-    update: { senhaHash: await bcrypt.hash('supervisor123', 10), setorAcesso: 'SUPERVISOR' },
-    create: {
-      login: 'supervisor',
-      senhaHash: await bcrypt.hash('supervisor123', 10),
-      setorAcesso: 'SUPERVISOR',
-      pessoaId: pessoaSupervisor.id,
-    },
+  await ensureUsuarioWithPolicy({
+    pessoaId: 11,
+    nomeCompleto: 'Admin Integrações',
+    telefone: '31999990002',
+    tipoPerfil: 'FUNCIONARIO',
+    login: 'admin.integracoes',
+    senha: 'integra123',
+    setorAcesso: 'ADMIN',
   });
-
-  const pessoaIntegracao = await prisma.pessoa.upsert({
-    where: { id: 11 },
-    update: {},
-    create: {
-      id: 11,
-      nomeCompleto: 'Admin Integrações',
-      telefone: '31999990002',
-      tipoPerfil: 'FUNCIONARIO',
-      maiorDeIdade: true,
-    },
-  });
-
-  await prisma.usuario.upsert({
-    where: { login: 'admin.integracoes' },
-    update: { senhaHash: await bcrypt.hash('integra123', 10), setorAcesso: 'ADMIN' },
-    create: {
-      login: 'admin.integracoes',
-      senhaHash: await bcrypt.hash('integra123', 10),
-      setorAcesso: 'ADMIN',
-      pessoaId: pessoaIntegracao.id,
-    },
-  });
-
-  console.log('Seed OK — supervisor / supervisor123 (SUPERVISOR)');
-  console.log('Seed OK — admin.integracoes / integra123 (ADMIN)');
-  console.log('Senha do login admin NÃO foi alterada.');
+  console.log('Seed OK — supervisor + admin.integracoes (senhas padrão do seed)');
+  console.log('Senha do login admin NÃO foi alterada neste modo.');
 }
 
 async function main() {
-  const pessoaAdmin = await prisma.pessoa.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      nomeCompleto: 'Administrador Casa da Paz',
-      telefone: '31999990000',
-      tipoPerfil: 'DIRETORIA',
-      maiorDeIdade: true,
-    },
-  });
-
-  await prisma.usuario.upsert({
-    where: { login: 'admin' },
-    update: { setorAcesso: 'DIRETORIA' },
-    create: {
-      login: 'admin',
-      senhaHash: await bcrypt.hash('admin123', 10),
-      setorAcesso: 'DIRETORIA',
-      pessoaId: pessoaAdmin.id,
-    },
-  });
-
-  await seedSupervisorOnly();
+  await seedAllUsers();
 
   const consulente = await prisma.pessoa.upsert({
     where: { id: 2 },
     update: {},
     create: {
+      id: 2,
       nomeCompleto: 'Maria Silva Consulente',
       telefone: '31988887777',
       tipoPerfil: 'CONSULENTE',
       maiorDeIdade: true,
-    },
-  });
-
-  const medium = await prisma.pessoa.upsert({
-    where: { id: 3 },
-    update: {},
-    create: {
-      nomeCompleto: 'João Medium Teste',
-      telefone: '31977776666',
-      tipoPerfil: 'MEDIUM',
-      maiorDeIdade: true,
-    },
-  });
-
-  await prisma.usuario.upsert({
-    where: { login: 'medium' },
-    update: {},
-    create: {
-      login: 'medium',
-      senhaHash: await bcrypt.hash('medium123', 10),
-      setorAcesso: 'MEDIUM',
-      pessoaId: medium.id,
-    },
-  });
-
-  const pessoaMarketing = await prisma.pessoa.upsert({
-    where: { id: 12 },
-    update: {},
-    create: {
-      id: 12,
-      nomeCompleto: 'Comunicacao Marketing',
-      telefone: '31999990003',
-      tipoPerfil: 'FUNCIONARIO',
-      maiorDeIdade: true,
-    },
-  });
-
-  await prisma.usuario.upsert({
-    where: { login: 'marketing' },
-    update: { setorAcesso: 'MARKETING' },
-    create: {
-      login: 'marketing',
-      senhaHash: await bcrypt.hash('marketing123', 10),
-      setorAcesso: 'MARKETING',
-      pessoaId: pessoaMarketing.id,
     },
   });
 
@@ -438,11 +553,7 @@ async function main() {
     },
   });
 
-  console.log('Seed OK — admin / admin123 (DIRETORIA)');
-  console.log('Seed OK — supervisor / supervisor123 (SUPERVISOR)');
-  console.log('Seed OK — admin.integracoes / integra123 (ADMIN)');
-  console.log('Seed OK — marketing / marketing123 (MARKETING)');
-  console.log('Seed OK — medium / medium123');
+  console.log('Seed completo OK — usuários com policies + dados de exemplo');
 }
 
 if (process.argv.includes('--supervisor-only')) {
@@ -451,6 +562,10 @@ if (process.argv.includes('--supervisor-only')) {
     .finally(() => prisma.$disconnect());
 } else if (process.argv.includes('--portal-content')) {
   seedPortalContent()
+    .catch(console.error)
+    .finally(() => prisma.$disconnect());
+} else if (process.argv.includes('--users-only')) {
+  seedAllUsers()
     .catch(console.error)
     .finally(() => prisma.$disconnect());
 } else {

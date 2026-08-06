@@ -13,7 +13,8 @@
 | Asaas (021) | **Dormant** — aguardando credenciais/chave do usuário (em breve) |
 | Validação local | ✅ migrate · smoke tesouraria · estudos/eventos/oficinas |
 | Deploy VPS | ✅ `deploy.sh` + migrate 18/18 + FE `index-B1tA4XDZ.js` |
-| Conteúdo portal | Seed `--portal-content` (estudos + giras/oficinas) — rodar em prod após pull |
+| Conteúdo portal | ✅ prod: 3 estudos + giras/oficinas (`--portal-content`, 2026-08-06) |
+| Usuários seed | admin, supervisor, admin.integracoes, medium, maedesanto (DIRETORIA), marketing01–04, tesouraria01–04 (FINANCEIRO) + UsuarioPolicy |
 
 ## Specs
 
