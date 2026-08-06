@@ -13,7 +13,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "db:seed-supervisor": "tsx prisma/seed.ts --supervisor-only"
+    "db:seed-supervisor": "tsx prisma/seed.ts --supervisor-only",
+    "db:seed-portal": "tsx prisma/seed.ts --portal-content"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",

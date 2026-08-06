@@ -3,6 +3,153 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+/** Conteúdo público de exemplo (estudos + giras/oficinas). Seguro para prod: só upsert, não apaga financeiro. */
+async function seedPortalContent() {
+  const materiais = [
+    {
+      slug: 'ervas-sagradas-intro',
+      categoria: 'ERVAS' as const,
+      titulo: 'Ervas sagradas — introdução respeitosa',
+      resumo:
+        'Noções iniciais sobre o uso de ervas na Umbanda: respeito à tradição, intenção e orientação dos mais velhos.',
+      corpo: `As ervas acompanham o trabalho espiritual da Casa com humildade e cuidado.
+
+Este material é introdutório e não substitui a orientação dos dirigentes, médiuns mais experientes ou a tradição viva da casa.
+
+## Princípios
+- Intenção alinhada ao bem e à caridade
+- Conhecer a planta antes de usar (nome, preparo, contraindicações)
+- Preferir orientação presencial nas giras e oficinas da Casa da Paz
+
+## Na prática
+Arruda, alecrim, guiné e manjericão aparecem com frequência em limpezas e proteção — sempre com moderação e contexto litúrgico.
+
+Traga dúvidas para a gira ou para as oficinas de ervas. O estudo se aprofunda no diálogo com os mais velhos.`,
+      imagemUrl: '/ervas.jpg',
+      ordem: 10,
+      publicado: true,
+    },
+    {
+      slug: 'banhos-de-descarrego-cuidados',
+      categoria: 'BANHOS' as const,
+      titulo: 'Banhos de descarrego — cuidados básicos',
+      resumo:
+        'Orientação geral sobre banhos de descarrego: preparo, horário, intenção e o que evitar.',
+      corpo: `Banhos de descarrego fazem parte do cuidado espiritual e do corpo. Use com respeito e, sempre que possível, sob orientação da casa.
+
+## Antes do banho
+- Defina a intenção com clareza (limpeza, tranquilidade, proteção)
+- Prepare as ervas com água limpa; não improvise com substâncias agressivas
+- Prefira o final do dia, quando indicado pelos mais velhos
+
+## Durante e depois
+- Banhe-se com calma, da cabeça aos pés ou conforme orientação recebida
+- Evite excessos (água muito quente, misturas desconhecidas)
+- Após o banho, vista roupa limpa e mantenha o pensamento sereno
+
+Em caso de dúvida sobre saúde (pele, gestação, alergias), consulte um profissional de saúde além da orientação espiritual.`,
+      imagemUrl: '/nature.jpg',
+      ordem: 20,
+      publicado: true,
+    },
+    {
+      slug: 'defumacao-casa-e-terreiro',
+      categoria: 'DEFUMACAO' as const,
+      titulo: 'Defumação — casa e terreiro',
+      resumo:
+        'Como a defumação limpa ambientes e prepara o espaço antes das giras, com segurança e respeito.',
+      corpo: `A defumação é um ato de limpeza e abertura. Na Casa da Paz, ela prepara o ambiente para o trabalho espiritual.
+
+## Elementos comuns
+- Ervas secas adequadas (conforme tradição da casa)
+- Carvão ou brasa em recipiente seguro
+- Ventilação: nunca deixe fumaça acumulada sem circulação de ar
+
+## Boas práticas
+- Peça bênção e mantenha foco na caridade
+- Afaste crianças e animais do contato direto com a brasa
+- Apague completamente o material ao terminar
+
+A defumação não substitui higiene, organização nem o cuidado mútuo entre os irmãos da corrente.`,
+      imagemUrl: '/velas.jpg',
+      ordem: 30,
+      publicado: true,
+    },
+  ];
+
+  for (const m of materiais) {
+    await prisma.materialEstudo.upsert({
+      where: { slug: m.slug },
+      update: {
+        categoria: m.categoria,
+        titulo: m.titulo,
+        resumo: m.resumo,
+        corpo: m.corpo,
+        imagemUrl: m.imagemUrl,
+        ordem: m.ordem,
+        publicado: m.publicado,
+      },
+      create: m,
+    });
+  }
+
+  const hoje = new Date();
+  const emDuasSemanas = new Date(hoje);
+  emDuasSemanas.setDate(emDuasSemanas.getDate() + 14);
+  const emUmMes = new Date(hoje);
+  emUmMes.setMonth(emUmMes.getMonth() + 1);
+
+  const eventos = [
+    {
+      nomeEvento: 'Gira de Caboclos',
+      dataEvento: hoje,
+      tipo: 'GIRA' as const,
+      status: 'ABERTO' as const,
+      capacidadeMax: 50,
+    },
+    {
+      nomeEvento: 'Gira de Pretos-Velhos',
+      dataEvento: emDuasSemanas,
+      tipo: 'GIRA' as const,
+      status: 'ABERTO' as const,
+      capacidadeMax: 50,
+    },
+    {
+      nomeEvento: 'Oficina de Ervas Sagradas',
+      dataEvento: emUmMes,
+      tipo: 'OFICINA' as const,
+      status: 'ABERTO' as const,
+      capacidadeMax: 15,
+    },
+    {
+      nomeEvento: 'Oficina de Banhos de Descarrego',
+      dataEvento: emUmMes,
+      tipo: 'OFICINA' as const,
+      status: 'ABERTO' as const,
+      capacidadeMax: 12,
+    },
+  ];
+
+  for (const e of eventos) {
+    const existing = await prisma.evento.findFirst({ where: { nomeEvento: e.nomeEvento } });
+    if (existing) {
+      await prisma.evento.update({
+        where: { id: existing.id },
+        data: {
+          dataEvento: e.dataEvento,
+          tipo: e.tipo,
+          status: e.status,
+          capacidadeMax: e.capacidadeMax,
+        },
+      });
+    } else {
+      await prisma.evento.create({ data: e });
+    }
+  }
+
+  console.log('Seed portal — 3 materiais de estudo + giras/oficinas de exemplo');
+}
+
 async function seedSupervisorOnly() {
   const pessoaSupervisor = await prisma.pessoa.upsert({
     where: { id: 10 },
@@ -200,17 +347,28 @@ async function main() {
       {
         nomeEvento: 'Gira de Caboclos',
         dataEvento: hoje,
+        tipo: 'GIRA',
         status: 'ABERTO',
         capacidadeMax: 50,
       },
       {
-        nomeEvento: 'Oficina de Ervas',
+        nomeEvento: 'Oficina de Ervas Sagradas',
         dataEvento: mesFuturo,
+        tipo: 'OFICINA',
         status: 'ABERTO',
         capacidadeMax: 15,
       },
+      {
+        nomeEvento: 'Oficina de Banhos de Descarrego',
+        dataEvento: mesFuturo,
+        tipo: 'OFICINA',
+        status: 'ABERTO',
+        capacidadeMax: 12,
+      },
     ],
   });
+
+  await seedPortalContent();
 
   await prisma.estoqueMovimentacao.deleteMany({});
   await prisma.livrariaConteudo.deleteMany({});
@@ -278,6 +436,10 @@ async function main() {
 
 if (process.argv.includes('--supervisor-only')) {
   seedSupervisorOnly()
+    .catch(console.error)
+    .finally(() => prisma.$disconnect());
+} else if (process.argv.includes('--portal-content')) {
+  seedPortalContent()
     .catch(console.error)
     .finally(() => prisma.$disconnect());
 } else {

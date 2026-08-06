@@ -6,13 +6,14 @@
 
 | Item | Status |
 |------|--------|
-| Fase | Materiais de estudo públicos (ervas/banhos) + Marketing |
+| Fase | Portal: estudos + oficinas + home; tesouraria 022–026 |
 | Versão | 0.1.0-alpha |
-| Commit docs/código | `a040174`+ em `main` (GitHub/GitLab) |
+| Commit | `main` (GitHub + GitLab) — pós-deploy VPS 2026-08-06 |
 | Produção | https://casadapaz.inovatitech.com.br |
-| Asaas (021) | **Dormant** — tesouraria opera sem PSP |
-| Validação local | ✅ migrate + smoke tesouraria + contribuintes |
-| Deploy VPS desta onda | ⏳ pendente (SSH do agente sem chave — rodar no terminal do usuário) |
+| Asaas (021) | **Dormant** — aguardando credenciais/chave do usuário (em breve) |
+| Validação local | ✅ migrate · smoke tesouraria · estudos/eventos/oficinas |
+| Deploy VPS | ✅ `deploy.sh` + migrate 18/18 + FE `index-B1tA4XDZ.js` |
+| Conteúdo portal | Seed `--portal-content` (estudos + giras/oficinas) — rodar em prod após pull |
 
 ## Specs
 
@@ -22,19 +23,20 @@
 | 022–025 tesouraria | ✅ |
 | Contribuintes / 026 | ✅ |
 | 027 materiais de estudo | ✅ |
-| 021 Asaas | Dormant até `ASAAS_API_KEY` |
+| Oficinas (`TipoEvento`) | ✅ |
+| 021 Asaas | Dormant até `ASAAS_API_KEY` (credenciais previstas em breve) |
 
 ## Documentação
 
-Índice atualizado em `docs/00-index.md` (stack canônica Express/Vite — refs Lovable só em `docs/reference/lovable/`).
+Índice: `docs/00-index.md`. Workspace Cursor: `Casa da Paz.code-workspace`.
 
 ## Harness
 
-- `agents.md` — construção + 5 agentes ops  
+- `agents.md` — construção + agentes ops  
 - `.specify/memory/memory.md`  
 
 ## Próximos passos
 
-1. Deploy VPS no terminal local do usuário (`git pull` + build FE + `deploy.sh`)  
-2. Smoke produção: health + Financeiro → Patrocínios + Cadastros → Médiuns  
-3. Asaas quando houver chave  
+1. Na VPS: `git pull` + `compose-prod.sh exec backend npx tsx prisma/seed.ts --portal-content` (não rodar seed completo em prod)  
+2. Smoke: `/public/estudos` · `/public/eventos` (Giras/Oficinas)  
+3. Ativar Asaas quando chegar `ASAAS_API_KEY` + confirmação explícita  
