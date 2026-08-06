@@ -149,7 +149,7 @@ export default function DashboardPage() {
         <div>
           <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.dashboard.title')}</h2>
           <p className="text-sm text-white/60 mt-1">
-            {user?.setorAcesso === 'FINANCEIRO'
+            {user?.setorAcesso === 'FINANCEIRO' || user?.setorAcesso === 'TESOURARIA'
               ? t('erp.dashboard.subtitleTreasury')
               : t('erp.dashboard.subtitleBoard')}
           </p>
@@ -177,7 +177,9 @@ export default function DashboardPage() {
             className="w-24 px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
             aria-label={t('erp.dashboard.year')}
           />
-          {(user?.setorAcesso === 'FINANCEIRO' || user?.setorAcesso === 'DIRETORIA') && (
+          {(user?.setorAcesso === 'FINANCEIRO' ||
+            user?.setorAcesso === 'TESOURARIA' ||
+            user?.setorAcesso === 'DIRETORIA') && (
             <Link
               to={`/app/financeiro/fluxo?mes=${mes}&ano=${ano}`}
               className="px-3 py-2 rounded bg-white/10 text-sm hover:bg-white/20"

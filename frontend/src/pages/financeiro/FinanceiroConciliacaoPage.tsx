@@ -16,7 +16,7 @@ interface MesHistorico {
 export default function FinanceiroConciliacaoPage() {
   const { t, locale, dateLocale } = useI18n();
   const { user } = useAuth();
-  const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'FINANCEIRO';
+  const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'FINANCEIRO' || user?.setorAcesso === 'TESOURARIA';
   const isDiretoria = user?.setorAcesso === 'DIRETORIA';
 
   const init = mesAnoAtual();

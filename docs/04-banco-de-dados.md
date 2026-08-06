@@ -28,7 +28,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 - `StatusOfxMovimento`: PENDENTE / CONCILIADO / IGNORADO  
 - `TipoContribuinte`: PATROCINIO / PADRINHO  
 - `OrigemTransacao`: inclui `RECORRENCIA`, `CONTA_PAGAR`, `OFX`, …  
-- `SetorAcesso`: SUPERVISOR, ADMIN, DIRETORIA, FINANCEIRO, MARKETING, RECEPCAO, LIVRARIA, MEDIUM, SUPORTE  
+- `SetorAcesso`: SUPERVISOR, ADMIN, DIRETORIA, FINANCEIRO, **TESOURARIA**, MARKETING, RECEPCAO, LIVRARIA, MEDIUM, SUPORTE  
 
 ## 4.3. Regras de dados
 

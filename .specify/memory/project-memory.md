@@ -14,7 +14,7 @@
 | Validação local | ✅ migrate · smoke tesouraria · estudos/eventos/oficinas |
 | Deploy VPS | ✅ `deploy.sh` + migrate 18/18 + FE `index-B1tA4XDZ.js` |
 | Conteúdo portal | ✅ prod: 3 estudos + giras/oficinas (`--portal-content`, 2026-08-06) |
-| Usuários seed | admin, supervisor, admin.integracoes, medium, maedesanto (DIRETORIA), marketing01–04, tesouraria01–04 (FINANCEIRO) + UsuarioPolicy |
+| Usuários seed | admin, supervisor, admin.integracoes, medium, maedesanto (DIRETORIA), marketing01–04, tesouraria01–04 (**setor TESOURARIA**) + UsuarioPolicy |
 
 ## Specs
 

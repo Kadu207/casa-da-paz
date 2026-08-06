@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { canAccess } from '../policies/rbac.js';
 
 describe('RBAC alertas', () => {
-  it('DIRETORIA e FINANCEIRO têm write', () => {
+  it('DIRETORIA, FINANCEIRO e TESOURARIA têm write', () => {
     expect(canAccess('DIRETORIA', 'alertas', 'read')).toBe(true);
     expect(canAccess('DIRETORIA', 'alertas', 'write')).toBe(true);
     expect(canAccess('FINANCEIRO', 'alertas', 'write')).toBe(true);
+    expect(canAccess('TESOURARIA', 'alertas', 'write')).toBe(true);
   });
 
   it('RECEPCAO e SUPORTE têm read-only', () => {

@@ -531,6 +531,7 @@ export const erpPtBR = {
   'erp.alertas.pendingBadge': '{count} alerta(s) pendente(s)',
   'erp.enum.setor.DIRETORIA': 'Diretoria',
   'erp.enum.setor.FINANCEIRO': 'Financeiro',
+  'erp.enum.setor.TESOURARIA': 'Tesouraria',
   'erp.enum.setor.RECEPCAO': 'Recepção',
   'erp.enum.setor.LIVRARIA': 'Livraria',
   'erp.enum.setor.MEDIUM': 'Médium',

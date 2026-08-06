@@ -29,7 +29,7 @@ const emptyForm = () => ({
 export default function FinanceiroLancamentosPage() {
   const { t, locale, dateLocale } = useI18n();
   const { user } = useAuth();
-  const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'FINANCEIRO';
+  const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'FINANCEIRO' || user?.setorAcesso === 'TESOURARIA';
 
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [meta, setMeta] = useState({ page: 1, limit: 50, total: 0, totalPages: 1 });

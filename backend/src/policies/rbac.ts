@@ -36,6 +36,7 @@ export type PolicyGrants = Partial<Record<Resource, PolicyGrant>>;
 export const OPERATIONAL_ROLES: SetorAcesso[] = [
   'DIRETORIA',
   'FINANCEIRO',
+  'TESOURARIA',
   'MARKETING',
   'RECEPCAO',
   'LIVRARIA',
@@ -116,6 +117,21 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     ...treasuryWrite,
   },
   FINANCEIRO: {
+    pessoas: 'read',
+    financeiro: 'write',
+    import: 'write',
+    dashboard: 'read',
+    alertas: 'write',
+    eventos: 'read',
+    livraria: 'read',
+    ecommerce: 'read',
+    transparencia: 'read',
+    contas: 'write',
+    cobrancas: 'write',
+    ...treasuryWrite,
+  },
+  /** Setor operacional Tesouraria — mesma matriz financeira (usuários tesouraria01–04). */
+  TESOURARIA: {
     pessoas: 'read',
     financeiro: 'write',
     import: 'write',

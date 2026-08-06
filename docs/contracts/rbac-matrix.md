@@ -9,29 +9,31 @@
 
 ## Papéis operacionais (policies configuráveis pelo SUPERVISOR)
 
-| Recurso / Ação | DIRETORIA | FINANCEIRO | MARKETING | RECEPCAO | LIVRARIA | MEDIUM | SUPORTE |
-|----------------|-----------|------------|-----------|----------|----------|--------|---------|
-| Usuários CRUD | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Pessoas CRUD | ✅ | 👁️ | ❌ | ✅ | 👁️ | ❌ | 👁️ |
-| Financeiro | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
-| Cobranças Asaas | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
-| Contas | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Transparência | 👁️ | 👁️ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Contas a pagar | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Recorrência | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Patrocínios / Padrinhos | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| DRE / orçamento | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Conciliação OFX | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Marketing | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Import Excel | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Eventos / check-in | ✅ | 👁️ | ✅ (publicar) | ✅ | ❌ | ❌ | ❌ |
-| PDV/Livraria/Estoque | ✅ | 👁️ | ✅ (publicar) | ❌ | ✅ | ❌ | ❌ |
-| Ecommerce | ✅ | 👁️ | ✅ (publicar) | ❌ | ✅ | ❌ | ❌ |
-| Dashboard | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
-| Agendamentos | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| Auditoria | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | 👁️ |
-| Alertas | ✅ | ✅ | ❌ | 👁️ | ❌ | ❌ | 👁️ |
-| Logs/Manutenção | 👁️ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Recurso / Ação | DIRETORIA | FINANCEIRO | TESOURARIA | MARKETING | RECEPCAO | LIVRARIA | MEDIUM | SUPORTE |
+|----------------|-----------|------------|------------|-----------|----------|----------|--------|---------|
+| Usuários CRUD | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Pessoas CRUD | ✅ | 👁️ | 👁️ | ❌ | ✅ | 👁️ | ❌ | 👁️ |
+| Financeiro | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
+| Cobranças Asaas | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
+| Contas | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Transparência | 👁️ | 👁️ | 👁️ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Contas a pagar | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Recorrência | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Patrocínios / Padrinhos | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| DRE / orçamento | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Conciliação OFX | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Marketing | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Import Excel | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Eventos / check-in | ✅ | 👁️ | 👁️ | ✅ (publicar) | ✅ | ❌ | ❌ | ❌ |
+| PDV/Livraria/Estoque | ✅ | 👁️ | 👁️ | ✅ (publicar) | ❌ | ✅ | ❌ | ❌ |
+| Ecommerce | ✅ | 👁️ | 👁️ | ✅ (publicar) | ❌ | ✅ | ❌ | ❌ |
+| Dashboard | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
+| Agendamentos | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Auditoria | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | 👁️ |
+| Alertas | ✅ | ✅ | ✅ | ❌ | 👁️ | ❌ | ❌ | 👁️ |
+| Logs/Manutenção | 👁️ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+
+**TESOURARIA** = setor operacional dos logins `tesouraria01`–`04` (mesma matriz financeira que FINANCEIRO; FINANCEIRO permanece por compatibilidade).
 
 **SUPERVISOR** gerencia usuários operacionais e define `usuario_policies.grants` **no ato do cadastro** (snapshot do setor + overrides). Edição posterior via UI Políticas.
 

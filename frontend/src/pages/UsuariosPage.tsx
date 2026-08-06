@@ -17,7 +17,7 @@ interface Pessoa {
   nomeCompleto: string;
 }
 
-const SETORES = ['DIRETORIA', 'FINANCEIRO', 'MARKETING', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'] as const;
+const SETORES = ['DIRETORIA', 'FINANCEIRO', 'TESOURARIA', 'MARKETING', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'] as const;
 const GRANT_OPTIONS = ['read', 'write', 'own', 'none'] as const;
 
 type GrantOpt = (typeof GRANT_OPTIONS)[number];

@@ -533,6 +533,7 @@ export const erpEn: Record<ErpTranslationKey, string> = {
   'erp.alertas.pendingBadge': '{count} pending alert(s)',
   'erp.enum.setor.DIRETORIA': 'Board',
   'erp.enum.setor.FINANCEIRO': 'Finance',
+  'erp.enum.setor.TESOURARIA': 'Treasury',
   'erp.enum.setor.RECEPCAO': 'Reception',
   'erp.enum.setor.LIVRARIA': 'Bookstore',
   'erp.enum.setor.MEDIUM': 'Medium',

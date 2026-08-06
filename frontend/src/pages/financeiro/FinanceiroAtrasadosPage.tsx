@@ -10,7 +10,7 @@ import type { Transacao } from '../../types/financeiro';
 export default function FinanceiroAtrasadosPage() {
   const { t, locale, dateLocale } = useI18n();
   const { user } = useAuth();
-  const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'FINANCEIRO';
+  const canWrite = user?.setorAcesso === 'DIRETORIA' || user?.setorAcesso === 'FINANCEIRO' || user?.setorAcesso === 'TESOURARIA';
 
   const [lista, setLista] = useState<Transacao[]>([]);
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set());

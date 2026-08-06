@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "SetorAcesso" ADD VALUE IF NOT EXISTS 'TESOURARIA';

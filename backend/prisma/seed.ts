@@ -173,7 +173,7 @@ async function seedAllUsers() {
       tipoPerfil: 'TESOURARIA',
       login: 'tesouraria01',
       senha: 'tesouraria123',
-      setorAcesso: 'FINANCEIRO',
+      setorAcesso: 'TESOURARIA',
     },
     {
       pessoaId: 21,
@@ -182,7 +182,7 @@ async function seedAllUsers() {
       tipoPerfil: 'TESOURARIA',
       login: 'tesouraria02',
       senha: 'tesouraria123',
-      setorAcesso: 'FINANCEIRO',
+      setorAcesso: 'TESOURARIA',
     },
     {
       pessoaId: 22,
@@ -191,7 +191,7 @@ async function seedAllUsers() {
       tipoPerfil: 'TESOURARIA',
       login: 'tesouraria03',
       senha: 'tesouraria123',
-      setorAcesso: 'FINANCEIRO',
+      setorAcesso: 'TESOURARIA',
     },
     {
       pessoaId: 23,
@@ -200,7 +200,7 @@ async function seedAllUsers() {
       tipoPerfil: 'TESOURARIA',
       login: 'tesouraria04',
       senha: 'tesouraria123',
-      setorAcesso: 'FINANCEIRO',
+      setorAcesso: 'TESOURARIA',
     },
   ];
 
@@ -208,7 +208,7 @@ async function seedAllUsers() {
     await ensureUsuarioWithPolicy(u);
   }
 
-  console.log('Seed users OK — policies por setor (DIRETORIA/FINANCEIRO/MARKETING/…)');
+  console.log('Seed users OK — policies por setor (DIRETORIA/TESOURARIA/MARKETING/…)');
   console.log('Logins: admin, supervisor, admin.integracoes, medium, maedesanto,');
   console.log('        marketing01–04, tesouraria01–04');
 }
