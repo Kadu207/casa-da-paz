@@ -1,5 +1,7 @@
 # Proxy no nginx do HOST — servidor compartilhado (inovati-server)
 
+**SSH:** `ssh -p 65025 gestaoti@128.140.77.31` (porta **65025**, não 22).
+
 Quando **80/443 já servem outro site** (ex.: Excellence Dental), o Casa da Paz roda em **Docker na porta 9080** (localhost) e o **nginx do host** encaminha o subdomínio.
 
 ## 1. `.env.production` (PC → VPS)
