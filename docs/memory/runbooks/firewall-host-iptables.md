@@ -64,13 +64,15 @@ Helpers no repo: `harden-origin-port.sh`, `harden-host-port.sh` (TCP/UDP), `hard
 | **2377/tcp** | **OK-filtrado** | `dockerd` Swarm (manager, 1 nó) | `harden-swarm-ports.sh` |
 | **7946/tcp+udp** | **OK-filtrado** | `dockerd` Swarm gossip | idem |
 | **4789/udp** | **OK-filtrado** | Swarm VXLAN overlay | idem |
-| **20243/tcp** | **OK-filtrado** | `cloudflared` (stack Swarm, sem `--metrics` localhost) | harden; tunnels systemd/`60123` já locais |
+| **20243/tcp** | **OK-local** | `excellence-cloudflared-n8n` (host network) | `--metrics 127.0.0.1:20243` (antes `*:20243`) |
 
 ### Swarm / cloudflared — notas
 
 - Cluster Swarm: **1 manager / 1 node** (`inovati-server`). Portas de plano de controle **não** precisam ser públicas até existir worker remoto (aí liberar só rede privada Hetzner).
-- `:20243`: listener do container `cloudflared_cloudflared` (token via args). Outros tunnels: systemd `cloudflared.service` / `cloudflared-inovatiprojects.service` e serviço Swarm com `--metrics 127.0.0.1:60123`.
-- Reaplicar: `bash ~/casadapaz/infra/scripts/harden-swarm-ports.sh`
+- `cloudflared_cloudflared` (Swarm): `--metrics 127.0.0.1:60123` (+ force recreate 2026-08-08).
+- `excellence-cloudflared-n8n` (Compose host network): `--metrics 127.0.0.1:20243` em `/opt/excellence/n8n/docker-compose.n8n.yml`.
+- Systemd: `cloudflared.service` → `127.0.0.1:20241`; `cloudflared-inovatiprojects` → `127.0.0.1:20242`.
+- Harden iptables em `2377/7946/4789/20243` permanece como defesa em profundidade (`harden-swarm-ports.sh`).
 
 ### Já localhost (amostra)
 

@@ -12,7 +12,7 @@
 | Produção | https://casadapaz.inovatitech.com.br |
 | Asaas (021) | **Dormant** |
 | Deploy VPS | ✅ 030 headers/CSP + FE `index-BdCnS8Id.js` |
-| Segurança | ✅ host lockdown P0–P2 + Swarm `2377/7946/4789` + cloudflared `:20243` filtrados |
+| Segurança | ✅ host lockdown + Swarm filtrado; cloudflared metrics só em 127.0.0.1 (60123/20241–20243) |
 | CodeRabbit | ✅ `.coderabbit.yaml` em `main` + check SUCCESS no [PR #2](https://github.com/Kadu207/casa-da-paz/pull/2) |
 | CRUD 029 | ✅ prod + smoke |
 
@@ -37,4 +37,3 @@
 
 1. Fechar PR smoke CodeRabbit #2 (opcional)  
 2. Asaas quando houver chave  
-3. (Opcional) `docker service update` no `cloudflared_cloudflared` com `--metrics 127.0.0.1:…` para não escutar `*:20243` — hoje já filtrado
