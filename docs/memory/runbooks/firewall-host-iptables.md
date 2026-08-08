@@ -2,7 +2,7 @@
 
 **Host:** `inovati-server` (`128.140.77.31`)  
 **Política:** preferir **iptables** (+ `iptables-persistent`), não UFW, neste servidor com Docker.  
-**Último inventário:** 2026-08-08
+**Último inventário:** 2026-08-08 (pós-lockdown P0–P2)
 
 ## Por que iptables e não UFW
 
@@ -15,88 +15,80 @@
 1. [ ] Compose: bind **`127.0.0.1:PORTA`** sempre que o acesso for só via nginx/Cloudflare no host.
 2. [ ] Só expor `0.0.0.0` se outro container **no host** precisar de `172.17.0.1:PORTA`.
 3. [ ] Público na internet: apenas **80/443** (nginx host + Cloudflare). App origin atrás do proxy.
-4. [ ] Se origin em `0.0.0.0:PORTA`, criar script `harden-origin-<porta>.sh` espelhando Casa da Paz (`raw PREROUTING` + allowlist privadas) **antes** do go-live.
-5. [ ] Após regras: `sudo netfilter-persistent save` (ou gravar `iptables-save` em `/etc/iptables/rules.v4`).
-6. [ ] Smoke de fora: `curl -m 3 http://IP:PORTA/` deve **falhar**; `https://dominio/...` deve **ok**.
+4. [ ] Se origin em `0.0.0.0:PORTA`, usar `harden-origin-port.sh` (`HOST_HTTP_PORT=…`) **antes** do go-live.
+5. [ ] Após regras: gravar `iptables-save` em `/etc/iptables/rules.v4` (via Alpine privilegiado se o host não tiver `iptables` no PATH).
+6. [ ] Smoke de fora: TCP/`curl` em `IP:PORTA` deve **falhar/timeout**; `https://dominio/...` deve **ok**.
 7. [ ] Atualizar a tabela de inventário abaixo (data + dono do app).
 8. [ ] **Não** reinstalar UFW em cima deste host sem plano de migração.
 
-### Template mínimo de regra (porta ORIGIN)
+### `127.0.0.1` vs harden
 
-Ver implementação de referência: [`infra/scripts/harden-origin-9080.sh`](../../infra/scripts/harden-origin-9080.sh)
+| Situação | Escolha |
+|----------|---------|
+| Só host / proxy no host / ferramentas locais | `127.0.0.1:PORTA` |
+| Outro container precisa de `172.17.0.1:PORTA` (tunnel, nginx Docker) | `0.0.0.0` + `harden-origin-port.sh` |
 
-- Allow: `127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`
-- Drop: resto em `raw/PREROUTING` com `--dport PORTA` (antes do DNAT Docker)
-- Opcional: `DOCKER-USER` + `--ctorigdstport PORTA`
+### Template (porta ORIGIN)
 
-Aplicar sem sudo interativo (user no grupo `docker`):
+Referência: [`infra/scripts/harden-origin-port.sh`](../../infra/scripts/harden-origin-port.sh)  
+Casa da Paz: [`infra/scripts/harden-origin-9080.sh`](../../infra/scripts/harden-origin-9080.sh)
+
+Allow: `127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`  
+Drop: resto em `raw/PREROUTING` (`--dport`) + `DOCKER-USER`/`ctorigdstport`
 
 ```bash
 docker run --rm --network host --privileged \
-  -v "$PWD/scripts/harden-origin-XXXX.sh:/harden.sh:ro" alpine:3.20 \
-  sh -c 'apk add --no-cache iptables && sh /harden.sh'
-sudo netfilter-persistent save
+  -v "$HOME/casadapaz/infra/scripts/harden-origin-port.sh:/harden.sh:ro" alpine:3.20 \
+  sh -c 'apk add --no-cache iptables && HOST_HTTP_PORT=XXXX sh /harden.sh'
+
+docker run --rm --network host --privileged -v /etc/iptables:/etc/iptables alpine:3.20 \
+  sh -c 'apk add --no-cache iptables && iptables-save > /etc/iptables/rules.v4'
 ```
 
-## Inventário — portas em `0.0.0.0` / `*` (2026-08-08)
+Helpers no repo (execução sob demanda na VPS): `apply-vps-port-lockdown.sh`, `bind-compose-localhost.py`.
 
-Legenda risco: **Alto** = serviço app/DB potencialmente sensível na internet | **Médio** = painel/API | **Baixo** = esperado (SSH/web) | **OK-filtrado** = escuta mas filtro iptables
+## Inventário — portas (2026-08-08 pós-lockdown)
 
-| Porta | Risco | Provável dono (Docker) | Nota |
-|------:|-------|------------------------|------|
-| 22 | Baixo | SSH host | Necessário; restringir por chave (já em uso) |
-| 80 | Baixo | nginx host / Traefik | Entrada HTTP |
-| 443 | Baixo | nginx host | Entrada HTTPS |
-| **9080** | **OK-filtrado** | `infra-frontend-1` Casa da Paz | De fora: **timeout**; local/proxy OK |
-| 3000 | Médio | `agenda-app` | Web agenda em `0.0.0.0` — preferir 127.0.0.1 + proxy |
-| 5440 | **Alto** | `inova-gastro-360-postgres` | **Postgres publicado** — prioridade fechar |
-| 8001 | Médio | `inova-platform-core-auth-service` | API platform |
-| 8002 | Médio | `inova-platform-core-tenant-service` | API platform |
-| 8004 | Médio | `inova-platform-core-audit-service` | API platform |
-| 8007 | Médio | `inova-platform-core-billing-service` | API platform |
-| 8195 | Médio | `gerenciador-licencas-web` | Web licenças |
-| 9088 | Médio | `inova-gastro-360-nginx` | Origin gastro |
-| 9180 | Médio | `dental-lab-system-lab-web` | Lab web |
-| **9500** | Médio | `inova-agenda-ai-web` | Agenda AI web |
-| **9501** | Médio | `inova-agenda-ai-tunnel-edge` | Tunnel edge Agenda AI |
-| 2377 / 7946 | Médio | Docker Swarm | Plano de controle Swarm — avaliar restrição |
-| 20243 | Médio | (host/swarm) | Identificar dono |
+| Porta | Estado | Provável dono | Ação |
+|------:|--------|---------------|------|
+| 22 | Baixo | SSH host | — |
+| 80 / 443 | Baixo | nginx host | — |
+| **5440** | **OK-local** | `inova-gastro-360-postgres` | P0: `127.0.0.1:5440:5432` |
+| **3000** | **OK-local** | `agenda-app` | P1: `127.0.0.1:3000` (+ `3100`) |
+| **8195** | **OK-local** | `gerenciador-licencas-web` | P2: bind `127.0.0.1` + harden |
+| **9080** | **OK-filtrado** | Casa da Paz frontend | harden-origin-9080 |
+| **9088** | **OK-filtrado** | `inova-gastro-360-nginx` | harden (0.0.0.0 p/ tunnel Docker) |
+| **9180** | **OK-filtrado** | `dental-lab-system-lab-web` | harden (Excellence via docker host) |
+| **9500 / 9501** | **OK-filtrado** | Agenda AI web / tunnel-edge | harden |
+| **8001 / 8002 / 8004 / 8006 / 8007** | **OK-filtrado** | platform-core APIs | harden |
+| 2377 / 7946 | Médio | Docker Swarm | pendente |
+| 20243 | Médio | (host/swarm) | pendente — identificar dono |
 
-### Bind só localhost (amostra — OK)
+### Já localhost (amostra)
 
-Muitos serviços já corretos: Postgres/Redis/N8N/CRM em `127.0.0.1` (`5432–5436`, `5678`, `6379`, `9400–9416`, `9300–9304`, `9502`, Chatwoot `3001`, Excellence `9081`, etc.).
+`5432–5436`, `5678`, `6379`, `9400–9416`, `9300–9304`, `9502`, Chatwoot `3001`, Excellence `9081`, gastro Postgres `5440`, agenda `3000`/`3100`, licenças `8195`.
 
-## Probe externo HTTP (2026-08-08, de fora do host)
+## Probe externo (2026-08-08, de fora — pós-lockdown)
 
-| Porta | HTTP | Interpretação |
-|------:|------|----------------|
-| 9080 | fail/timeout | Filtro Casa da Paz OK |
-| 3000, 8001–8007, 8195, 9088, 9180, 9500, 9501 | 200 | **Expostos** na internet |
-| 80 | 301 | Redirect esperado |
-| 443 | 400 | TLS/handshake via HTTP probe — porta aberta |
-| 5440 | fail HTTP | Ainda escuta TCP `0.0.0.0:5440` (Postgres) — risco mesmo sem HTTP |
+| Porta | Resultado | Interpretação |
+|------:|-----------|----------------|
+| 5440, 3000, 8001–8007, 8195, 9080, 9088, 9180, 9500, 9501 | **TIMEOUT** | Fechado/filtrado de fora |
+| 80 / 443 | aberto | Entrada pública esperada |
 
-
-Ordem sugerida (autorizar por app):
-
-1. **P0:** `5440` Postgres gastro → `127.0.0.1:5440:5432` + restart  
-2. **P1:** `9500`/`9501` Agenda AI → localhost ou harden-origin  
-3. **P1:** `3000` agenda-app → localhost + vhost  
-4. **P2:** platform `8001/8002/8004/8007`, `8195`, `9088`, `9180` — proxy Cloudflare only + bind local ou filtro iptables  
-5. Documentar dono de `20243` / Swarm ports
+HTTPS: `https://casadapaz.inovatitech.com.br/health` → 200; `https://licencas.inovatitech.com.br/` → 200.
 
 ## Casa da Paz — referência rápida
 
 ```bash
-cd ~/casadapaz/infra
-sudo ./scripts/harden-origin-9080.sh   # precisa +x
-sudo netfilter-persistent save
-# Smoke PC: curl -m 3 http://IP:9080/health → falhar
-#           curl -sf https://casadapaz.inovatitech.com.br/health → ok
+docker run --rm --network host --privileged \
+  -v "$HOME/casadapaz/infra/scripts/harden-origin-9080.sh:/harden.sh:ro" alpine:3.20 \
+  sh -c 'apk add --no-cache iptables && sh /harden.sh'
+# Smoke: curl -m 3 http://IP:9080/health → falhar
+#        curl -sf https://casadapaz.inovatitech.com.br/health → ok
 ```
 
 ## Relacionado
 
-- Skill: `.cursor/skills/agent-security-ops/SKILL.md`  
-- Spec: `specs/030-security-hardening/`  
+- Skill: `.cursor/skills/agent-security-ops/SKILL.md`
+- Spec: `specs/030-security-hardening/`
 - Deploy compartilhado: [deploy-servidor-compartilhado.md](./deploy-servidor-compartilhado.md)
