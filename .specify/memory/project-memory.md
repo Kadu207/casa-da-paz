@@ -12,7 +12,8 @@
 | Produção | https://casadapaz.inovatitech.com.br |
 | Asaas (021) | **Dormant** |
 | Deploy VPS | ✅ 030 headers/CSP + FE `index-BdCnS8Id.js` |
-| Segurança | ✅ app harden + firewall `:9080` (iptables CASADAPAZ-9080) |
+| Segurança | ✅ app harden + `:9080` fechado (raw PREROUTING + DOCKER-USER, persistido) |
+| CodeRabbit | ✅ `.coderabbit.yaml` em `main` + check SUCCESS no [PR #2](https://github.com/Kadu207/casa-da-paz/pull/2) |
 | CRUD 029 | ✅ prod + smoke |
 
 ## Specs
@@ -34,7 +35,6 @@
 
 ## Próximos passos
 
-1. ~~Firewall `:9080`~~ ✅  
-2. Ativar/verificar CodeRabbit no GitHub (`docs/coderabbit.yaml`)  
+1. Fechar PR smoke CodeRabbit #2 (opcional)  
+2. Priorizar fechamento **P0 Postgres `:5440`** e **P1 Agenda AI `:9500/:9501`** (ver runbook firewall)  
 3. Asaas quando houver chave  
-4. Opcional: `sudo apt install iptables-persistent` na VPS para persistir regras após reboot  
