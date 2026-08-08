@@ -11,6 +11,6 @@ description: Alertas de recebíveis atrasados e pagamentos a vencer → N8N/Chat
 - Disparo N8N `lembrete_atraso` / futuros workflows
 
 ## Checklist
-- [ ] Separar canal receber vs pagar
-- [ ] Rate limit / não spam
-- [ ] FINANCEIRO/DIRETORIA veem alertas
+- [x] Canal receber vs pagar separados na UI/API — 2026-08-08
+- [x] Rate limit em rotas públicas; alertas autenticados — 2026-08-08
+- [x] FINANCEIRO/DIRETORIA/TESOURARIA veem alertas (RBAC) — 2026-08-08

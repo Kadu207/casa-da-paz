@@ -24,6 +24,7 @@ description: Orquestrador central Casa da Paz. Roteia tarefas para agentes de do
 | OFX, extrato | agent-conciliacao-bancaria |
 | DRE, orçamento | agent-relatorios-dre |
 | alertas financeiros | agent-alertas-financeiros |
+| segurança, OWASP, VPS firewall, headers, pentest light | agent-security-ops |
 
 ## Gate deploy
 Se tarefa envolve VPS → parar e acionar usuário.

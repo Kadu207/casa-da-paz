@@ -4,9 +4,16 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { datasProximas, parseOfx } from '../lib/ofx-parser.js';
+import { isAllowedOfxUpload } from '../lib/upload-filters.js';
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    cb(null, isAllowedOfxUpload(file.mimetype, file.originalname));
+  },
+});
 
 router.post(
   '/import',

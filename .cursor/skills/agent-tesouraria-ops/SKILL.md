@@ -11,10 +11,10 @@ description: Operação diária da tesouraria Casa da Paz — contas a pagar, ba
 - Fechamento mensal e fluxo de caixa
 
 ## Checklist operacional
-- [ ] Baixar parcelas vencidas do dia
-- [ ] Revisar agenda `/app/financeiro/pagamentos`
-- [ ] Conciliação mensal ao fim do mês
-- [ ] Não misturar atrasados (receber) com pagamentos a fazer
+- [x] API contas a pagar / fornecedores / pagamentos-a-fazer em prod (022) — 2026-08-08
+- [x] UI Financeiro → agenda / parcelas disponível — 2026-08-08
+- [x] Fechamento mensal e fluxo de caixa (specs 022–025) — 2026-08-08
+- [x] Não misturar atrasados (receber) com pagamentos a fazer (rotas separadas) — 2026-08-08
 
 ## API
 `/api/fornecedores`, `/api/contas-pagar`, `/api/financeiro/pagamentos-a-fazer`

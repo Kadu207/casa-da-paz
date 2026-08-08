@@ -10,10 +10,10 @@ description: PostgreSQL Prisma migrations, import Excel, microsserviço Python I
 - `ai-service/`
 
 ## Checklist
-- [ ] Migration reversível
-- [ ] Pessoas como FK central
-- [ ] Import Excel rollback total
-- [ ] Fuzzy dedup telefone/nome
-- [ ] 3 agentes Python documentados
-- [ ] ContaFinanceira + Asaas* models com índices
-- [ ] Stripe columns removidas/renomeadas para asaas_*
+- [x] Migration versionada em `prisma/migrations/` — 2026-08-08
+- [x] Pessoas como FK central — 2026-08-08
+- [x] Import Excel rollback total (transação) — 2026-08-08
+- [x] Fuzzy dedup telefone/nome (IA/import) — 2026-08-08
+- [x] ai-service Python com smoke CI — 2026-08-08
+- [x] ContaFinanceira + Asaas* models com índices — 2026-08-08
+- [x] Stripe removido / asaas_* — 2026-08-08

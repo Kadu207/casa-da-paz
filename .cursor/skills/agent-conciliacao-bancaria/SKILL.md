@@ -11,7 +11,7 @@ description: Import OFX, matching com ledger e divergências Casa da Paz.
 - Spec 025
 
 ## Checklist
-- [ ] fitId único (idempotência)
-- [ ] Match só em PENDENTE
-- [ ] IGNORAR não cria lançamento
-- [ ] ContaFinanceira vinculada ao import
+- [x] fitId único (idempotência) — 2026-08-08
+- [x] Match só em PENDENTE — 2026-08-08
+- [x] IGNORAR não cria lançamento — 2026-08-08
+- [x] ContaFinanceira vinculada ao import — 2026-08-08

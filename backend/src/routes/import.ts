@@ -2,18 +2,21 @@ import { Router } from 'express';
 import multer from 'multer';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
+import { isAllowedExcelUpload } from '../lib/upload-filters.js';
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    cb(null, isAllowedExcelUpload(file.mimetype, file.originalname));
+  },
+});
 const AI_URL = process.env.AI_SERVICE_URL ?? 'http://localhost:8000';
 
 router.post('/excel', authenticate, authorize('import', 'write'), upload.single('file'), async (req, res) => {
   if (!req.file) {
     res.status(400).json({ error: 'Arquivo .xlsx obrigatório' });
-    return;
-  }
-  if (!req.file.originalname.endsWith('.xlsx')) {
-    res.status(400).json({ error: 'Formato inválido — use .xlsx' });
     return;
   }
 

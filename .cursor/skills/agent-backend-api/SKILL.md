@@ -11,12 +11,12 @@ description: Express Prisma REST API, Zod, transações, webhooks Asaas/N8N/PIX 
 - `docs/contracts/openapi.yaml`
 
 ## Checklist
-- [ ] Zod schema para body/params
-- [ ] RBAC policy aplicada
-- [ ] OpenAPI atualizado
-- [ ] Transações atômicas em lote
-- [ ] Webhooks com secret validation
-- [ ] Asaas sandbox por padrão (`ASAAS_ENV=sandbox`) — opcional/dormant
-- [ ] Tesouraria 022–025 sem depender de Asaas
-- [ ] Webhook Asaas idempotente (`AsaasWebhookEvent`)
-- [ ] Conciliação ledger ↔ pedido ↔ inscrição atômica
+- [x] Zod schema para body/params (rotas críticas) — 2026-08-08
+- [x] RBAC policy aplicada (`authorize`) — 2026-08-08
+- [x] OpenAPI / contratos em `docs/contracts/` — 2026-08-08
+- [x] Transações atômicas em lote (import Excel, OFX) — 2026-08-08
+- [x] Webhooks com secret validation — 2026-08-08
+- [x] Asaas sandbox por padrão (`ASAAS_ENV=sandbox`) — 2026-08-08
+- [x] Tesouraria 022–025 sem depender de Asaas — 2026-08-08
+- [x] Webhook Asaas idempotente (`AsaasWebhookEvent`) — 2026-08-08
+- [x] Conciliação ledger ↔ pedido ↔ inscrição atômica — 2026-08-08

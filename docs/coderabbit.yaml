@@ -1,0 +1,34 @@
+# CodeRabbit — Casa da Paz
+# Copiar para a raiz como `.coderabbit.yaml` se o SO bloquear o ponto inicial,
+# ou instalar o app CodeRabbit no GitHub e apontar para este arquivo.
+# Ativar: https://github.com/apps/coderabbitai
+
+language: pt-BR
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false
+  collapse_walkthrough: true
+  path_filters:
+    - "!**/dist/**"
+    - "!**/node_modules/**"
+    - "!**/*.lock"
+  path_instructions:
+    - path: "backend/src/**"
+      instructions: |
+        Foque em: RBAC (authorize), secrets fail-closed, webhooks timing-safe,
+        rate-limit, validação Zod, vazamento de PII/senhas em logs/auditoria.
+        Nunca sugerir commits de .env ou chaves.
+    - path: "frontend/src/**"
+      instructions: |
+        Foque em: hasPermission só oculta UI, XSS, token em localStorage,
+        rotas SUPERVISOR-only, i18n de erros.
+    - path: "infra/**"
+      instructions: |
+        Foque em: portas publicadas, HOST_BIND, deploy gate, nginx headers, SSL.
+    - path: "specs/**"
+      instructions: |
+        Verifique se features não-triviais têm spec; preferir plan.md + tasks.md.
+chat:
+  auto_reply: true

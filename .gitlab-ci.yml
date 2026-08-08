@@ -1,6 +1,7 @@
 # Mirror CI — GitLab
 stages:
   - lint
+  - test
   - build
 
 backend-lint:
@@ -9,8 +10,14 @@ backend-lint:
   script:
     - cd backend && npm ci && npx prisma generate && npm run lint
 
+backend-test:
+  stage: test
+  image: node:22-alpine
+  script:
+    - cd backend && npm ci && npx prisma generate && npm test
+
 frontend-build:
   stage: build
   image: node:22-alpine
   script:
-    - cd frontend && npm ci && npm run build
+    - cd frontend && npm ci && npm test && npm run build

@@ -31,6 +31,7 @@ Usuário → agent-orquestrador → agente-domínio → validador-integracao →
 | [`agent-conciliacao-bancaria`](.cursor/skills/agent-conciliacao-bancaria/SKILL.md) | Import OFX, matching |
 | [`agent-alertas-financeiros`](.cursor/skills/agent-alertas-financeiros/SKILL.md) | Atrasados (receber) + vencendo (pagar) → N8N |
 | [`agent-relatorios-dre`](.cursor/skills/agent-relatorios-dre/SKILL.md) | DRE, orçamento vs realizado, centros de custo |
+| [`agent-security-ops`](.cursor/skills/agent-security-ops/SKILL.md) | Segurança contínua pós-go-live (OWASP light, VPS, secrets) |
 
 ## Features ativas
 
