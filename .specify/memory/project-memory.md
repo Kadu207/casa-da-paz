@@ -14,7 +14,8 @@
 | Validação local | ✅ migrate · smoke tesouraria · estudos/eventos/oficinas |
 | Deploy VPS | ✅ `deploy.sh` + migrate 18/18 + FE `index-B1tA4XDZ.js` |
 | Conteúdo portal | ✅ prod: 3 estudos + giras/oficinas (`--portal-content`, 2026-08-06) |
-| Usuários seed | admin, supervisor, admin.integracoes, medium, maedesanto (DIRETORIA), marketing01–04, tesouraria01–04 (**setor TESOURARIA**) + UsuarioPolicy |
+| Segurança | ✅ harden `b423f36` + auditoria completa SUPERVISOR (028) |
+| Auditoria | Menu `/app/auditoria` só SUPERVISOR; middleware mutações; migrate `20260808120000` |
 
 ## Specs
 
@@ -38,6 +39,7 @@
 
 ## Próximos passos
 
-1. Na VPS: `git pull` + `compose-prod.sh exec backend npx tsx prisma/seed.ts --portal-content` (não rodar seed completo em prod)  
-2. Smoke: `/public/estudos` · `/public/eventos` (Giras/Oficinas)  
-3. Ativar Asaas quando chegar `ASAAS_API_KEY` + confirmação explícita  
+1. ~~Implementar auditoria SUPERVISOR~~ (build local)  
+2. Deploy VPS: migrate `20260808120000` + deploy.sh + sync FE (confirmação)  
+3. Smoke: login supervisor → `/app/auditoria`  
+4. Asaas quando houver chave  

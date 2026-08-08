@@ -29,9 +29,11 @@
 | Ecommerce | ✅ | 👁️ | 👁️ | ✅ (publicar) | ❌ | ✅ | ❌ | ❌ |
 | Dashboard | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
 | Agendamentos | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| Auditoria | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | 👁️ |
+| Auditoria (logs de atividades) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Alertas | ✅ | ✅ | ✅ | ❌ | 👁️ | ❌ | ❌ | 👁️ |
 | Logs/Manutenção | 👁️ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+
+**Auditoria:** somente **SUPERVISOR** (fora da tabela operacional). Menu ERP → **Auditoria** (`/app/auditoria`). DIRETORIA/SUPORTE não têm acesso.
 
 **TESOURARIA** = setor operacional dos logins `tesouraria01`–`04` (mesma matriz financeira que FINANCEIRO; FINANCEIRO permanece por compatibilidade).
 

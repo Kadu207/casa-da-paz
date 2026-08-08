@@ -37,6 +37,10 @@ export function hasPermission(
   action: 'read' | 'write' = 'read'
 ): boolean {
   if (!user) return false;
+  // Auditoria / logs de atividades: somente SUPERVISOR
+  if (resource === 'auditoria') {
+    return user.setorAcesso === 'SUPERVISOR';
+  }
   if (user.setorAcesso === 'SUPERVISOR') {
     if (resource === 'integracoes' || resource === 'webhooks') return action === 'read';
     return true;

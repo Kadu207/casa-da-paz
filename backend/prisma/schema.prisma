@@ -583,16 +583,28 @@ model NewsletterInscrito {
 }
 
 model AdminAuditLog {
-  id        Int      @id @default(autoincrement())
-  usuarioId Int?     @map("usuario_id")
-  setor     String?  @db.VarChar(50)
-  rota      String   @db.VarChar(120)
-  motivo    String?
-  ip        String?  @db.VarChar(45)
-  userAgent String?  @map("user_agent")
-  createdAt DateTime @default(now()) @map("created_at")
+  id           Int      @id @default(autoincrement())
+  usuarioId    Int?     @map("usuario_id")
+  login        String?  @db.VarChar(50)
+  setor        String?  @db.VarChar(50)
+  metodo       String?  @db.VarChar(10)
+  recurso      String?  @db.VarChar(60)
+  acao         String?  @db.VarChar(40)
+  entidadeTipo String?  @map("entidade_tipo") @db.VarChar(60)
+  entidadeId   String?  @map("entidade_id") @db.VarChar(80)
+  statusHttp   Int?     @map("status_http")
+  sucesso      Boolean? @default(true)
+  detalhe      Json?
+  rota         String   @db.VarChar(120)
+  motivo       String?
+  ip           String?  @db.VarChar(45)
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
 
   @@index([createdAt])
+  @@index([usuarioId, createdAt])
+  @@index([recurso, createdAt])
+  @@index([sucesso, createdAt])
   @@map("admin_audit_log")
 }
 

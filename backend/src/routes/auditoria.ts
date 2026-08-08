@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { authenticate, authorize } from '../middleware/auth.js';
+import { authenticate, requireSupervisor } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
 import { enriquecerLogAuditoria, type AuditLocale } from '../lib/audit-i18n.js';
 import { gerarPdfAuditoria } from '../lib/audit-pdf.js';
@@ -41,7 +41,7 @@ async function loadExportLogs(
   return { locale, logs };
 }
 
-router.get('/', authenticate, authorize('auditoria', 'read'), async (req, res) => {
+router.get('/', authenticate, requireSupervisor, async (req, res) => {
   const parsed = querySchema.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.flatten() });
@@ -71,7 +71,7 @@ router.get('/', authenticate, authorize('auditoria', 'read'), async (req, res) =
   });
 });
 
-router.get('/export.csv', authenticate, authorize('auditoria', 'read'), async (req, res) => {
+router.get('/export.csv', authenticate, requireSupervisor, async (req, res) => {
   const parsed = querySchema.omit({ page: true, limit: true }).safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.flatten() });
@@ -93,7 +93,7 @@ router.get('/export.csv', authenticate, authorize('auditoria', 'read'), async (r
   res.send(buildAuditoriaCsv(logs, locale));
 });
 
-router.get('/export.pdf', authenticate, authorize('auditoria', 'read'), async (req, res) => {
+router.get('/export.pdf', authenticate, requireSupervisor, async (req, res) => {
   const parsed = querySchema.omit({ page: true, limit: true }).safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.flatten() });

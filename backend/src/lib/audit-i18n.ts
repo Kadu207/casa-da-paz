@@ -1,6 +1,7 @@
 /** Traduções de rotas/motivos do admin_audit_log (pt-BR / en). */
 const ROTAS: Record<string, { 'pt-BR': string; en: string }> = {
   'admin.login': { 'pt-BR': 'Login administrativo', en: 'Admin login' },
+  'admin.login.fail': { 'pt-BR': 'Falha de login', en: 'Login failure' },
   'admin.eventos.create': { 'pt-BR': 'Criar evento', en: 'Create event' },
   'admin.eventos.update': { 'pt-BR': 'Atualizar evento', en: 'Update event' },
   'admin.eventos.delete': { 'pt-BR': 'Excluir evento', en: 'Delete event' },
@@ -25,6 +26,7 @@ export function traduzirMotivoAuditoria(motivo: string | null, locale: AuditLoca
   const map: Record<string, { 'pt-BR': string; en: string }> = {
     export_filtros: { 'pt-BR': 'Exportação com filtros aplicados', en: 'Export with active filters' },
     novo_inscrito: { 'pt-BR': 'Novo inscrito na newsletter', en: 'New newsletter subscriber' },
+    credenciais_invalidas: { 'pt-BR': 'Credenciais inválidas', en: 'Invalid credentials' },
   };
   return map[motivo]?.[locale] ?? motivo;
 }

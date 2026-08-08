@@ -8,7 +8,13 @@ const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 
 export interface AuditLogItem {
   id: number;
+  login: string | null;
   setor: string | null;
+  metodo: string | null;
+  recurso: string | null;
+  acao: string | null;
+  statusHttp: number | null;
+  sucesso: boolean | null;
   rota: string;
   rotaLabel: string;
   motivo: string | null;
@@ -35,7 +41,18 @@ export interface AuditFilters {
   order: 'asc' | 'desc';
 }
 
-const SETORES = ['DIRETORIA', 'FINANCEIRO', 'RECEPCAO', 'LIVRARIA', 'MEDIUM', 'SUPORTE'] as const;
+const SETORES = [
+  'SUPERVISOR',
+  'ADMIN',
+  'DIRETORIA',
+  'TESOURARIA',
+  'FINANCEIRO',
+  'MARKETING',
+  'RECEPCAO',
+  'LIVRARIA',
+  'MEDIUM',
+  'SUPORTE',
+] as const;
 
 function buildQuery(f: AuditFilters, locale: string, csv = false): string {
   const p = new URLSearchParams();
@@ -258,13 +275,16 @@ export default function AuditoriaPage() {
                   <th className="p-3 cursor-pointer hover:text-white" onClick={() => toggleSort('createdAt')}>
                     {t('erp.common.date')} {filters.sort === 'createdAt' && (filters.order === 'desc' ? '↓' : '↑')}
                   </th>
+                  <th className="p-3">{t('erp.auditoria.colUser')}</th>
                   <th className="p-3 cursor-pointer hover:text-white" onClick={() => toggleSort('setor')}>
                     {t('erp.auditoria.filterSector')}{' '}
                     {filters.sort === 'setor' && (filters.order === 'desc' ? '↓' : '↑')}
                   </th>
+                  <th className="p-3">{t('erp.auditoria.colAction')}</th>
                   <th className="p-3 cursor-pointer hover:text-white" onClick={() => toggleSort('rota')}>
                     {t('erp.auditoria.colRoute')} {filters.sort === 'rota' && (filters.order === 'desc' ? '↓' : '↑')}
                   </th>
+                  <th className="p-3">{t('erp.auditoria.colStatus')}</th>
                   <th className="p-3">{t('erp.auditoria.colReason')}</th>
                   <th className="p-3">{t('erp.auditoria.colIp')}</th>
                 </tr>
@@ -275,11 +295,20 @@ export default function AuditoriaPage() {
                     <td className="p-3 whitespace-nowrap">
                       {new Date(log.createdAt).toLocaleString(dateLocale)}
                     </td>
+                    <td className="p-3 font-mono text-xs">{log.login ?? t('erp.common.emptyDash')}</td>
                     <td className="p-3">
                       {log.setor ? labelEnum(t, 'setor', log.setor) : t('erp.common.emptyDash')}
                     </td>
+                    <td className="p-3 text-xs">
+                      {[log.metodo, log.recurso, log.acao].filter(Boolean).join(' · ') ||
+                        t('erp.common.emptyDash')}
+                    </td>
                     <td className="p-3">
                       <span title={log.rota}>{log.rotaLabel}</span>
+                    </td>
+                    <td className="p-3 font-mono text-xs">
+                      {log.statusHttp != null ? log.statusHttp : t('erp.common.emptyDash')}
+                      {log.sucesso === false ? ' ✕' : ''}
                     </td>
                     <td className="p-3 max-w-xs truncate" title={log.motivo ?? undefined}>
                       {log.motivoLabel ?? t('erp.common.emptyDash')}

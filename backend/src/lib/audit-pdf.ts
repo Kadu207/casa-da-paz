@@ -30,8 +30,8 @@ export function gerarPdfAuditoria(logs: AdminAuditLog[], locale: AuditLocale): P
       doc
         .fontSize(8)
         .text(
-          `${e.createdAt.toISOString()} | ${e.setor ?? '—'} | ${e.rotaLabel}\n` +
-            `Motivo: ${e.motivoLabel ?? '—'} | IP: ${e.ip ?? '—'}`
+          `${e.createdAt.toISOString()} | ${e.login ?? '—'} | ${e.setor ?? '—'} | ${e.rotaLabel}\n` +
+            `HTTP ${e.statusHttp ?? '—'} | Motivo: ${e.motivoLabel ?? '—'} | IP: ${e.ip ?? '—'}`
         );
     });
 

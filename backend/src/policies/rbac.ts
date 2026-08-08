@@ -108,7 +108,6 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     agendamentos: 'write',
     logs: 'read',
     ecommerce: 'write',
-    auditoria: 'write',
     alertas: 'write',
     marketing: 'write',
     transparencia: 'read',
@@ -172,7 +171,6 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
   SUPORTE: {
     pessoas: 'read',
     logs: 'write',
-    auditoria: 'read',
     alertas: 'read',
     manutencao: 'write',
   },

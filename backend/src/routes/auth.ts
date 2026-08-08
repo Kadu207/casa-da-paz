@@ -17,6 +17,7 @@ import {
   snapshotGrantsForSetor,
   type PolicyGrants,
 } from '../policies/rbac.js';
+import { registrarAuditoria } from '../lib/auditoria.js';
 
 const router = Router();
 
@@ -112,6 +113,16 @@ router.post('/login', loginRateLimit, async (req, res) => {
     include: { pessoa: true, policy: true },
   });
   if (!usuario || !(await bcrypt.compare(senha, usuario.senhaHash))) {
+    await registrarAuditoria(req, {
+      rota: 'admin.login.fail',
+      recurso: 'auth',
+      acao: 'login_fail',
+      metodo: 'POST',
+      login,
+      statusHttp: 401,
+      sucesso: false,
+      motivo: 'credenciais_invalidas',
+    });
     res.status(401).json({ error: 'Credenciais inválidas' });
     return;
   }
@@ -120,6 +131,17 @@ router.post('/login', loginRateLimit, async (req, res) => {
     pessoaId: usuario.pessoaId,
     setorAcesso: usuario.setorAcesso,
     login: usuario.login,
+  });
+  await registrarAuditoria(req, {
+    rota: 'admin.login',
+    recurso: 'auth',
+    acao: 'login',
+    metodo: 'POST',
+    usuarioId: usuario.id,
+    login: usuario.login,
+    setor: usuario.setorAcesso,
+    statusHttp: 200,
+    sucesso: true,
   });
   res.json({
     token,

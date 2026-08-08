@@ -26,6 +26,7 @@ import ofxRoutes from './routes/ofx.js';
 import contribuintesRoutes from './routes/contribuintes.js';
 import { gerarMensalidadesDoMes } from './jobs/gerar-mensalidades.js';
 import { isProductionRuntime } from './lib/runtime-env.js';
+import { auditMiddleware } from './middleware/audit.js';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
@@ -49,6 +50,7 @@ app.use((_req, res, next) => {
 });
 
 app.use(express.json({ limit: '1mb' }));
+app.use(auditMiddleware);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'casadapaz-backend' });
