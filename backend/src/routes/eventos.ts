@@ -92,6 +92,56 @@ router.post('/', authenticate, authorize('eventos', 'write'), async (req, res) =
   res.status(201).json(evento);
 });
 
+router.put('/:id', authenticate, authorize('eventos', 'write'), async (req, res) => {
+  const id = Number(req.params.id);
+  const body = z
+    .object({
+      nomeEvento: z.string().min(2).optional(),
+      dataEvento: z.string().optional(),
+      tipo: z.enum(['GIRA', 'OFICINA']).optional(),
+      capacidadeMax: z.number().int().positive().nullable().optional(),
+      status: z.enum(['ABERTO', 'ENCERRADO']).optional(),
+    })
+    .safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.flatten() });
+    return;
+  }
+  const existing = await prisma.evento.findUnique({ where: { id } });
+  if (!existing) {
+    res.status(404).json({ error: 'Evento não encontrado' });
+    return;
+  }
+  const data: Record<string, unknown> = {};
+  if (body.data.nomeEvento !== undefined) data.nomeEvento = body.data.nomeEvento;
+  if (body.data.dataEvento !== undefined) data.dataEvento = new Date(body.data.dataEvento);
+  if (body.data.tipo !== undefined) data.tipo = body.data.tipo;
+  if (body.data.capacidadeMax !== undefined) data.capacidadeMax = body.data.capacidadeMax;
+  if (body.data.status !== undefined) data.status = body.data.status;
+  const evento = await prisma.evento.update({ where: { id }, data });
+  res.json(evento);
+});
+
+router.delete('/:id', authenticate, authorize('eventos', 'write'), async (req, res) => {
+  const id = Number(req.params.id);
+  const existing = await prisma.evento.findUnique({
+    where: { id },
+    include: { _count: { select: { inscricoes: true } } },
+  });
+  if (!existing) {
+    res.status(404).json({ error: 'Evento não encontrado' });
+    return;
+  }
+  if (existing._count.inscricoes > 0) {
+    res.status(409).json({
+      error: 'Evento possui inscrição(ões). Encerre o evento em vez de excluir.',
+    });
+    return;
+  }
+  await prisma.evento.delete({ where: { id } });
+  res.status(204).send();
+});
+
 router.get('/:id/inscricoes', authenticate, authorize('eventos', 'read'), async (req, res) => {
   const eventoId = Number(req.params.id);
   const inscricoes = await prisma.inscricao.findMany({

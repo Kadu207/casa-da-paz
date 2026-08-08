@@ -85,6 +85,7 @@ function serializeUsuario(u: {
   login: string;
   setorAcesso: import('@prisma/client').SetorAcesso;
   pessoaId: number;
+  ativo?: boolean;
   pessoa?: unknown;
   policy?: { grants: unknown } | null;
   senhaHash?: string;
@@ -95,6 +96,7 @@ function serializeUsuario(u: {
     login: u.login,
     setorAcesso: u.setorAcesso,
     pessoaId: u.pessoaId,
+    ativo: u.ativo ?? true,
     pessoa: u.pessoa,
     policy: customGrants,
     effectiveGrants: effectiveGrants(u.setorAcesso, customGrants),
@@ -124,6 +126,21 @@ router.post('/login', loginRateLimit, async (req, res) => {
       motivo: 'credenciais_invalidas',
     });
     res.status(401).json({ error: 'Credenciais inválidas' });
+    return;
+  }
+  if (usuario.ativo === false) {
+    await registrarAuditoria(req, {
+      rota: 'admin.login.fail',
+      recurso: 'auth',
+      acao: 'login_fail',
+      metodo: 'POST',
+      login,
+      usuarioId: usuario.id,
+      statusHttp: 403,
+      sucesso: false,
+      motivo: 'usuario_inativo',
+    });
+    res.status(403).json({ error: 'Usuário desativado. Contate o SUPERVISOR.' });
     return;
   }
   const token = signToken({
@@ -305,21 +322,56 @@ router.put('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async 
       login: loginFieldSchema.optional(),
       senha: z.string().min(6).optional(),
       setorAcesso: operationalSetorSchema.optional(),
+      ativo: z.boolean().optional(),
     })
     .safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: body.error.flatten() });
     return;
   }
+  if (body.data.setorAcesso && !canManageTargetUser(req.user!.setorAcesso, body.data.setorAcesso)) {
+    res.status(403).json({ error: 'Sem permissão para mover usuário para este setor' });
+    return;
+  }
+  if (body.data.ativo === false && id === req.user!.userId) {
+    res.status(400).json({ error: 'Não é possível desativar o próprio usuário' });
+    return;
+  }
+
   const data: Record<string, unknown> = {};
   if (body.data.login) data.login = body.data.login;
   if (body.data.setorAcesso) data.setorAcesso = body.data.setorAcesso;
   if (body.data.senha) data.senhaHash = await bcrypt.hash(body.data.senha, 10);
-  const usuario = await prisma.usuario.update({
-    where: { id },
-    data,
-    include: { pessoa: true, policy: true },
+  if (body.data.ativo !== undefined) data.ativo = body.data.ativo;
+
+  const usuario = await prisma.$transaction(async (tx) => {
+    const updated = await tx.usuario.update({
+      where: { id },
+      data,
+      include: { pessoa: true, policy: true },
+    });
+    if (body.data.setorAcesso && body.data.setorAcesso !== target.setorAcesso) {
+      const grants = snapshotGrantsForSetor(body.data.setorAcesso);
+      await tx.usuarioPolicy.upsert({
+        where: { usuarioId: id },
+        create: {
+          usuarioId: id,
+          grants,
+          atualizadoPorId: req.user!.userId,
+        },
+        update: {
+          grants,
+          atualizadoPorId: req.user!.userId,
+        },
+      });
+      return tx.usuario.findUniqueOrThrow({
+        where: { id },
+        include: { pessoa: true, policy: true },
+      });
+    }
+    return updated;
   });
+
   res.json(serializeUsuario(usuario));
 });
 

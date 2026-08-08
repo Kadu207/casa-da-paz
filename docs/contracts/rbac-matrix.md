@@ -25,7 +25,7 @@
 | Marketing | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Import Excel | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Eventos / check-in | ✅ | 👁️ | 👁️ | ✅ (publicar) | ✅ | ❌ | ❌ | ❌ |
-| PDV/Livraria/Estoque | ✅ | 👁️ | 👁️ | ✅ (publicar) | ❌ | ✅ | ❌ | ❌ |
+| PDV/Livraria/Estoque | ✅ | 👁️ | 👁️ | ✅ (publicar conteúdo; **sem** `estoque`) | ❌ | ✅ | ❌ | ❌ |
 | Ecommerce | ✅ | 👁️ | 👁️ | ✅ (publicar) | ❌ | ✅ | ❌ | ❌ |
 | Dashboard | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
 | Agendamentos | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
@@ -34,6 +34,8 @@
 | Logs/Manutenção | 👁️ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 **Auditoria:** somente **SUPERVISOR** (fora da tabela operacional). Menu ERP → **Auditoria** (`/app/auditoria`). DIRETORIA/SUPORTE não têm acesso.
+
+**MARKETING** publica eventos/conteúdo (`eventos`/`livraria`/`marketing` write) mas **não** cadastra estoque (`estoque` só DIRETORIA/LIVRARIA/SUPERVISOR). Cadastro de livros: setor LIVRARIA.
 
 **TESOURARIA** = setor operacional dos logins `tesouraria01`–`04` (mesma matriz financeira que FINANCEIRO; FINANCEIRO permanece por compatibilidade).
 

@@ -223,6 +223,7 @@ model Usuario {
   login        String      @unique @db.VarChar(50)
   senhaHash    String      @map("senha_hash") @db.VarChar(255)
   setorAcesso  SetorAcesso @map("setor_acesso")
+  ativo        Boolean     @default(true)
   pessoa       Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
   fechamentosFinanceiros FinanceiroFechamentoMensal[]
   policy       UsuarioPolicy?

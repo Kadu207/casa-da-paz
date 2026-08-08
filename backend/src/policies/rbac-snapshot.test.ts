@@ -19,4 +19,12 @@ describe('snapshotGrantsForSetor', () => {
     expect(snap.financeiro).toBe('write');
     expect(snap.contribuintes).toBe('write');
   });
+
+  it('MARKETING publica livraria/eventos sem grant de estoque', () => {
+    const snap = snapshotGrantsForSetor('MARKETING');
+    expect(snap.livraria).toBe('write');
+    expect(snap.eventos).toBe('write');
+    expect(snap.marketing).toBe('write');
+    expect(snap.estoque).toBeUndefined();
+  });
 });

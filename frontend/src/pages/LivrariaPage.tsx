@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, hasPermission } from '../context/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { formatMoney, labelEnum } from '../i18n/helpers';
 
@@ -47,12 +47,15 @@ const emptyConteudo = {
 export default function LivrariaPage() {
   const { t, locale } = useI18n();
   const { user } = useAuth();
-  const canWrite =
-    user?.setorAcesso === 'DIRETORIA' ||
-    user?.setorAcesso === 'LIVRARIA' ||
-    user?.setorAcesso === 'MARKETING';
+  const canReadEstoque = hasPermission(user, 'estoque', 'read');
+  const canWriteEstoque = hasPermission(user, 'estoque', 'write');
+  const canWriteLivraria = hasPermission(user, 'livraria', 'write');
+  const canWriteVenda = canWriteLivraria;
+  const showPdv = canWriteEstoque || (canWriteVenda && canReadEstoque);
 
-  const [aba, setAba] = useState<'catalogo' | 'conteudos' | 'pdv'>('catalogo');
+  const [aba, setAba] = useState<'catalogo' | 'conteudos' | 'pdv'>(() =>
+    canReadEstoque || canWriteEstoque ? 'catalogo' : 'conteudos'
+  );
   const [filtroTipo, setFiltroTipo] = useState<string>('LIVRO');
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [conteudos, setConteudos] = useState<Conteudo[]>([]);
@@ -78,13 +81,25 @@ export default function LivrariaPage() {
   }, []);
 
   const carregar = useCallback(async () => {
-    await Promise.all([carregarProdutos(), carregarConteudos()]);
-  }, [carregarProdutos, carregarConteudos]);
+    setErro('');
+    try {
+      const jobs: Promise<unknown>[] = [carregarConteudos()];
+      if (canReadEstoque) jobs.push(carregarProdutos());
+      else setProdutos([]);
+      await Promise.all(jobs);
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.livraria.loadError'));
+    }
+  }, [carregarProdutos, carregarConteudos, canReadEstoque, t]);
 
   useEffect(() => {
-    carregar().catch(console.error);
-    api<Produto[]>('/livraria/produtos?tipo=LIVRO').then(setLivrosVinculo).catch(console.error);
-  }, [carregar]);
+    carregar().catch(() => undefined);
+    if (canReadEstoque) {
+      api<Produto[]>('/livraria/produtos?tipo=LIVRO').then(setLivrosVinculo).catch(() => undefined);
+    } else {
+      setLivrosVinculo([]);
+    }
+  }, [carregar, canReadEstoque]);
 
   const salvarProduto = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,15 +202,20 @@ export default function LivrariaPage() {
   const registrarEntrada = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro('');
-    await api('/livraria/entrada', {
-      method: 'POST',
-      body: JSON.stringify({
-        produtoId: Number(entrada.produtoId),
-        quantidade: Number(entrada.quantidade),
-      }),
-    });
-    setMsg(t('erp.livraria.stockEntry'));
-    await carregarProdutos();
+    setMsg('');
+    try {
+      await api('/livraria/entrada', {
+        method: 'POST',
+        body: JSON.stringify({
+          produtoId: Number(entrada.produtoId),
+          quantidade: Number(entrada.quantidade),
+        }),
+      });
+      setMsg(t('erp.livraria.stockEntry'));
+      await carregarProdutos();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.livraria.stockEntryError'));
+    }
   };
 
   const vender = async (e: React.FormEvent) => {
@@ -234,7 +254,13 @@ export default function LivrariaPage() {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {(['catalogo', 'conteudos', 'pdv'] as const).map((tab) => (
+        {(
+          [
+            ...(canReadEstoque || canWriteEstoque ? (['catalogo'] as const) : []),
+            'conteudos' as const,
+            ...(showPdv ? (['pdv'] as const) : []),
+          ] as const
+        ).map((tab) => (
           <button
             key={tab}
             type="button"
@@ -254,10 +280,15 @@ export default function LivrariaPage() {
 
       {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
       {msg && <p className="text-[var(--color-success)] text-sm">{msg}</p>}
+      {!canWriteEstoque && (
+        <p className="text-sm text-amber-200/90 bg-amber-500/10 border border-amber-500/30 rounded-lg px-3 py-2">
+          {t('erp.livraria.noStockWrite')}
+        </p>
+      )}
 
-      {aba === 'catalogo' && (
+      {aba === 'catalogo' && (canReadEstoque || canWriteEstoque) && (
         <>
-          {canWrite && (
+          {canWriteEstoque && (
             <form onSubmit={salvarProduto} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3 max-w-lg">
               <h3 className="font-medium text-[var(--color-accent)]">
                 {editProdutoId ? t('erp.livraria.editItem') : t('erp.livraria.newProduct')}
@@ -292,14 +323,18 @@ export default function LivrariaPage() {
                   className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
                   required
                 />
-                <input
-                  type="number"
-                  min="0"
-                  value={formProduto.estoqueAtual}
-                  onChange={(e) => setFormProduto({ ...formProduto, estoqueAtual: e.target.value })}
-                  placeholder={t('erp.livraria.stockPlaceholder')}
-                  className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
-                />
+                <label className="block">
+                  <span className="text-xs text-white/60 mb-1 block">{t('erp.livraria.stockPlaceholder')}</span>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formProduto.estoqueAtual}
+                    onChange={(e) => setFormProduto({ ...formProduto, estoqueAtual: e.target.value })}
+                    placeholder={t('erp.livraria.stockPlaceholder')}
+                    className="w-full px-3 py-2 rounded bg-black/30 border border-[var(--color-accent)]/50 font-semibold"
+                    required
+                  />
+                </label>
               </div>
               <textarea
                 value={formProduto.descricaoEcommerce}
@@ -361,11 +396,17 @@ export default function LivrariaPage() {
                   <p className="text-xs text-white/60 mt-2 line-clamp-3 flex-1">{p.descricaoEcommerce}</p>
                 )}
                 <p className="text-[var(--color-accent)] mt-2">{formatMoney(locale, Number(p.preco))}</p>
-                <p className={`text-xs ${p.estoqueAtual <= 3 ? 'text-[var(--color-danger)]' : 'text-white/50'}`}>
+                <p
+                  className={`text-sm font-semibold mt-1 ${
+                    p.estoqueAtual <= 3 ? 'text-[var(--color-danger)]' : 'text-[var(--color-accent)]'
+                  }`}
+                >
                   {t('erp.livraria.stock', { count: p.estoqueAtual })}
-                  {p.publicadoEcommerce === false && t('erp.livraria.hiddenShop')}
+                  {p.publicadoEcommerce === false && (
+                    <span className="font-normal text-white/50">{t('erp.livraria.hiddenShop')}</span>
+                  )}
                 </p>
-                {canWrite && (
+                {canWriteEstoque && (
                   <div className="flex gap-2 mt-3">
                     <button
                       type="button"
@@ -392,7 +433,7 @@ export default function LivrariaPage() {
 
       {aba === 'conteudos' && (
         <>
-          {canWrite && (
+          {canWriteLivraria && (
             <form onSubmit={salvarConteudo} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3 max-w-lg">
               <h3 className="font-medium text-[var(--color-accent)]">
                 {editConteudoId ? t('erp.livraria.editContent') : t('erp.livraria.newContent')}
@@ -483,7 +524,7 @@ export default function LivrariaPage() {
                     </span>
                     <h3 className="font-medium mt-1">{c.titulo}</h3>
                   </div>
-                  {canWrite && (
+                  {canWriteLivraria && (
                     <div className="flex gap-2">
                       <button type="button" onClick={() => editarConteudo(c)} className="text-xs px-2 py-1 rounded bg-white/10">
                         {t('erp.common.edit')}
@@ -513,8 +554,9 @@ export default function LivrariaPage() {
         </>
       )}
 
-      {aba === 'pdv' && canWrite && (
+      {aba === 'pdv' && showPdv && (
         <div className="grid gap-4 md:grid-cols-2 max-w-3xl">
+          {canWriteVenda && (
           <form onSubmit={vender} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
             <h3 className="font-medium">{t('erp.livraria.posSale')}</h3>
             <select
@@ -542,6 +584,8 @@ export default function LivrariaPage() {
               {t('erp.livraria.registerSale')}
             </button>
           </form>
+          )}
+          {canWriteEstoque && (
           <form onSubmit={registrarEntrada} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
             <h3 className="font-medium">{t('erp.livraria.posStock')}</h3>
             <select
@@ -569,6 +613,7 @@ export default function LivrariaPage() {
               {t('erp.livraria.registerStock')}
             </button>
           </form>
+          )}
         </div>
       )}
     </div>

@@ -41,12 +41,12 @@ async function ensureUsuarioWithPolicy(input: SeedUserInput) {
   if (byLogin) {
     usuario = await prisma.usuario.update({
       where: { id: byLogin.id },
-      data: { senhaHash, setorAcesso: input.setorAcesso, pessoaId: pessoa.id },
+      data: { senhaHash, setorAcesso: input.setorAcesso, pessoaId: pessoa.id, ativo: true },
     });
   } else if (byPessoa) {
     usuario = await prisma.usuario.update({
       where: { id: byPessoa.id },
-      data: { login: input.login, senhaHash, setorAcesso: input.setorAcesso },
+      data: { login: input.login, senhaHash, setorAcesso: input.setorAcesso, ativo: true },
     });
   } else {
     usuario = await prisma.usuario.create({
@@ -55,6 +55,7 @@ async function ensureUsuarioWithPolicy(input: SeedUserInput) {
         senhaHash,
         setorAcesso: input.setorAcesso,
         pessoaId: pessoa.id,
+        ativo: true,
       },
     });
   }

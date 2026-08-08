@@ -8,6 +8,7 @@ interface Usuario {
   id: number;
   login: string;
   setorAcesso: string;
+  ativo?: boolean;
   pessoa: { id: number; nomeCompleto: string };
   policy?: Partial<Record<string, GrantOpt>> | null;
 }
@@ -75,6 +76,8 @@ export default function UsuariosPage() {
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [catalogo, setCatalogo] = useState<Catalogo | null>(null);
   const [mostrarForm, setMostrarForm] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState({ login: '', setorAcesso: 'RECEPCAO' as SetorOp });
   const [redefinirId, setRedefinirId] = useState<number | null>(null);
   const [policyUserId, setPolicyUserId] = useState<number | null>(null);
   const [policyDraft, setPolicyDraft] = useState<Partial<Record<string, GrantOpt>>>({});
@@ -227,6 +230,71 @@ export default function UsuariosPage() {
     }
   };
 
+  const abrirEdicao = (u: Usuario) => {
+    setErro('');
+    setMostrarForm(false);
+    setPolicyUserId(null);
+    setRedefinirId(null);
+    setEditId(u.id);
+    setEditForm({
+      login: u.login,
+      setorAcesso: (SETORES.includes(u.setorAcesso as SetorOp)
+        ? u.setorAcesso
+        : 'RECEPCAO') as SetorOp,
+    });
+  };
+
+  const salvarEdicao = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editId == null) return;
+    setErro('');
+    try {
+      await api(`/auth/usuarios/${editId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          login: editForm.login,
+          setorAcesso: editForm.setorAcesso,
+        }),
+      });
+      setEditId(null);
+      await carregar();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.usuarios.editError'));
+    }
+  };
+
+  const alternarAtivo = async (u: Usuario) => {
+    setErro('');
+    const next = !(u.ativo !== false);
+    if (
+      !window.confirm(
+        next ? t('erp.usuarios.confirmActivate') : t('erp.usuarios.confirmDeactivate')
+      )
+    ) {
+      return;
+    }
+    try {
+      await api(`/auth/usuarios/${u.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ ativo: next }),
+      });
+      await carregar();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.usuarios.toggleError'));
+    }
+  };
+
+  const excluirUsuario = async (u: Usuario) => {
+    setErro('');
+    if (!window.confirm(t('erp.usuarios.confirmDelete', { login: u.login }))) return;
+    try {
+      await api(`/auth/usuarios/${u.id}`, { method: 'DELETE' });
+      await carregar();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.usuarios.deleteError'));
+    }
+  };
+
   if (user?.setorAcesso !== 'SUPERVISOR') {
     return (
       <p className="text-white/70">{t('erp.usuarios.supervisorOnly')}</p>
@@ -235,6 +303,7 @@ export default function UsuariosPage() {
 
   const pessoasSemUsuario = pessoas.filter((p) => !usuarios.some((u) => u.pessoa.id === p.id));
   const usuarioRedefinir = usuarios.find((u) => u.id === redefinirId);
+  const usuarioEdit = usuarios.find((u) => u.id === editId);
 
   return (
     <div className="space-y-4">
@@ -369,6 +438,49 @@ export default function UsuariosPage() {
         </form>
       )}
 
+      {editId != null && usuarioEdit && (
+        <form onSubmit={salvarEdicao} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3 max-w-md">
+          <h3 className="font-medium text-[var(--color-accent)]">
+            {t('erp.usuarios.editTitle', { login: usuarioEdit.login })}
+          </h3>
+          {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
+          <input
+            type="text"
+            value={editForm.login}
+            onChange={(e) => setEditForm({ ...editForm, login: e.target.value })}
+            className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
+            pattern="[a-zA-Z0-9._-]{3,50}"
+            required
+          />
+          <select
+            value={editForm.setorAcesso}
+            onChange={(e) =>
+              setEditForm({ ...editForm, setorAcesso: e.target.value as SetorOp })
+            }
+            className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
+          >
+            {SETORES.map((s) => (
+              <option key={s} value={s}>
+                {labelEnum(t, 'setor', s)}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-white/50">{t('erp.usuarios.editSectorHint')}</p>
+          <div className="flex gap-2">
+            <button type="submit" className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm">
+              {t('erp.common.save')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditId(null)}
+              className="px-4 py-2 bg-white/10 rounded text-sm"
+            >
+              {t('erp.common.cancel')}
+            </button>
+          </div>
+        </form>
+      )}
+
       {policyUserId != null && (
         <form onSubmit={salvarPoliticas} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3 max-w-3xl">
           <h3 className="font-medium text-[var(--color-accent)]">{t('erp.usuarios.policiesTitle')}</h3>
@@ -399,6 +511,7 @@ export default function UsuariosPage() {
             <th className="p-2">{t('erp.common.name')}</th>
             <th className="p-2">{t('erp.usuarios.colLogin')}</th>
             <th className="p-2">{t('erp.usuarios.colSector')}</th>
+            <th className="p-2">{t('erp.usuarios.colStatus')}</th>
             <th className="p-2">{t('erp.usuarios.colPolicy')}</th>
             <th className="p-2">{t('erp.common.actions')}</th>
           </tr>
@@ -409,18 +522,35 @@ export default function UsuariosPage() {
               <td className="p-2">{u.pessoa.nomeCompleto}</td>
               <td className="p-2">{u.login}</td>
               <td className="p-2">{labelEnum(t, 'setor', u.setorAcesso)}</td>
+              <td className="p-2 text-xs">
+                {u.ativo === false ? (
+                  <span className="text-[var(--color-danger)]">{t('erp.usuarios.statusInactive')}</span>
+                ) : (
+                  <span className="text-emerald-400/90">{t('erp.usuarios.statusActive')}</span>
+                )}
+              </td>
               <td className="p-2 text-xs text-white/70">
                 {u.policy && Object.keys(u.policy).length > 0
                   ? t('erp.usuarios.policyDefined')
                   : t('erp.usuarios.policyMissing')}
               </td>
               <td className="p-2 flex flex-wrap gap-2">
+                {SETORES.includes(u.setorAcesso as SetorOp) && (
+                  <button
+                    type="button"
+                    onClick={() => abrirEdicao(u)}
+                    className="text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/20"
+                  >
+                    {t('erp.common.edit')}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => {
                     setErro('');
                     setMostrarForm(false);
                     setPolicyUserId(null);
+                    setEditId(null);
                     setRedefinirId(u.id);
                     setNovaSenhaAdmin('');
                   }}
@@ -435,6 +565,26 @@ export default function UsuariosPage() {
                     className="text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/20"
                   >
                     {t('erp.usuarios.policiesAction')}
+                  </button>
+                )}
+                {SETORES.includes(u.setorAcesso as SetorOp) && (
+                  <button
+                    type="button"
+                    onClick={() => alternarAtivo(u)}
+                    className="text-xs px-2 py-1 rounded bg-white/10 hover:bg-white/20"
+                  >
+                    {u.ativo === false
+                      ? t('erp.usuarios.activateAction')
+                      : t('erp.usuarios.deactivateAction')}
+                  </button>
+                )}
+                {SETORES.includes(u.setorAcesso as SetorOp) && (
+                  <button
+                    type="button"
+                    onClick={() => excluirUsuario(u)}
+                    className="text-xs px-2 py-1 rounded bg-red-500/20 text-red-200 hover:bg-red-500/30"
+                  >
+                    {t('erp.common.delete')}
                   </button>
                 )}
               </td>
