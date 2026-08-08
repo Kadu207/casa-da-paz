@@ -8,7 +8,7 @@
 | Licenças | OK | — |
 | Chatwoot Swarm (`chat.inovatitech.com.br`) | **OK em IPv4** após subir Redis | Manter `redis_redis` 1/1 |
 | Gastro / Chat / Portainer (padrão) | **OK IPv4 / 502 IPv6** | Desligar IPv6 no Cloudflare (zona) |
-| SSH `:22` | **TIMEOUT** (v4 e v6) a partir do PC | Console Hetzner / unban fail2ban |
+| SSH | Porta alterada para **`65025`** (OK) | `ssh -p 65025 gestaoti@128.140.77.31` |
 | Swarm deps (n8n, minio, mysql, traefik) | Vários `0/1` | Subir só o que for necessário |
 
 ## 1) Gastro 502 IPv6 (e zona inteira)
@@ -77,17 +77,17 @@ CF-RAY muda por POP; o edge Cloudflare responde 502 no caminho IPv6 enquanto o t
 
 Só subir o que o negócio precisa (n8n/minio consomem RAM).
 
-## 4) SSH bloqueado
+## 4) SSH
 
-Desde ~17:17 UTC-ish, `128.140.77.31:22` e IPv6 `:22` → **timeout** (HTTP/apps OK ⇒ host vivo).
-
-**Fazer no console Hetzner:**
+Porta alterada para **`65025`** (2026-08-08). Exemplo:
 
 ```bash
-# possíveis causas
-sudo fail2ban-client status sshd
-sudo ufw status || true
-sudo iptables -L INPUT -n | head
+ssh -p 65025 gestaoti@128.140.77.31
+```
+
+Pendência no host (se ainda inactive):
+
+```bash
 sudo systemctl start cloudflared-inovatiprojects
 sudo systemctl enable cloudflared-inovatiprojects
 docker service ls
