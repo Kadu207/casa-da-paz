@@ -12,7 +12,7 @@
 | Produção | https://casadapaz.inovatitech.com.br |
 | Asaas (021) | **Dormant** |
 | Deploy VPS | ✅ 030 headers/CSP + FE `index-BdCnS8Id.js` |
-| Segurança | ✅ app harden; ⏳ firewall `:9080` aguarda `sudo` no host |
+| Segurança | ✅ app harden + firewall `:9080` (iptables CASADAPAZ-9080) |
 | CRUD 029 | ✅ prod + smoke |
 
 ## Specs
@@ -34,6 +34,7 @@
 
 ## Próximos passos
 
-1. Na VPS (senha sudo): `cd ~/casadapaz/infra && sudo ./scripts/harden-origin-9080.sh`  
-2. Instalar app CodeRabbit no GitHub (config em `docs/coderabbit.yaml`)  
+1. ~~Firewall `:9080`~~ ✅  
+2. Ativar/verificar CodeRabbit no GitHub (`docs/coderabbit.yaml`)  
 3. Asaas quando houver chave  
+4. Opcional: `sudo apt install iptables-persistent` na VPS para persistir regras após reboot  
