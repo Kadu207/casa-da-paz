@@ -32,3 +32,5 @@ reviews:
         Verifique se features não-triviais têm spec; preferir plan.md + tasks.md.
 chat:
   auto_reply: true
+
+# smoke: CodeRabbit PR check 2026-08-08
