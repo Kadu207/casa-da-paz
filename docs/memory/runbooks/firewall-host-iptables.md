@@ -2,7 +2,7 @@
 
 **Host:** `inovati-server` (`128.140.77.31`)  
 **Política:** preferir **iptables** (+ `iptables-persistent`), não UFW, neste servidor com Docker.  
-**Último inventário:** 2026-08-08 (pós-lockdown P0–P2)
+**Último inventário:** 2026-08-08 (P0–P2 + Swarm/cloudflared)
 
 ## Por que iptables e não UFW
 
@@ -45,9 +45,9 @@ docker run --rm --network host --privileged -v /etc/iptables:/etc/iptables alpin
   sh -c 'apk add --no-cache iptables && iptables-save > /etc/iptables/rules.v4'
 ```
 
-Helpers no repo (execução sob demanda na VPS): `apply-vps-port-lockdown.sh`, `bind-compose-localhost.py`.
+Helpers no repo: `harden-origin-port.sh`, `harden-host-port.sh` (TCP/UDP), `harden-swarm-ports.sh`, `apply-vps-port-lockdown.sh`, `bind-compose-localhost.py`.
 
-## Inventário — portas (2026-08-08 pós-lockdown)
+## Inventário — portas (2026-08-08 completo)
 
 | Porta | Estado | Provável dono | Ação |
 |------:|--------|---------------|------|
@@ -61,18 +61,27 @@ Helpers no repo (execução sob demanda na VPS): `apply-vps-port-lockdown.sh`, `
 | **9180** | **OK-filtrado** | `dental-lab-system-lab-web` | harden (Excellence via docker host) |
 | **9500 / 9501** | **OK-filtrado** | Agenda AI web / tunnel-edge | harden |
 | **8001 / 8002 / 8004 / 8006 / 8007** | **OK-filtrado** | platform-core APIs | harden |
-| 2377 / 7946 | Médio | Docker Swarm | pendente |
-| 20243 | Médio | (host/swarm) | pendente — identificar dono |
+| **2377/tcp** | **OK-filtrado** | `dockerd` Swarm (manager, 1 nó) | `harden-swarm-ports.sh` |
+| **7946/tcp+udp** | **OK-filtrado** | `dockerd` Swarm gossip | idem |
+| **4789/udp** | **OK-filtrado** | Swarm VXLAN overlay | idem |
+| **20243/tcp** | **OK-filtrado** | `cloudflared` (stack Swarm, sem `--metrics` localhost) | harden; tunnels systemd/`60123` já locais |
+
+### Swarm / cloudflared — notas
+
+- Cluster Swarm: **1 manager / 1 node** (`inovati-server`). Portas de plano de controle **não** precisam ser públicas até existir worker remoto (aí liberar só rede privada Hetzner).
+- `:20243`: listener do container `cloudflared_cloudflared` (token via args). Outros tunnels: systemd `cloudflared.service` / `cloudflared-inovatiprojects.service` e serviço Swarm com `--metrics 127.0.0.1:60123`.
+- Reaplicar: `bash ~/casadapaz/infra/scripts/harden-swarm-ports.sh`
 
 ### Já localhost (amostra)
 
 `5432–5436`, `5678`, `6379`, `9400–9416`, `9300–9304`, `9502`, Chatwoot `3001`, Excellence `9081`, gastro Postgres `5440`, agenda `3000`/`3100`, licenças `8195`.
 
-## Probe externo (2026-08-08, de fora — pós-lockdown)
+## Probe externo (2026-08-08, de fora)
 
 | Porta | Resultado | Interpretação |
 |------:|-----------|----------------|
-| 5440, 3000, 8001–8007, 8195, 9080, 9088, 9180, 9500, 9501 | **TIMEOUT** | Fechado/filtrado de fora |
+| 5440, 3000, 8001–8007, 8195, 9080, 9088, 9180, 9500, 9501 | **TIMEOUT** | Fechado/filtrado |
+| 2377, 7946, 20243 | **TIMEOUT** | Swarm/cloudflared filtrados |
 | 80 / 443 | aberto | Entrada pública esperada |
 
 HTTPS: `https://casadapaz.inovatitech.com.br/health` → 200; `https://licencas.inovatitech.com.br/` → 200.
