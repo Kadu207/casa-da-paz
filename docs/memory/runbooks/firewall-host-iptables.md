@@ -53,7 +53,7 @@ Helpers no repo: `harden-origin-port.sh`, `harden-host-port.sh` (TCP/UDP), `hard
 |------:|--------|---------------|------|
 | 22 | Baixo | SSH host | — |
 | 80 / 443 | Baixo | nginx host | — |
-| **5440** | **OK-local** | `inova-gastro-360-postgres` | P0: `127.0.0.1:5440:5432` |
+| **5440** | **OK-filtrado** | `inova-gastro-360-postgres` | publish `0.0.0.0:5440` + harden (app usa `172.17.0.1:5440`; **não** usar só `127.0.0.1`) |
 | **3000** | **OK-local** | `agenda-app` | P1: `127.0.0.1:3000` (+ `3100`) |
 | **8195** | **OK-local** | `gerenciador-licencas-web` | P2: bind `127.0.0.1` + harden |
 | **9080** | **OK-filtrado** | Casa da Paz frontend | harden-origin-9080 |
