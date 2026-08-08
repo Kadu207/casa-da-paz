@@ -8,11 +8,11 @@
 |------|--------|
 | Fase | Pós-go-live: security ops + gates 030 |
 | Versão | 0.1.0-alpha |
-| Commit | em andamento — security hardening 030 |
+| Commit | `2422dae` em `main` (GitHub + GitLab + VPS) |
 | Produção | https://casadapaz.inovatitech.com.br |
 | Asaas (021) | **Dormant** |
-| Deploy VPS | ⏳ 030 (headers + firewall + redeploy) |
-| Segurança | harden app + `agent-security-ops` + CI tests FE |
+| Deploy VPS | ✅ 030 headers/CSP + FE `index-BdCnS8Id.js` |
+| Segurança | ✅ app harden; ⏳ firewall `:9080` aguarda `sudo` no host |
 | CRUD 029 | ✅ prod + smoke |
 
 ## Specs
@@ -20,7 +20,7 @@
 | Spec | Status |
 |------|--------|
 | 020–029 | ✅ |
-| 030 security hardening | ⏳ |
+| 030 security hardening | ✅ prod (firewall sudo pendente) |
 | 021 Asaas | Dormant |
 
 ## Harness
@@ -34,6 +34,6 @@
 
 ## Próximos passos
 
-1. Deploy 030 + `harden-origin-9080.sh` (sudo)
-2. Instalar app CodeRabbit no GitHub apontando `docs/coderabbit.yaml` ou copiar para `.coderabbit.yaml` no Linux
-3. Asaas quando houver chave
+1. Na VPS (senha sudo): `cd ~/casadapaz/infra && sudo ./scripts/harden-origin-9080.sh`  
+2. Instalar app CodeRabbit no GitHub (config em `docs/coderabbit.yaml`)  
+3. Asaas quando houver chave  

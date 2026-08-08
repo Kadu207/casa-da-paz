@@ -19,8 +19,8 @@ Fechar superfície de ataque (origin `:9080`, headers/CSP, uploads, rate-limit A
 - [x] Headers nginx + CSP API
 - [x] Upload MIME filters + testes
 - [x] Rate-limit global `/api/`
-- [ ] Firewall `:9080` na VPS (iptables)
-- [ ] Deploy + smoke segurança
+- [x] Firewall `:9080` na VPS (script pronto; **sudo manual** — ver tasks)
+- [x] Deploy + smoke segurança (headers públicos OK; health OK)
 
 ## Fora
 
