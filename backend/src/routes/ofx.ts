@@ -21,11 +21,16 @@ router.post(
   authorize('conciliacao_bancaria', 'write'),
   upload.single('file'),
   async (req, res) => {
-    const contaId = Number(req.body?.contaId);
-    if (!contaId || !req.file) {
+    const parsed = z
+      .object({
+        contaId: z.coerce.number().int().positive(),
+      })
+      .safeParse(req.body);
+    if (!parsed.success || !req.file) {
       res.status(400).json({ error: 'contaId e arquivo OFX obrigatórios' });
       return;
     }
+    const { contaId } = parsed.data;
     const conta = await prisma.contaFinanceira.findUnique({ where: { id: contaId } });
     if (!conta) {
       res.status(404).json({ error: 'Conta não encontrada' });

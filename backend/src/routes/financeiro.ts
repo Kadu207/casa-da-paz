@@ -36,6 +36,12 @@ import { buildHistoricoResumo } from '../lib/historico-pessoa.js';
 import { registrarAuditoria } from '../lib/auditoria.js';
 import { gerarAlertasAdimplencia } from '../jobs/adimplencia.js';
 import type { Periodo } from '../lib/fluxo-caixa.js';
+import {
+  canAccessPessoaId,
+  denyOwnOrgWide,
+  ownPessoaWhere,
+  reqIsOwnScope,
+} from '../lib/own-scope.js';
 
 const router = Router();
 
@@ -116,11 +122,9 @@ function withAdimplencia<T extends { status: string; vencimento: Date | null }>(
   };
 }
 
+/** Escopo `own` no recurso financeiro (não só setor MEDIUM). */
 function mediumScope(req: Request): Prisma.FinanceiroTransacaoWhereInput | undefined {
-  if (req.user!.setorAcesso === 'MEDIUM') {
-    return { pessoaId: req.user!.pessoaId };
-  }
-  return undefined;
+  return ownPessoaWhere(req, 'financeiro');
 }
 
 router.get('/', authenticate, authorize('financeiro', 'read'), async (req, res) => {
@@ -168,7 +172,9 @@ router.get('/', authenticate, authorize('financeiro', 'read'), async (req, res) 
   });
 });
 
-router.get('/dashboard', authenticate, authorize('dashboard', 'read'), async (_req, res) => {
+router.get('/dashboard', authenticate, authorize('dashboard', 'read'), async (req, res) => {
+  if (denyOwnOrgWide(req, res, 'dashboard')) return;
+
   const receitas = await prisma.financeiroTransacao.groupBy({
     by: ['categoria'],
     where: { tipo: 'RECEITA', status: 'CONCLUIDO' },
@@ -299,10 +305,8 @@ router.post('/batch/status', authenticate, authorize('financeiro', 'write'), asy
     transacoes.map((t) => [t.id, { id: t.id, status: t.status, pessoaId: t.pessoaId }])
   );
 
-  const canUpdate = (row: { pessoaId: number | null }) => {
-    if (req.user!.setorAcesso !== 'MEDIUM') return true;
-    return row.pessoaId === req.user!.pessoaId;
-  };
+  const canUpdate = (row: { pessoaId: number | null }) =>
+    canAccessPessoaId(req, 'financeiro', row.pessoaId);
 
   const plan = planBatchStatusUpdate(ids, status, rowsById, canUpdate);
 
@@ -525,7 +529,7 @@ router.get(
       return;
     }
 
-    if (req.user!.setorAcesso === 'MEDIUM' && req.user!.pessoaId !== pessoaId) {
+    if (!canAccessPessoaId(req, 'financeiro', pessoaId)) {
       res.status(403).json({ error: 'Acesso negado' });
       return;
     }
@@ -598,7 +602,7 @@ router.put('/:id', authenticate, authorize('financeiro', 'write'), async (req, r
     return;
   }
 
-  if (req.user!.setorAcesso === 'MEDIUM' && atual.pessoaId !== req.user!.pessoaId) {
+  if (!canAccessPessoaId(req, 'financeiro', atual.pessoaId)) {
     res.status(403).json({ error: 'Acesso negado' });
     return;
   }
@@ -642,7 +646,7 @@ router.patch('/:id/status', authenticate, authorize('financeiro', 'write'), asyn
     res.status(404).json({ error: 'Transação não encontrada' });
     return;
   }
-  if (req.user!.setorAcesso === 'MEDIUM' && atual.pessoaId !== req.user!.pessoaId) {
+  if (!canAccessPessoaId(req, 'financeiro', atual.pessoaId)) {
     res.status(403).json({ error: 'Acesso negado' });
     return;
   }
@@ -662,7 +666,7 @@ router.delete('/:id', authenticate, authorize('financeiro', 'write'), async (req
     res.status(404).json({ error: 'Transação não encontrada' });
     return;
   }
-  if (req.user!.setorAcesso === 'MEDIUM') {
+  if (reqIsOwnScope(req, 'financeiro')) {
     res.status(403).json({ error: 'Acesso negado' });
     return;
   }

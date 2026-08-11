@@ -11,10 +11,11 @@ describe('upload-filters', () => {
     expect(isAllowedImageMime('image/gif')).toBe(false);
   });
 
-  it('aceita OFX por extensão ou MIME', () => {
+  it('aceita OFX só com extensão e MIME permitidos', () => {
     expect(isAllowedOfxUpload('application/octet-stream', 'extrato.ofx')).toBe(true);
     expect(isAllowedOfxUpload('text/plain', 'x.qfx')).toBe(true);
-    expect(isAllowedOfxUpload('application/pdf', 'x.pdf')).toBe(false);
+    expect(isAllowedOfxUpload('application/pdf', 'x.ofx')).toBe(false);
+    expect(isAllowedOfxUpload('application/octet-stream', 'x.pdf')).toBe(false);
   });
 
   it('aceita apenas .xlsx', () => {

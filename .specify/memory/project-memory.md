@@ -1,6 +1,6 @@
 # Memória Viva — Casa da Paz
 
-**Última atualização:** 2026-08-08
+**Última atualização:** 2026-08-11
 
 ## Estado do projeto
 
@@ -12,7 +12,7 @@
 | Produção | https://casadapaz.inovatitech.com.br |
 | Asaas (021) | **Dormant** |
 | Deploy VPS | ✅ 030 headers/CSP + FE `index-BdCnS8Id.js` |
-| Segurança | ✅ host lockdown + Swarm filtrado; cloudflared metrics só em 127.0.0.1 (60123/20241–20243) |
+| Segurança | ✅ host lockdown + Swarm; backend: block `own` em agregados + Zod Asaas/OFX (local, pendente commit/deploy) |
 | CodeRabbit | ✅ `.coderabbit.yaml` em `main` + check SUCCESS no [PR #2](https://github.com/Kadu207/casa-da-paz/pull/2) |
 | CRUD 029 | ✅ prod + smoke |
 
@@ -35,5 +35,6 @@
 
 ## Próximos passos
 
-1. Fechar PR smoke CodeRabbit #2 (opcional)  
-2. Asaas quando houver chave  
+1. Commit + deploy backend: bloquear MEDIUM/`own` em `/metricas/*` agregados e `/financeiro/dashboard`; unificar escopo `own`; Zod Asaas + OFX  
+2. Fechar PR smoke CodeRabbit #2 (opcional)  
+3. Asaas quando houver chave  

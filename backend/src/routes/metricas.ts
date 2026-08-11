@@ -7,6 +7,7 @@ import {
   financeiroWhereNoPeriodo,
 } from '../lib/metricas-periodo.js';
 import { buildMeuPainelFinanceiro } from '../lib/meu-painel.js';
+import { denyOwnOrgWide, reqIsOwnScope } from '../lib/own-scope.js';
 
 const router = Router();
 
@@ -40,7 +41,9 @@ async function rankingEventos() {
   });
 }
 
-router.get('/eventos', authenticate, authorize('dashboard', 'read'), async (_req, res) => {
+router.get('/eventos', authenticate, authorize('dashboard', 'read'), async (req, res) => {
+  if (denyOwnOrgWide(req, res, 'dashboard')) return;
+
   const lista = await rankingEventos();
   const totais = {
     visualizacoes: lista.reduce((s, e) => s + e.visualizacoes, 0),
@@ -51,8 +54,8 @@ router.get('/eventos', authenticate, authorize('dashboard', 'read'), async (_req
 });
 
 router.get('/meu-painel', authenticate, authorize('dashboard', 'read'), async (req, res) => {
-  if (req.user!.setorAcesso !== 'MEDIUM') {
-    res.status(403).json({ error: 'Apenas Médium' });
+  if (!reqIsOwnScope(req, 'dashboard')) {
+    res.status(403).json({ error: 'Acesso negado' });
     return;
   }
 
@@ -113,6 +116,8 @@ router.get('/meu-painel', authenticate, authorize('dashboard', 'read'), async (r
 });
 
 router.get('/resumo', authenticate, authorize('dashboard', 'read'), async (req, res) => {
+  if (denyOwnOrgWide(req, res, 'dashboard')) return;
+
   const periodoParsed = parseMetricasPeriodo({
     mes: typeof req.query.mes === 'string' ? req.query.mes : undefined,
     ano: typeof req.query.ano === 'string' ? req.query.ano : undefined,

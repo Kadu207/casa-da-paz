@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, authorize } from '../middleware/auth.js';
+import { reqIsOwnScope } from '../lib/own-scope.js';
 import {
   createAssinaturaMedium,
   createCobrancaAvulsa,
@@ -25,7 +26,7 @@ router.get('/config', authenticate, authorize('cobrancas', 'read'), async (_req,
 router.get('/', authenticate, authorize('cobrancas', 'read'), async (req, res) => {
   const status = typeof req.query.status === 'string' ? req.query.status : undefined;
   const pessoaId = req.query.pessoaId ? Number(req.query.pessoaId) : undefined;
-  const isOwn = req.user?.setorAcesso === 'MEDIUM';
+  const isOwn = reqIsOwnScope(req, 'cobrancas');
 
   const cobrancas = await prisma.asaasCobranca.findMany({
     where: {
@@ -142,7 +143,7 @@ router.post(
 );
 
 router.get('/assinaturas', authenticate, authorize('cobrancas', 'read'), async (req, res) => {
-  const isOwn = req.user?.setorAcesso === 'MEDIUM';
+  const isOwn = reqIsOwnScope(req, 'cobrancas');
   const assinaturas = await prisma.asaasAssinatura.findMany({
     where: isOwn ? { pessoaId: req.user!.pessoaId } : undefined,
     include: {

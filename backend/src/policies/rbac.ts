@@ -221,6 +221,24 @@ export function effectiveGrants(
   return { ...base, ...(customGrants ?? {}) };
 }
 
+/** Grant efetivo do recurso (matriz do setor + overrides de policy). */
+export function effectiveGrant(
+  setor: SetorAcesso,
+  resource: Resource,
+  customGrants?: PolicyGrants | null
+): PolicyGrant | undefined {
+  return effectiveGrants(setor, customGrants)[resource];
+}
+
+/** Escopo `own`: filtrar por pessoa_id do JWT (não usar só setorAcesso === MEDIUM). */
+export function isOwnScope(
+  setor: SetorAcesso,
+  resource: Resource,
+  customGrants?: PolicyGrants | null
+): boolean {
+  return effectiveGrant(setor, resource, customGrants) === 'own';
+}
+
 function isSystemRoleStatic(setor: SetorAcesso): boolean {
   return setor === 'SUPERVISOR' || setor === 'ADMIN';
 }

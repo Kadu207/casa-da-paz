@@ -8,7 +8,7 @@ export function isAllowedImageMime(mime: string): boolean {
 
 export function isAllowedOfxUpload(mime: string, originalname: string): boolean {
   const name = originalname.toLowerCase();
-  if (name.endsWith('.ofx') || name.endsWith('.qfx')) return true;
+  if (!name.endsWith('.ofx') && !name.endsWith('.qfx')) return false;
   const m = mime.toLowerCase();
   return (
     m === 'application/x-ofx' ||

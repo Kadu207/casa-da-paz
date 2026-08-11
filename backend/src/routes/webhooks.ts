@@ -12,6 +12,26 @@ import {
 
 const router = Router();
 
+const asaasWebhookSchema = z.object({
+  id: z.string().min(1).optional(),
+  event: z.string().min(1),
+  payment: z
+    .object({
+      id: z.string().min(1),
+      status: z.string().min(1),
+      billingType: z.string().optional(),
+      value: z.number().optional(),
+      dueDate: z.string().optional(),
+      invoiceUrl: z.string().optional(),
+      bankSlipUrl: z.string().optional(),
+      customer: z.string().optional(),
+      externalReference: z.string().optional(),
+      subscription: z.string().optional(),
+    })
+    .passthrough()
+    .optional(),
+});
+
 function validateSecret(req: Request, secret: string): boolean {
   const header = req.headers['x-webhook-secret'];
   if (typeof header !== 'string' || !secret) return false;
@@ -33,17 +53,17 @@ router.post('/asaas', async (req, res) => {
     return;
   }
 
-  const body = req.body as { id?: string; event?: string; payment?: unknown };
-  if (!body?.event) {
-    res.status(400).json({ error: 'Payload inválido' });
+  const parsed = asaasWebhookSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
     return;
   }
 
   try {
     const result = await processAsaasWebhook({
-      id: body.id,
-      event: body.event,
-      payment: body.payment as never,
+      id: parsed.data.id,
+      event: parsed.data.event,
+      payment: parsed.data.payment as never,
     });
     res.json(result);
   } catch (err) {
