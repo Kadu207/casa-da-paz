@@ -11,7 +11,9 @@
 | Commit | `e18a63c` (030 Helmet/uploads; backend rebuild na VPS 2026-08-20) |
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (**não** :22) |
-| Asaas (021) | **Dormant** |
+| Asaas (021) | **Dormant** — runbook [`docs/memory/runbooks/asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
+| Spec 032 ingressos | 📋 Stub em `specs/032-ingressos-eventos/` (não implementar) |
+| SSH allowlist | Script `infra/scripts/allowlist-ssh-65025.sh` (opcional; gate humano) |
 | Security 030 | ✅ Fase 0–2: `:9080` filtrado (smoke TIMEOUT), headers OK, Helmet+magic uploads, CI GL test, CodeRabbit no Git, validators 028/029/030 |
 | Deploy 031 | ✅ migrate + FE na VPS |
 

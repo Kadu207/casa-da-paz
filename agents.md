@@ -40,8 +40,9 @@ Usuário → agent-orquestrador → agente-domínio → validador-integracao →
 | 022–025 | Tesouraria completa | **Não depende** |
 | 026 | Patrocínios / padrinhos | **Não depende** |
 | 020 | Policies no cadastro de usuário | — |
-| 021 | Asaas PSP | Dormant até `ASAAS_API_KEY` |
+| 021 | Asaas PSP | Dormant até `ASAAS_API_KEY` — [`asaas-dormant.md`](docs/memory/runbooks/asaas-dormant.md) |
 | 031 | Estoque primário da casa | **Não depende** |
+| 032 | Ingressos/eventos (secundário) | 📋 Planejado — não implementar ainda |
 
 Docs: [`docs/00-index.md`](docs/00-index.md)
 

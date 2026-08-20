@@ -11,35 +11,33 @@
 | 011 portal público | `/public/*`, LGPD, agendamento | ✅ Prod |
 | 014 alertas UI | Badge + N8N lembrete | ✅ |
 | 017–019 | Dashboard, painel médium, auditoria export | ✅ |
-| 020 RBAC + policies | Hierarquia + `UsuarioPolicy` | ✅ (+ snapshot no cadastro) |
-| 021 Asaas + marketing | Código completo | ✅ **dormant** sem chave |
+| 020 RBAC + policies | Hierarquia + `UsuarioPolicy` | ✅ |
+| 021 Asaas + marketing | Código completo | ✅ **dormant** — ver `docs/memory/runbooks/asaas-dormant.md` |
 | 022–025 tesouraria | AP, recorrência, DRE, OFX | ✅ Prod |
-| Contribuintes | Patrocínios / padrinhos + mensalidade médiuns | ✅ Prod |
-| Harness agents | `agents.md` + 5 agentes ops | ✅ |
-| 030 security | Hardening / own-scope | ✅ Prod |
-| **031 estoque casa** | Almoxarifado primário + checklist limpeza | ✅ Código + migrate local |
+| Contribuintes | Patrocínios / padrinhos | ✅ Prod |
+| 030 security | Hardening | ✅ Prod |
+| **031 estoque casa** | Almoxarifado primário | ✅ Prod |
+| Stash VPS `vps-before-031` | Removido | ✅ |
 
 ## Sequência atual
 
 ```
-✅ 031 Estoque primário (código + docs + migrate local)
+✅ 031 Estoque em produção
     ↓
-⏳ Deploy VPS 031 (gate humano confirmado nesta sessão)
+📋 032 Ingressos/eventos (spec stub — ADR-010) — aguarda abertura
     ↓
-012 Chatwoot/N8N polish (tokens)
+021 Asaas — dormant até chave + confirmação
     ↓
-Ativar Asaas (sandbox → prod) só com chave + confirmação
+012 Chatwoot/N8N polish
     ↓
-Ingressos/eventos (estoque secundário — ADR-010)
-    ↓
-016 Next.js — só com aprovação + ADR-008/009
+016 Next.js — ADR-008
 ```
 
 ## Próxima onda
 
 | Prioridade | Item | Notas |
 |------------|------|-------|
-| **1** | Deploy VPS 031 | migrate + seed `--estoque-casa-only` (não seed destroy) |
-| **2** | Chatwoot/N8N prod polish | Token Meta / widget |
-| **3** | Asaas sandbox | Quando houver `ASAAS_API_KEY` |
-| **4** | Ingressos eventos | Spec futura (secundário) |
+| **1** | Spec 032 detalhada | Só quando priorizar ingressos |
+| **2** | Asaas sandbox | `asaas-dormant.md` gate |
+| **3** | SSH allowlist :65025 | Script `infra/scripts/allowlist-ssh-65025.sh` (opcional) |
+| **4** | Chatwoot/N8N | Tokens Meta / widget |
