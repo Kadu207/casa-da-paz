@@ -12,7 +12,9 @@
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65022 gestaoti@128.140.77.31` (**não** :22) |
 | Asaas (021) | **Dormant** |
-| Deploy 031 | Em andamento — limpar testes órfãos na VPS + rebuild |
+| Deploy 031 backend | ✅ migrate 22 + seed catálogo + health OK (`619e694`) |
+| Deploy 031 frontend | ⏳ PC→VPS SSH `:65022` timeout — build na VPS com Docker |
+| SSH do PC | Timeout em `128.140.77.31:65022` (firewall Hetzner/ISP ou allowlist) |
 
 ## Deploy VPS (colar)
 
@@ -34,5 +36,30 @@ Frontend (PC):
 
 ```powershell
 cd "C:\Projetos DEV\Casa da Paz"
-.\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend -SshPort 65022
+.\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend
 ```
+
+Se SSH do PC der **timeout** (comum se a porta 65022 só aceita IPs allowlist / console Hetzner),
+builde **na própria VPS** (não precisa npm no host):
+
+```bash
+cd ~/casadapaz
+git pull origin main
+cd infra
+chmod +x scripts/build-frontend-on-vps.sh
+./scripts/build-frontend-on-vps.sh
+./scripts/compose-prod.sh restart frontend
+curl -sI http://127.0.0.1:9080/login | head -3
+```
+
+### Diagnóstico SSH timeout do PC
+
+```bash
+# Na VPS — quem escuta e regras
+sudo ss -tlnp | grep 65022
+sudo iptables -L INPUT -n -v | head -40
+# Hetzner Cloud Console → Firewall: porta 65022/tcp liberada para seu IP público?
+```
+
+Do PC: `Test-NetConnection 128.140.77.31 -Port 65022`  
+Timeout = bloqueio de rede (não é senha/script).
