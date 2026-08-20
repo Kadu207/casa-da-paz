@@ -627,23 +627,26 @@ function assertSeedGate(mode: 'destroy' | 'users' | 'portal' | 'supervisor') {
   );
 }
 
-if (process.argv.includes('--supervisor-only')) {
+const seedArgs = process.argv.slice(2);
+const hasFlag = (flag: string) => seedArgs.includes(flag);
+
+if (hasFlag('--supervisor-only')) {
   assertSeedGate('supervisor');
   seedSupervisorOnly()
     .catch(console.error)
     .finally(() => prisma.$disconnect());
-} else if (process.argv.includes('--estoque-casa-only')) {
+} else if (hasFlag('--estoque-casa-only')) {
   // Idempotente — seguro em produção (só upsert do catálogo primário)
   seedEstoqueCasaCatalogo()
     .then(() => console.log('Seed estoque casa (catálogo) OK'))
     .catch(console.error)
     .finally(() => prisma.$disconnect());
-} else if (process.argv.includes('--portal-content')) {
+} else if (hasFlag('--portal-content')) {
   assertSeedGate('portal');
   seedPortalContent()
     .catch(console.error)
     .finally(() => prisma.$disconnect());
-} else if (process.argv.includes('--users-only')) {
+} else if (hasFlag('--users-only')) {
   assertSeedGate('users');
   seedAllUsers()
     .catch(console.error)

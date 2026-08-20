@@ -3,9 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY prisma ./prisma
-RUN npx prisma generate
 COPY . .
-RUN npm run build
+# Generate AFTER full COPY so host node_modules never overwrite the client
+RUN npx prisma generate && npm run build
 
 FROM node:22-alpine
 WORKDIR /app
