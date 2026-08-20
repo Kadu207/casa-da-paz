@@ -57,3 +57,4 @@ flowchart LR
 4. Import Excel atômico
 5. Deploy VPS só com confirmação humana
 6. Tesouraria **não depende** de Asaas
+7. Estoques separados: primário (casa) ≠ livraria/PDV ≠ ingressos futuros (ADR-010)

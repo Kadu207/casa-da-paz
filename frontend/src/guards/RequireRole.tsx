@@ -13,6 +13,7 @@ const routeResources: Record<string, string> = {
   '/app/eventos': 'eventos',
   '/app/pessoas': 'pessoas',
   '/app/livraria': 'livraria',
+  '/app/estoque': 'estoque_casa',
   '/app/ecommerce': 'ecommerce',
   '/app/usuarios': 'usuarios',
   '/app/auditoria': 'auditoria',

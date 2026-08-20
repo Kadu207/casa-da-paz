@@ -17,7 +17,8 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | Contribuintes | `Contribuinte` (`PATROCINIO` \| `PADRINHO`) |
 | Asaas (021, opcional) | `AsaasCliente`, `AsaasCobranca`, `AsaasAssinatura`, `AsaasWebhookEvent` |
 | Eventos | `Evento`, `Inscricao`, `Presenca` |
-| Livraria / ecommerce | produtos, estoque, `EcommercePedido` |
+| Estoque primário (031) | `ItemEstoqueCasa`, `MovimentacaoEstoqueCasa`, `GrupoLimpeza`, `ChecklistLimpeza`, `ChecklistLimpezaItem` |
+| Livraria / ecommerce | `Produto`, `EstoqueMovimentacao`, `EcommercePedido` (venda — ADR-004) |
 | Portal | `AgendamentoPublico`, newsletter, consentimentos LGPD |
 | Ops | `Alerta`, auditoria, marketing |
 
@@ -30,6 +31,13 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 - `OrigemTransacao`: inclui `RECORRENCIA`, `CONTA_PAGAR`, `OFX`, …  
 - `SetorAcesso`: SUPERVISOR, ADMIN, DIRETORIA, FINANCEIRO, **TESOURARIA**, MARKETING, RECEPCAO, LIVRARIA, MEDIUM, SUPORTE  
 
+### Estoque da casa (031)
+
+- `CategoriaEstoqueCasa`: RITUAL, BEBIDA, TABACO, VELA, LIMPEZA, DESCARTAVEL, OUTROS  
+- `UnidadeEstoqueCasa`: UN, CX, PCT, L, ML, KG, G  
+- `TipoMovEstoqueCasa`: ENTRADA, SAIDA, AJUSTE  
+- `StatusChecklistLimpeza`: RASCUNHO, CONCLUIDO  
+
 ## 4.3. Regras de dados
 
 | Regra | Detalhe |
@@ -39,6 +47,8 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | Mensalidade | Um `MensalidadePlano` por `pessoaId`; job gera lançamento do mês se ausente |
 | Policy | `UsuarioPolicy.grants` JSON — snapshot no cadastro do usuário |
 | Import Excel | Transação atômica com rollback total |
+| Estoque mínimo (casa) | Derivado: `estoqueAtual <= estoqueMinimo` (não status persistido) |
+| Multi-estoque | Primário (`itens_estoque_casa`) ≠ livraria (`produtos`) — ADR-010 |
 
 ## 4.4. Migrations recentes
 
@@ -47,11 +57,14 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | `20260803000000_financeiro_asaas_gestor` | Contas + Asaas + MARKETING |
 | `20260806120000_tesouraria_022_025` | Contas a pagar, planos, DRE, OFX |
 | `20260806140000_contribuintes_patrocinio_padrinho` | Contribuintes |
+| `20260820120000_estoque_casa_031` | Almoxarifado primário + grupos limpeza + checklist |
 
 ```bash
 cd backend
 npx prisma migrate deploy
 npx prisma generate
+# Catálogo primário (idempotente, seguro em prod):
+npx tsx prisma/seed.ts --estoque-casa-only
 ```
 
 ## 4.5. Porta local

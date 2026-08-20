@@ -27,6 +27,8 @@ copy .env.example .env   # se necessário
 npm ci
 npx prisma migrate deploy
 npm run db:seed
+# Ou só catálogo do estoque primário (idempotente):
+# npx tsx prisma/seed.ts --estoque-casa-only
 npm run dev
 
 # outro terminal

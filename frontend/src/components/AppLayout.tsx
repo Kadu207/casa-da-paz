@@ -14,6 +14,7 @@ const nav: { path: string; labelKey: ErpTranslationKey; resource: string }[] = [
   { path: '/app/eventos', labelKey: 'erp.nav.eventos', resource: 'eventos' },
   { path: '/app/pessoas', labelKey: 'erp.nav.pessoas', resource: 'pessoas' },
   { path: '/app/livraria', labelKey: 'erp.nav.livraria', resource: 'livraria' },
+  { path: '/app/estoque', labelKey: 'erp.nav.estoque', resource: 'estoque_casa' },
   { path: '/app/ecommerce', labelKey: 'erp.nav.ecommerce', resource: 'ecommerce' },
   { path: '/app/usuarios', labelKey: 'erp.nav.usuarios', resource: 'usuarios' },
   { path: '/app/auditoria', labelKey: 'erp.nav.auditoria', resource: 'auditoria' },

@@ -6,6 +6,7 @@ info:
     Contrato parcial da API Express. Stack: JWT + RBAC.
     Tesouraria 022–025 e contribuintes não dependem de Asaas.
     POST /auth/usuarios cria UsuarioPolicy (snapshot de grants) no ato do cadastro.
+    Estoque primário (031): /estoque-casa/* — separado da livraria (ADR-010).
 servers:
   - url: /api
 paths:
@@ -142,6 +143,36 @@ paths:
       security: [{ bearerAuth: [] }]
   /livraria/venda:
     post:
+      security: [{ bearerAuth: [] }]
+  /estoque-casa/itens:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Lista itens do estoque primário (estoque_casa)
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Cadastrar item
+  /estoque-casa/movimentacoes:
+    get:
+      security: [{ bearerAuth: [] }]
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Entrada / saída / ajuste
+  /estoque-casa/grupos-limpeza:
+    get:
+      security: [{ bearerAuth: [] }]
+    post:
+      security: [{ bearerAuth: [] }]
+  /estoque-casa/checklists:
+    get:
+      security: [{ bearerAuth: [] }]
+    post:
+      security: [{ bearerAuth: [] }]
+  /estoque-casa/checklists/{id}/concluir:
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Conclui checklist e aplica baixas atômicas
+  /estoque-casa/relatorio:
+    get:
       security: [{ bearerAuth: [] }]
   /public/eventos:
     get:

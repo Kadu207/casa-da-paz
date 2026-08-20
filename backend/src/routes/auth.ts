@@ -17,6 +17,7 @@ import {
   snapshotGrantsForSetor,
   type PolicyGrants,
 } from '../policies/rbac.js';
+import { enrichEstoqueCasaGrants } from '../lib/estoque-casa.js';
 import { registrarAuditoria } from '../lib/auditoria.js';
 
 const router = Router();
@@ -80,7 +81,7 @@ async function loadUsuarioOr404(id: number, res: import('express').Response) {
   return usuario;
 }
 
-function serializeUsuario(u: {
+async function serializeUsuario(u: {
   id: number;
   login: string;
   setorAcesso: import('@prisma/client').SetorAcesso;
@@ -99,7 +100,7 @@ function serializeUsuario(u: {
     ativo: u.ativo ?? true,
     pessoa: u.pessoa,
     policy: customGrants,
-    effectiveGrants: effectiveGrants(u.setorAcesso, customGrants),
+    effectiveGrants: await enrichEstoqueCasaGrants(u.id, u.setorAcesso, customGrants),
   };
 }
 
@@ -162,7 +163,7 @@ router.post('/login', loginRateLimit, async (req, res) => {
   });
   res.json({
     token,
-    user: serializeUsuario(usuario),
+    user: await serializeUsuario(usuario),
   });
 });
 
@@ -175,7 +176,7 @@ router.get('/me', authenticate, async (req, res) => {
     res.status(404).json({ error: 'Usuário não encontrado' });
     return;
   }
-  res.json(serializeUsuario(usuario));
+  res.json(await serializeUsuario(usuario));
 });
 
 router.get('/politicas/catalogo', authenticate, requireSupervisor, (_req, res) => {
@@ -271,7 +272,7 @@ router.get('/usuarios', authenticate, authorize('usuarios', 'read'), async (_req
       policy: true,
     },
   });
-  res.json(usuarios.map((u) => serializeUsuario(u)));
+  res.json(await Promise.all(usuarios.map((u) => serializeUsuario(u))));
 });
 
 router.post('/usuarios', authenticate, authorize('usuarios', 'write'), async (req, res) => {
@@ -306,7 +307,7 @@ router.post('/usuarios', authenticate, authorize('usuarios', 'write'), async (re
     });
   });
 
-  res.status(201).json(serializeUsuario(usuario));
+  res.status(201).json(await serializeUsuario(usuario));
 });
 
 router.put('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async (req, res) => {
@@ -372,7 +373,7 @@ router.put('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async 
     return updated;
   });
 
-  res.json(serializeUsuario(usuario));
+  res.json(await serializeUsuario(usuario));
 });
 
 router.delete('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async (req, res) => {

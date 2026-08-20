@@ -46,6 +46,7 @@ export function hasPermission(
     return true;
   }
   if (user.setorAcesso === 'ADMIN') {
+    if (resource === 'estoque_casa') return true;
     return ['integracoes', 'webhooks', 'logs', 'manutencao'].includes(resource);
   }
   const grant = user.effectiveGrants?.[resource];

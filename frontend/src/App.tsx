@@ -17,6 +17,7 @@ import FinanceiroOfxPage from './pages/financeiro/FinanceiroOfxPage';
 import FinanceiroContribuintesPage from './pages/financeiro/FinanceiroContribuintesPage';
 import RecepcaoPage from './pages/RecepcaoPage';
 import LivrariaPage from './pages/LivrariaPage';
+import EstoqueCasaPage from './pages/EstoqueCasaPage';
 import UsuariosPage from './pages/UsuariosPage';
 import PessoasPage from './pages/PessoasPage';
 import EventosPage from './pages/EventosPage';
@@ -155,6 +156,14 @@ export default function App() {
           element={
             <RequireRole path="/app/livraria">
               <LivrariaPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="estoque"
+          element={
+            <RequireRole path="/app/estoque">
+              <EstoqueCasaPage />
             </RequireRole>
           }
         />

@@ -41,7 +41,8 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/app/pessoas` | pessoas | Cadastros por função (+ mensalidade nos médiuns) |
 | `/app/recepcao` | checkin | Recepção / check-in |
 | `/app/eventos` | eventos | Eventos ERP |
-| `/app/livraria` | livraria | PDV / estoque |
+| `/app/livraria` | livraria | PDV / estoque de venda |
+| `/app/estoque` | estoque_casa | Estoque primário da casa (insumos) |
 | `/app/ecommerce` | ecommerce | Pedidos |
 | `/app/marketing` | marketing | Marketing + materiais de estudo |
 | `/app/usuarios` | usuarios | Usuários + policies (SUPERVISOR) |
@@ -61,6 +62,8 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | * | `/api/mensalidade-planos` | Recorrência |
 | * | `/api/contribuintes` | Patrocínios / padrinhos |
 | * | `/api/cobrancas`, `/api/webhooks/asaas` | Asaas (se chave) |
+| * | `/api/livraria` | PDV / produtos |
+| * | `/api/estoque-casa` | Estoque primário (itens, movimentações, grupos, checklists) |
 | * | `/api/public/*` | Portal anônimo |
 
 Contrato parcial: [`docs/contracts/openapi.yaml`](./contracts/openapi.yaml).

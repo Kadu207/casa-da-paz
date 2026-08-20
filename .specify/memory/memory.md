@@ -39,10 +39,11 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 020 policies no cadastro | ✅ Snapshot no POST usuários |
 | 021 Asaas | **Dormant** até chave |
 | 026 contribuintes | ✅ (spec dedicada) |
+| 031 estoque-casa | ✅ Primário (ADR-010) |
 
 ## ADRs
 
-001–009 em `docs/memory/decisions/` — 002 (RBAC+policies), 009 Asaas opcional.
+001–010 em `docs/memory/decisions/` — 002 (RBAC+policies), 009 Asaas opcional, **010 estoque primário**.
 
 ## Regras
 

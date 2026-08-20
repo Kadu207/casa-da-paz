@@ -11,8 +11,7 @@
 | Ago/2026 | Patrocínios/padrinhos + mensalidade na lista de médiuns |
 | Ago/2026 | Policies **no ato do cadastro** de usuário |
 | Ago/2026 | Harness `agents.md` + 5 agentes de operação pós-construção |
-
-Commit de referência tesouraria+policies: `a040174` (main).
+| Ago/2026 | **031 Estoque primário** (almoxarifado casa, grupos limpeza, checklist) — ADR-010 |
 
 ## 9.2. Estado atual
 
@@ -20,9 +19,9 @@ Ver [`.specify/memory/project-memory.md`](../.specify/memory/project-memory.md) 
 
 ## 9.3. Próximos passos
 
-1. Deploy VPS do `main` atual (gate humano — SSH no terminal do usuário se o agente não tiver chave)  
-2. Ativar Asaas sandbox/produção **somente** com chave e confirmação  
-3. Chatwoot/N8N polish (tokens Meta / widget)  
+1. Ativar Asaas sandbox/produção **somente** com chave e confirmação  
+2. Chatwoot/N8N polish (tokens Meta / widget)  
+3. Controle de **ingressos/eventos** como estoque secundário (documentado no ADR-010)  
 4. Next.js (016) — bloqueado por ADR-008 até aprovação  
 
 ## 9.4. Referência Lovable

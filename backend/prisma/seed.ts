@@ -554,7 +554,60 @@ async function main() {
     },
   });
 
+  await seedEstoqueCasaCatalogo();
+
   console.log('Seed completo OK — usuários com policies + dados de exemplo');
+}
+
+async function seedEstoqueCasaCatalogo() {
+  const catalogo: {
+    nome: string;
+    categoria: 'RITUAL' | 'BEBIDA' | 'TABACO' | 'VELA' | 'LIMPEZA' | 'DESCARTAVEL' | 'OUTROS';
+    unidade: 'UN' | 'CX' | 'PCT' | 'L' | 'ML' | 'KG' | 'G';
+    estoqueAtual: number;
+    estoqueMinimo: number;
+  }[] = [
+    { nome: 'Charuto', categoria: 'TABACO', unidade: 'UN', estoqueAtual: 20, estoqueMinimo: 5 },
+    { nome: 'Cigarrilha', categoria: 'TABACO', unidade: 'CX', estoqueAtual: 10, estoqueMinimo: 3 },
+    { nome: 'Fumo de corda', categoria: 'TABACO', unidade: 'UN', estoqueAtual: 8, estoqueMinimo: 2 },
+    { nome: 'Cachaça', categoria: 'BEBIDA', unidade: 'L', estoqueAtual: 6, estoqueMinimo: 2 },
+    { nome: 'Vinho tinto', categoria: 'BEBIDA', unidade: 'UN', estoqueAtual: 8, estoqueMinimo: 2 },
+    { nome: 'Cerveja', categoria: 'BEBIDA', unidade: 'UN', estoqueAtual: 24, estoqueMinimo: 6 },
+    { nome: 'Água mineral', categoria: 'BEBIDA', unidade: 'UN', estoqueAtual: 48, estoqueMinimo: 12 },
+    { nome: 'Café', categoria: 'BEBIDA', unidade: 'KG', estoqueAtual: 3, estoqueMinimo: 1 },
+    { nome: 'Vela branca', categoria: 'VELA', unidade: 'UN', estoqueAtual: 50, estoqueMinimo: 15 },
+    { nome: 'Vela 7 dias', categoria: 'VELA', unidade: 'UN', estoqueAtual: 20, estoqueMinimo: 5 },
+    { nome: 'Vela vermelha', categoria: 'VELA', unidade: 'UN', estoqueAtual: 15, estoqueMinimo: 5 },
+    { nome: 'Vela azul', categoria: 'VELA', unidade: 'UN', estoqueAtual: 15, estoqueMinimo: 5 },
+    { nome: 'Vela amarela', categoria: 'VELA', unidade: 'UN', estoqueAtual: 15, estoqueMinimo: 5 },
+    { nome: 'Pemba', categoria: 'RITUAL', unidade: 'UN', estoqueAtual: 10, estoqueMinimo: 3 },
+    { nome: 'Defumador', categoria: 'RITUAL', unidade: 'PCT', estoqueAtual: 12, estoqueMinimo: 4 },
+    { nome: 'Essência', categoria: 'RITUAL', unidade: 'ML', estoqueAtual: 200, estoqueMinimo: 50 },
+    { nome: 'Azeite', categoria: 'RITUAL', unidade: 'L', estoqueAtual: 2, estoqueMinimo: 1 },
+    { nome: 'Farofa', categoria: 'RITUAL', unidade: 'KG', estoqueAtual: 3, estoqueMinimo: 1 },
+    { nome: 'Pipoca', categoria: 'RITUAL', unidade: 'KG', estoqueAtual: 2, estoqueMinimo: 1 },
+    { nome: 'Azeite de dendê', categoria: 'RITUAL', unidade: 'L', estoqueAtual: 2, estoqueMinimo: 1 },
+    { nome: 'Detergente', categoria: 'LIMPEZA', unidade: 'UN', estoqueAtual: 8, estoqueMinimo: 2 },
+    { nome: 'Desinfetante', categoria: 'LIMPEZA', unidade: 'L', estoqueAtual: 5, estoqueMinimo: 2 },
+    { nome: 'Esponja', categoria: 'LIMPEZA', unidade: 'UN', estoqueAtual: 20, estoqueMinimo: 5 },
+    { nome: 'Saco de lixo', categoria: 'LIMPEZA', unidade: 'PCT', estoqueAtual: 10, estoqueMinimo: 3 },
+    { nome: 'Papel toalha', categoria: 'LIMPEZA', unidade: 'UN', estoqueAtual: 12, estoqueMinimo: 4 },
+    { nome: 'Copo descartável', categoria: 'DESCARTAVEL', unidade: 'PCT', estoqueAtual: 15, estoqueMinimo: 5 },
+    { nome: 'Prato descartável', categoria: 'DESCARTAVEL', unidade: 'PCT', estoqueAtual: 10, estoqueMinimo: 3 },
+    { nome: 'Guardanapo', categoria: 'DESCARTAVEL', unidade: 'PCT', estoqueAtual: 12, estoqueMinimo: 4 },
+  ];
+
+  for (const item of catalogo) {
+    await prisma.itemEstoqueCasa.upsert({
+      where: { nome_categoria: { nome: item.nome, categoria: item.categoria } },
+      create: item,
+      update: {
+        unidade: item.unidade,
+        estoqueMinimo: item.estoqueMinimo,
+        ativo: true,
+      },
+    });
+  }
 }
 
 function assertSeedGate(mode: 'destroy' | 'users' | 'portal' | 'supervisor') {
@@ -577,6 +630,12 @@ function assertSeedGate(mode: 'destroy' | 'users' | 'portal' | 'supervisor') {
 if (process.argv.includes('--supervisor-only')) {
   assertSeedGate('supervisor');
   seedSupervisorOnly()
+    .catch(console.error)
+    .finally(() => prisma.$disconnect());
+} else if (process.argv.includes('--estoque-casa-only')) {
+  // Idempotente — seguro em produção (só upsert do catálogo primário)
+  seedEstoqueCasaCatalogo()
+    .then(() => console.log('Seed estoque casa (catálogo) OK'))
     .catch(console.error)
     .finally(() => prisma.$disconnect());
 } else if (process.argv.includes('--portal-content')) {

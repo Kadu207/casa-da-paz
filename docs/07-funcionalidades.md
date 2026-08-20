@@ -41,11 +41,20 @@ Menores: `PessoaResponsavel`.
 | Dashboard | KPIs por período; painel próprio para MEDIUM |
 | Recepção | Check-in / presença |
 | Eventos | Gestão + inscrições |
-| Livraria | PDV e estoque |
+| **Estoque** | Almoxarifado **primário** (`/app/estoque`): itens, mínimo/alertas, grupos de limpeza, checklist, relatório |
+| Livraria | PDV e estoque de **venda** (produtos) |
 | Ecommerce | Pedidos |
 | Marketing | Conteúdo / campanhas (papel MARKETING) |
 | Usuários | SUPERVISOR: criar com policies no ato |
 | Auditoria | Filtros + export CSV/PDF |
+
+### Taxonomia de estoques
+
+| Prioridade | Módulo | Resource |
+|------------|--------|----------|
+| Primário | Estoque da Casa | `estoque_casa` |
+| Secundário | Livraria/PDV | `estoque` |
+| Futuro | Ingressos/eventos | módulo eventos |
 
 ## 7.5. Specs de referência
 
@@ -58,3 +67,6 @@ Menores: `PessoaResponsavel`.
 | 024 DRE / orçamento / centros | ✅ |
 | 025 Conciliação OFX | ✅ |
 | Contribuintes (patrocínio/padrinho) | ✅ (junto ao ciclo tesouraria) |
+| 027 Materiais de estudo | ✅ |
+| 030 Security hardening | ✅ |
+| **031 Estoque primário da casa** | ✅ |

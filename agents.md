@@ -41,6 +41,7 @@ Usuário → agent-orquestrador → agente-domínio → validador-integracao →
 | 026 | Patrocínios / padrinhos | **Não depende** |
 | 020 | Policies no cadastro de usuário | — |
 | 021 | Asaas PSP | Dormant até `ASAAS_API_KEY` |
+| 031 | Estoque primário da casa | **Não depende** |
 
 Docs: [`docs/00-index.md`](docs/00-index.md)
 

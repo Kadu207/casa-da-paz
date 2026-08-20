@@ -1,41 +1,35 @@
 # Memória Viva — Casa da Paz
 
-**Última atualização:** 2026-08-11
+**Última atualização:** 2026-08-20
 
 ## Estado do projeto
 
 | Item | Status |
 |------|--------|
-| Fase | Pós-go-live: security ops + multi-app |
+| Fase | Pós-go-live: estoque primário 031 |
 | Versão | 0.1.0-alpha |
-| Commit | `50d8abc` em `main` (smoke own-scope) |
 | Produção | https://casadapaz.inovatitech.com.br |
 | Asaas (021) | **Dormant** |
-| Deploy VPS | ✅ own-scope + smoke MEDIUM OK |
+| Local 031 | ✅ migrate `20260820120000_estoque_casa_031` + seed OK |
+| Deploy VPS 031 | Em andamento (confirmação usuário) |
 | Segurança | ✅ host lockdown; own-scope agregados; OFX/Asaas Zod |
-| CodeRabbit | ✅ PR #2 **fechado** (smoke ok; config em main) |
-| Multi-app | ✅ n8n-excellence 200; Swarm n8n **não** subir; agenda loops = CF |
-| CRUD 029 | ✅ prod + smoke |
 
 ## Specs
 
 | Spec | Status |
 |------|--------|
-| 020–029 | ✅ |
-| 030 security hardening | ✅ |
+| 020–030 | ✅ |
+| **031 estoque casa** | ✅ código + docs; deploy VPS |
 | 021 Asaas | Dormant |
 
 ## Harness
 
-- `agents.md` — construção + ops + **security-ops**
-- Checklists skills datados 2026-08-08
-- Smoke MEDIUM: `scripts/test-own-scope-medium.ps1`
-- CodeRabbit: `docs/coderabbit.yaml` (raiz `.coderabbit.yaml` bloqueada no Windows)
-- Spec Kit: `.specify/README.md` + templates
-- CI: GitHub + GitLab com `npm test` BE/FE
+- `agents.md` — construção + ops + security-ops
+- ADR-010 multi-estoque (primário casa vs livraria vs ingressos)
+- Seed seguro catálogo: `npx tsx prisma/seed.ts --estoque-casa-only`
 
 ## Próximos passos
 
-1. Cloudflare (manual): SSL Full + origins agenda/`api`/healthplataform; Gastro → `127.0.0.1:9088`  
-2. Asaas quando houver chave  
-3. Opcional: apontar `wf` → excellence `:5678`  
+1. Concluir deploy VPS 031 (migrate + seed catálogo + FE build)  
+2. Cloudflare / Asaas quando houver chave  
+3. Spec futura: ingressos/eventos (estoque secundário)  

@@ -160,6 +160,37 @@ enum TipoMovimentacao {
   SAIDA
 }
 
+enum CategoriaEstoqueCasa {
+  RITUAL
+  BEBIDA
+  TABACO
+  VELA
+  LIMPEZA
+  DESCARTAVEL
+  OUTROS
+}
+
+enum UnidadeEstoqueCasa {
+  UN
+  CX
+  PCT
+  L
+  ML
+  KG
+  G
+}
+
+enum TipoMovEstoqueCasa {
+  ENTRADA
+  SAIDA
+  AJUSTE
+}
+
+enum StatusChecklistLimpeza {
+  RASCUNHO
+  CONCLUIDO
+}
+
 enum StatusAgendamento {
   PENDENTE
   CONFIRMADO
@@ -227,6 +258,9 @@ model Usuario {
   pessoa       Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
   fechamentosFinanceiros FinanceiroFechamentoMensal[]
   policy       UsuarioPolicy?
+  gruposLimpezaResponsavel GrupoLimpeza[]            @relation("GrupoLimpezaResponsavel")
+  movimentacoesEstoqueCasa MovimentacaoEstoqueCasa[]
+  checklistsCriados        ChecklistLimpeza[]        @relation("ChecklistCriadoPor")
 
   @@map("usuarios")
 }
@@ -751,4 +785,91 @@ model EcommerceItemPedido {
   produto       Produto         @relation(fields: [produtoId], references: [id])
 
   @@map("ecommerce_itens_pedido")
+}
+
+/// Almoxarifado primário — insumos de funcionamento / ritualística (ADR-010)
+model ItemEstoqueCasa {
+  id             Int                      @id @default(autoincrement())
+  nome           String                   @db.VarChar(150)
+  categoria      CategoriaEstoqueCasa
+  unidade        UnidadeEstoqueCasa       @default(UN)
+  estoqueAtual   Int                      @default(0) @map("estoque_atual")
+  estoqueMinimo  Int                      @default(0) @map("estoque_minimo")
+  ativo          Boolean                  @default(true)
+  observacao     String?                  @db.VarChar(500)
+  createdAt      DateTime                 @default(now()) @map("created_at")
+  updatedAt      DateTime                 @updatedAt @map("updated_at")
+  movimentacoes  MovimentacaoEstoqueCasa[]
+  checklistItens ChecklistLimpezaItem[]
+
+  @@unique([nome, categoria])
+  @@index([ativo, categoria])
+  @@map("itens_estoque_casa")
+}
+
+model MovimentacaoEstoqueCasa {
+  id          Int                 @id @default(autoincrement())
+  itemId      Int                 @map("item_id")
+  tipo        TipoMovEstoqueCasa
+  quantidade  Int
+  saldoApos   Int                 @map("saldo_apos")
+  motivo      String?             @db.VarChar(300)
+  usuarioId   Int                 @map("usuario_id")
+  checklistId Int?                @map("checklist_id")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  item        ItemEstoqueCasa     @relation(fields: [itemId], references: [id])
+  usuario     Usuario             @relation(fields: [usuarioId], references: [id])
+  checklist   ChecklistLimpeza?   @relation(fields: [checklistId], references: [id], onDelete: SetNull)
+
+  @@index([itemId, createdAt])
+  @@index([createdAt])
+  @@map("movimentacoes_estoque_casa")
+}
+
+model GrupoLimpeza {
+  id                   Int                @id @default(autoincrement())
+  nome                 String             @db.VarChar(120)
+  ativo                Boolean            @default(true)
+  responsavelUsuarioId Int                @map("responsavel_usuario_id")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+  responsavel          Usuario            @relation("GrupoLimpezaResponsavel", fields: [responsavelUsuarioId], references: [id])
+  checklists           ChecklistLimpeza[]
+
+  @@index([ativo])
+  @@index([responsavelUsuarioId])
+  @@map("grupos_limpeza")
+}
+
+model ChecklistLimpeza {
+  id                Int                     @id @default(autoincrement())
+  grupoId           Int                     @map("grupo_id")
+  competencia       DateTime                @db.Date
+  status            StatusChecklistLimpeza  @default(RASCUNHO)
+  observacao        String?                 @db.VarChar(500)
+  criadoPorUsuarioId Int                    @map("criado_por_usuario_id")
+  concluidoEm       DateTime?               @map("concluido_em")
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+  grupo             GrupoLimpeza            @relation(fields: [grupoId], references: [id])
+  criadoPor         Usuario                 @relation("ChecklistCriadoPor", fields: [criadoPorUsuarioId], references: [id])
+  itens             ChecklistLimpezaItem[]
+  movimentacoes     MovimentacaoEstoqueCasa[]
+
+  @@index([grupoId, competencia])
+  @@index([status])
+  @@map("checklists_limpeza")
+}
+
+model ChecklistLimpezaItem {
+  id              Int               @id @default(autoincrement())
+  checklistId     Int               @map("checklist_id")
+  itemId          Int               @map("item_id")
+  quantidadeBaixa Int               @default(0) @map("quantidade_baixa")
+  conferido       Boolean           @default(false)
+  checklist       ChecklistLimpeza  @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  item            ItemEstoqueCasa   @relation(fields: [itemId], references: [id])
+
+  @@unique([checklistId, itemId])
+  @@map("checklist_limpeza_itens")
 }

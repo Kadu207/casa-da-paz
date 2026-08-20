@@ -23,8 +23,14 @@ Implementação: `backend/src/policies/rbac.ts`
 | Papel | Escopo |
 |-------|--------|
 | SUPERVISOR | Master operacional (usuários + policies); não write em integrações |
-| ADMIN | Integrações (webhooks, N8N), logs |
-| Operacionais | DIRETORIA, FINANCEIRO, MARKETING, RECEPCAO, LIVRARIA, MEDIUM, SUPORTE |
+| ADMIN | Integrações (webhooks, N8N), logs; também `estoque_casa` write |
+| Operacionais | DIRETORIA, FINANCEIRO, **TESOURARIA**, MARKETING, RECEPCAO, LIVRARIA, MEDIUM, SUPORTE |
+
+### Estoque da casa (`estoque_casa`)
+
+- Write default: SUPERVISOR, ADMIN, DIRETORIA, TESOURARIA  
+- MEDIUM: via override de policy **ou** como `GrupoLimpeza.responsavelUsuarioId` (grant efetivo enriquecido no login/`/me`)  
+- Separado do resource `estoque` (livraria/PDV) — ADR-010  
 
 ### Policies no cadastro (obrigatório operacional)
 

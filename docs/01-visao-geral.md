@@ -7,8 +7,9 @@ O **Casa da Paz Management System Cloud** apoia a gestão do terreiro e a presen
 - Cadastros por função (Presidência, Diretoria, Tesouraria, Médiuns, Consulentes, etc.)
 - Tesouraria completa **sem depender de PSP** (lançamentos, atrasados, contas a pagar, DRE, OFX, patrocínios/padrinhos, recorrência de mensalidade)
 - Recepção / check-in, eventos e inscrições
-- Livraria (PDV/estoque) e ecommerce
-- Portal público (eventos, agendamento, livraria, LGPD)
+- **Estoque primário da casa** (insumos ritualísticos e de funcionamento — ADR-010)
+- Livraria (PDV/estoque de venda) e ecommerce
+- Portal público (eventos, agendamento, livraria, estudos, LGPD)
 - Marketing institucional (papel MARKETING)
 - Cobranças Asaas **opcionais** (dormant até `ASAAS_API_KEY` — ADR-009)
 - Alertas e automações via N8N / Chatwoot
@@ -50,3 +51,4 @@ Conselheiro Lafaiete — MG
 | Specs SDD | `specs/<feature>/` |
 | RBAC | `docs/contracts/rbac-matrix.md` |
 | Schema | `backend/prisma/schema.prisma` |
+| Multi-estoque | ADR-010 (`docs/memory/decisions/010-estoque-casa.md`) |

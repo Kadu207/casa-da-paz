@@ -25,7 +25,8 @@
 | Marketing | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Import Excel | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Eventos / check-in | ✅ | 👁️ | 👁️ | ✅ (publicar) | ✅ | ❌ | ❌ | ❌ |
-| PDV/Livraria/Estoque | ✅ | 👁️ | 👁️ | ✅ (publicar conteúdo; **sem** `estoque`) | ❌ | ✅ | ❌ | ❌ |
+| PDV/Livraria/Estoque (venda) | ✅ | 👁️ | 👁️ | ✅ (publicar conteúdo; **sem** `estoque`) | ❌ | ✅ | ❌ | ❌ |
+| Estoque da Casa (`estoque_casa`) | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌* | ❌ |
 | Ecommerce | ✅ | 👁️ | 👁️ | ✅ (publicar) | ❌ | ✅ | ❌ | ❌ |
 | Dashboard | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
 | Agendamentos | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
@@ -36,6 +37,8 @@
 **Auditoria:** somente **SUPERVISOR** (fora da tabela operacional). Menu ERP → **Auditoria** (`/app/auditoria`). DIRETORIA/SUPORTE não têm acesso.
 
 **MARKETING** publica eventos/conteúdo (`eventos`/`livraria`/`marketing` write) mas **não** cadastra estoque (`estoque` só DIRETORIA/LIVRARIA/SUPERVISOR). Cadastro de livros: setor LIVRARIA.
+
+**Estoque da Casa (`estoque_casa`):** almoxarifado primário (ADR-010). Write default: SUPERVISOR, ADMIN, DIRETORIA, TESOURARIA. \*MEDIUM acessa via policy override **ou** como responsável de `GrupoLimpeza` ativo. Separado do estoque de venda da livraria.
 
 **TESOURARIA** = setor operacional dos logins `tesouraria01`–`04` (mesma matriz financeira que FINANCEIRO; FINANCEIRO permanece por compatibilidade).
 
