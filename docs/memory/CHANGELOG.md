@@ -9,6 +9,7 @@
 ### Segurança
 - `npm audit` BE: override `deepmerge-ts` ≥8 (0 vulns omit=dev)
 - Smoke 2026-08-20: HTTPS headers OK; `http://IP:9080` TIMEOUT
+- Deploy VPS backend `e18a63c` (Helmet + uploads) — health + CSP API em produção
 
 ### Documentação
 - **Refresh 2026-08-06:** `docs/00–09`, README, roadmap, playbooks, constitution IX, specs 022–026 status, OpenAPI/RBAC alinhados à stack Express/Vite (Lovable movido para `docs/reference/lovable/`)

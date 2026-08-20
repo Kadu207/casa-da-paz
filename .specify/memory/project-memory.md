@@ -8,7 +8,7 @@
 |------|--------|
 | Fase | Pós-go-live: estoque 031 + **security harden 030** |
 | Versão | 0.1.0-alpha |
-| Commit | (pendente commit local — Helmet/uploads/smoke 030) |
+| Commit | `e18a63c` (030 Helmet/uploads; backend rebuild na VPS 2026-08-20) |
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (**não** :22) |
 | Asaas (021) | **Dormant** |
