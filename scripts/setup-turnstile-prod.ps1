@@ -1,4 +1,4 @@
-# Aplica Turnstile na VPS: site key no backend + restart + deploy frontend (PC)
+﻿# Aplica Turnstile na VPS: site key no backend + restart + deploy frontend (PC)
 # Uso (da raiz do repo):
 #   .\scripts\setup-turnstile-prod.ps1 -SiteKey "0x4AAAA..." -PasswordOnly
 param(
@@ -11,7 +11,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $remote = "gestaoti@128.140.77.31"
-$sshPort = 65022
+$sshPort = 65025
 
 Write-Host "=== Turnstile prod ===" -ForegroundColor Cyan
 

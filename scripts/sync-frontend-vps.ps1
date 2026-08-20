@@ -1,4 +1,4 @@
-# Envia frontend/dist para a VPS — rode NO SEU PC (Windows PowerShell), nao na VPS.
+﻿# Envia frontend/dist para a VPS â€” rode NO SEU PC (Windows PowerShell), nao na VPS.
 # Build + sync (recomendado): .\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend
 # Linux/Debian: scripts/sync-frontend-vps.sh (chave SSH em ~/.ssh).
 #
@@ -27,7 +27,7 @@ if (-not $RemoteHost) {
 }
 if ($SshPort -le 0) {
     if ($script:VpsSshPort) { $SshPort = [int]$script:VpsSshPort }
-    else { $SshPort = 65022 }
+    else { $SshPort = 65025 }
 }
 
 if (-not (Test-Path (Join-Path $localDist "index.html"))) {

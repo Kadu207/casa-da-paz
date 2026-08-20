@@ -1,4 +1,4 @@
-# Envia infra/.env.production local para a VPS (não vai para o Git)
+﻿# Envia infra/.env.production local para a VPS (nÃ£o vai para o Git)
 param(
     [string]$RemoteHost = "",
     [int]$SshPort = 0,
@@ -19,18 +19,18 @@ if (-not $RemoteHost) {
 }
 if ($SshPort -le 0) {
     if ($script:VpsSshPort) { $SshPort = [int]$script:VpsSshPort }
-    else { $SshPort = 65022 }
+    else { $SshPort = 65025 }
 }
 
 if (-not (Test-Path $localFile)) {
-    throw "Arquivo não encontrado: $localFile`nCopie infra\.env.production.example e preencha os valores."
+    throw "Arquivo nÃ£o encontrado: $localFile`nCopie infra\.env.production.example e preencha os valores."
 }
 
 Write-Host "Enviando .env.production para ${RemoteHost}:${RemotePath} (scp -P $SshPort)" -ForegroundColor Cyan
 scp -P $SshPort $localFile "${RemoteHost}:${RemotePath}"
 
 Write-Host ""
-Write-Host "OK — Na VPS, confira e redeploy:" -ForegroundColor Green
+Write-Host "OK â€” Na VPS, confira e redeploy:" -ForegroundColor Green
 Write-Host ('  ssh -p ' + $SshPort + ' ' + $RemoteHost)
 Write-Host '  cd ~/casadapaz/infra'
 Write-Host '  grep NGINX_CONF .env.production && grep HOST_HTTP_PORT .env.production'

@@ -1,12 +1,12 @@
-# Proxy no nginx do HOST — servidor compartilhado (inovati-server)
+﻿# Proxy no nginx do HOST â€” servidor compartilhado (inovati-server)
 
-**SSH:** `ssh -p 65022 gestaoti@128.140.77.31` (porta **65022**, não 22).
+**SSH:** `ssh -p 65025 gestaoti@128.140.77.31` (porta **65025**, nÃ£o 22).
 
-Quando **80/443 já servem outro site** (ex.: Excellence Dental), o Casa da Paz roda em **Docker na porta 9080** (localhost) e o **nginx do host** encaminha o subdomínio.
+Quando **80/443 jÃ¡ servem outro site** (ex.: Excellence Dental), o Casa da Paz roda em **Docker na porta 9080** (localhost) e o **nginx do host** encaminha o subdomÃ­nio.
 
-## 1. `.env.production` (PC → VPS)
+## 1. `.env.production` (PC â†’ VPS)
 
-No PC (Windows), após editar `infra\.env.production`:
+No PC (Windows), apÃ³s editar `infra\.env.production`:
 
 ```powershell
 .\scripts\sync-env-vps.ps1
@@ -15,10 +15,10 @@ No PC (Windows), após editar `infra\.env.production`:
 Ou:
 
 ```powershell
-scp -P 65022 "infra\.env.production" gestaoti@128.140.77.31:~/casadapaz/infra/.env.production
+scp -P 65025 "infra\.env.production" gestaoti@128.140.77.31:~/casadapaz/infra/.env.production
 ```
 
-Conteúdo mínimo:
+ConteÃºdo mÃ­nimo:
 
 ```env
 DB_PASSWORD=...
@@ -32,7 +32,7 @@ HOST_HTTP_PORT=9080
 
 ```bash
 cd ~/casadapaz
-git checkout -- infra/scripts/deploy.sh   # descarta edição local que bloqueia pull
+git checkout -- infra/scripts/deploy.sh   # descarta ediÃ§Ã£o local que bloqueia pull
 git pull origin main
 cd frontend && npm ci && npm run build && cd ../infra
 chmod +x scripts/*.sh
@@ -47,9 +47,9 @@ Teste local:
 curl -s http://127.0.0.1:9080/health
 ```
 
-## 3. Proxy nginx no HOST (obrigatório para HTTPS público)
+## 3. Proxy nginx no HOST (obrigatÃ³rio para HTTPS pÃºblico)
 
-Sem este passo, `casadapaz.inovatitech.com.br` cai no site padrão da VPS (ex.: Excellence Dental).
+Sem este passo, `casadapaz.inovatitech.com.br` cai no site padrÃ£o da VPS (ex.: Excellence Dental).
 
 ```bash
 cd ~/casadapaz
@@ -67,23 +67,23 @@ curl -s https://casadapaz.inovatitech.com.br/health
 curl -sI https://casadapaz.inovatitech.com.br/public | head -5
 ```
 
-## 4. Acesso temporário (trocar senha antes do vhost)
+## 4. Acesso temporÃ¡rio (trocar senha antes do vhost)
 
-A porta **9080** só escuta em `127.0.0.1` — não abre no navegador externo (`ERR_CONNECTION_REFUSED` é esperado).
+A porta **9080** sÃ³ escuta em `127.0.0.1` â€” nÃ£o abre no navegador externo (`ERR_CONNECTION_REFUSED` Ã© esperado).
 
-No **Windows** (PowerShell), túnel SSH:
+No **Windows** (PowerShell), tÃºnel SSH:
 
 ```powershell
-ssh -p 65022 -L 9080:127.0.0.1:9080 gestaoti@128.140.77.31
+ssh -p 65025 -L 9080:127.0.0.1:9080 gestaoti@128.140.77.31
 ```
 
 Deixe a janela aberta e acesse no browser: **http://localhost:9080/login**  
-Login: `admin` / `admin123` → `/app/minha-senha`
+Login: `admin` / `admin123` â†’ `/app/minha-senha`
 
 ## 5. Cloudflare
 
-- DNS **A** `casadapaz` → IP da VPS (proxy laranja)
-- SSL/TLS → **Full (strict)**
+- DNS **A** `casadapaz` â†’ IP da VPS (proxy laranja)
+- SSL/TLS â†’ **Full (strict)**
 
 ## 6. Seed
 
@@ -92,7 +92,7 @@ cd ~/casadapaz/infra
 ./scripts/compose-prod.sh exec backend npx prisma db seed
 ```
 
-## Diagnóstico
+## DiagnÃ³stico
 
 ```bash
 sudo ss -tlnp | grep -E ':80|:443|:9080'
@@ -102,7 +102,7 @@ curl -s http://127.0.0.1:9080/health
 curl -sI https://casadapaz.inovatitech.com.br/health
 ```
 
-**Comandos úteis** (sempre com env carregado):
+**Comandos Ãºteis** (sempre com env carregado):
 
 ```bash
 ./scripts/compose-prod.sh down

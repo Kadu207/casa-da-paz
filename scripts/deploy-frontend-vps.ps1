@@ -1,7 +1,7 @@
-# Build + sync frontend para VPS (Windows).
+﻿# Build + sync frontend para VPS (Windows).
 # Da raiz do repo:
 #   .\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend
-#   .\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend -SshPort 65022
+#   .\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend -SshPort 65025
 param(
     [switch]$PasswordOnly,
     [switch]$RestartFrontend,
