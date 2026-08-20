@@ -3,7 +3,7 @@
 **Host:** `inovati-server` (`128.140.77.31`)  
 **SSH:** porta **`65025`** (não usar `:22`) — `ssh -p 65025 gestaoti@128.140.77.31`  
 **Política:** preferir **iptables** (+ `iptables-persistent`), não UFW, neste servidor com Docker.  
-**Último inventário:** 2026-08-20 (SSH confirmado em **65025**)
+**Último inventário:** 2026-08-20 (SSH :65025; smoke bypass `:9080` TIMEOUT de fora; health HTTPS 200)
 
 ## Por que iptables e não UFW
 

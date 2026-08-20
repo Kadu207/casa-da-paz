@@ -1,6 +1,6 @@
 # Tasks — 029 CRUD Usuários / Livraria / Eventos
 
-## Validador Integração (V1) — 2026-08-08
+## Validador Integração (V1) — 2026-08-08 (reconfirmado 2026-08-20 no ciclo 030)
 
 | Item | OK | Evidência |
 |------|----|-----------|
@@ -11,7 +11,7 @@
 | Eventos PUT/DELETE | sim | `eventos.ts` + `EventosPage.tsx` |
 | FE ↔ API usuários/edit/delete | sim | `UsuariosPage.tsx` |
 
-## Validador Qualidade (V2) — 2026-08-08
+## Validador Qualidade (V2) — 2026-08-08 (reconfirmado 2026-08-20 no ciclo 030)
 
 | Item | OK | Evidência |
 |------|----|-----------|

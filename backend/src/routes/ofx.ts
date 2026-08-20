@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { datasProximas, parseOfx } from '../lib/ofx-parser.js';
-import { isAllowedOfxUpload } from '../lib/upload-filters.js';
+import { isAllowedOfxBuffer, isAllowedOfxUpload } from '../lib/upload-filters.js';
 
 const router = Router();
 const upload = multer({
@@ -28,6 +28,10 @@ router.post(
       .safeParse(req.body);
     if (!parsed.success || !req.file) {
       res.status(400).json({ error: 'contaId e arquivo OFX obrigatórios' });
+      return;
+    }
+    if (!isAllowedOfxBuffer(req.file.buffer)) {
+      res.status(400).json({ error: 'Arquivo inválido: conteúdo não parece OFX/QFX' });
       return;
     }
     const { contaId } = parsed.data;

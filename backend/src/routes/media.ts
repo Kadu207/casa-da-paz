@@ -3,7 +3,7 @@ import multer from 'multer';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { cloudflareImagesEnabled, uploadToCloudflareImages } from '../lib/cloudflare-images.js';
 import { registrarAuditoria } from '../lib/auditoria.js';
-import { isAllowedImageMime } from '../lib/upload-filters.js';
+import { isAllowedImageBuffer, isAllowedImageMime } from '../lib/upload-filters.js';
 
 const router = Router();
 const upload = multer({
@@ -32,6 +32,10 @@ router.post(
     }
     if (!req.file) {
       res.status(400).json({ error: 'Arquivo obrigatório (JPEG/PNG/WebP, máx. 5 MB)' });
+      return;
+    }
+    if (!isAllowedImageMime(req.file.mimetype) || !isAllowedImageBuffer(req.file.buffer, req.file.mimetype)) {
+      res.status(400).json({ error: 'Arquivo inválido: conteúdo não corresponde a JPEG/PNG/WebP' });
       return;
     }
 

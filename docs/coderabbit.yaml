@@ -1,7 +1,7 @@
 # CodeRabbit — Casa da Paz
-# Copiar para a raiz como `.coderabbit.yaml` se o SO bloquear o ponto inicial,
-# ou instalar o app CodeRabbit no GitHub e apontar para este arquivo.
-# Ativar: https://github.com/apps/coderabbitai
+# Canônico no Git: `.coderabbit.yaml` (raiz). Neste Windows o checkout do
+# dotfile pode falhar ("Invalid argument"); manter este espelho em sync.
+# Ativar app: https://github.com/apps/coderabbitai
 
 language: pt-BR
 reviews:

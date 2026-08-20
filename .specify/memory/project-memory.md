@@ -1,20 +1,37 @@
-﻿# MemÃ³ria Viva â€” Casa da Paz
+﻿# Memória Viva — Casa da Paz
 
-**Ãšltima atualizaÃ§Ã£o:** 2026-08-20
+**Última atualização:** 2026-08-20
 
 ## Estado do projeto
 
 | Item | Status |
 |------|--------|
-| Fase | PÃ³s-go-live: estoque primÃ¡rio 031 |
-| VersÃ£o | 0.1.0-alpha |
-| Commit | `79a6ace`+ (Docker Prisma fix; SSH port / tsconfig tests) |
-| ProduÃ§Ã£o | https://casadapaz.inovatitech.com.br |
-| SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (**nÃ£o** :22) |
+| Fase | Pós-go-live: estoque 031 + **security harden 030** |
+| Versão | 0.1.0-alpha |
+| Commit | (pendente commit local — Helmet/uploads/smoke 030) |
+| Produção | https://casadapaz.inovatitech.com.br |
+| SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (**não** :22) |
 | Asaas (021) | **Dormant** |
-| Deploy 031 backend | âœ… migrate 22 + seed catÃ¡logo + health OK |
-| Deploy 031 frontend | âœ… build Docker na VPS â€” bundle `index-RuKfHPXy.js` HTTP 200 |
-| SSH do PC | Timeout em `:65025` (allowlist/firewall); sync FE via Docker na VPS |
+| Security 030 | ✅ Fase 0–2: `:9080` filtrado (smoke TIMEOUT), headers OK, Helmet+magic uploads, CI GL test, CodeRabbit no Git, validators 028/029/030 |
+| Deploy 031 | ✅ migrate + FE na VPS |
+
+## Security (030) — referência rápida
+
+```powershell
+# Do PC
+.\infra\scripts\smoke-security-origin.ps1
+# Esperado: 7 ok; http://IP:9080 inacessível
+```
+
+```bash
+# Na VPS — secrets sem imprimir valores
+cd ~/casadapaz/infra && ./scripts/check-prod-secrets.sh
+# Reaplicar filtro 9080 se necessário
+sudo ./scripts/harden-origin-9080.sh
+```
+
+Inventário portas: `docs/memory/runbooks/firewall-host-iptables.md`  
+Spec: `specs/030-security-hardening/`
 
 ## Deploy VPS (colar)
 
@@ -28,7 +45,6 @@ cd infra
 docker compose --env-file .env.production -f docker-compose.prod.yml build --no-cache backend
 CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh
 ./scripts/compose-prod.sh exec -T backend npx prisma migrate deploy
-./scripts/compose-prod.sh exec -T backend npx tsx prisma/seed.ts --estoque-casa-only
 curl -s http://127.0.0.1:9080/health
 ```
 
@@ -39,27 +55,12 @@ cd "C:\Projetos DEV\Casa da Paz"
 .\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend
 ```
 
-Se SSH do PC der **timeout** (comum se a porta 65025 sÃ³ aceita IPs allowlist / console Hetzner),
-builde **na prÃ³pria VPS** (nÃ£o precisa npm no host):
+Se SSH do PC der **timeout**, build FE na VPS:
 
 ```bash
-cd ~/casadapaz
-git pull origin main
-cd infra
-chmod +x scripts/build-frontend-on-vps.sh
+cd ~/casadapaz && git pull origin main && cd infra
 ./scripts/build-frontend-on-vps.sh
 ./scripts/compose-prod.sh restart frontend
-curl -sI http://127.0.0.1:9080/login | head -3
 ```
 
-### DiagnÃ³stico SSH timeout do PC
-
-```bash
-# Na VPS â€” quem escuta e regras
-sudo ss -tlnp | grep 65025
-sudo iptables -L INPUT -n -v | head -40
-# Hetzner Cloud Console â†’ Firewall: porta 65025/tcp liberada para seu IP pÃºblico?
-```
-
-Do PC: `Test-NetConnection 128.140.77.31 -Port 65025`  
-Timeout = bloqueio de rede (nÃ£o Ã© senha/script).
+**Gate:** nunca `deploy.sh` sem confirmação explícita do usuário.

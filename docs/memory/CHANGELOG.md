@@ -3,10 +3,16 @@
 ## [Unreleased]
 
 ### Adicionado
+- **030 Security hardening:** Helmet/CSP API, magic bytes em uploads (media/OFX/Excel), rate-limit `/api`, smoke bypass `:9080`, `check-prod-secrets.sh`, Spec 030 (spec/plan/tasks), skill `agent-security-ops` checklist datado
 - **031 Estoque primário da Casa:** menu `/app/estoque`, API `/api/estoque-casa`, catálogo seedado (ritualística/limpeza), estoque mínimo/alertas, grupos de limpeza + checklist com baixas, RBAC `estoque_casa` (ADR-010) — separado da Livraria/PDV
+
+### Segurança
+- `npm audit` BE: override `deepmerge-ts` ≥8 (0 vulns omit=dev)
+- Smoke 2026-08-20: HTTPS headers OK; `http://IP:9080` TIMEOUT
 
 ### Documentação
 - **Refresh 2026-08-06:** `docs/00–09`, README, roadmap, playbooks, constitution IX, specs 022–026 status, OpenAPI/RBAC alinhados à stack Express/Vite (Lovable movido para `docs/reference/lovable/`)
+- Cloudflare DNS + runbook firewall: smoke scripts e inventário secrets
 
 ### Adicionado (anterior)
 - **027 Materiais de estudo:** portal `/public/estudos` (ervas/banhos/defumação); edição em Marketing; home galeria ervas → estudos

@@ -1,6 +1,6 @@
 # Tasks — 028 Auditoria SUPERVISOR
 
-## Validador Integração (V1) — 2026-08-08
+## Validador Integração (V1) — 2026-08-08 (reconfirmado 2026-08-20 no ciclo 030)
 
 | Item | OK | Evidência |
 |------|----|-----------|
@@ -11,7 +11,7 @@
 | Schema `admin_audit_log` + migration | sim | prisma migrations |
 | Sanitização senhas/tokens em detalhe | sim | `sanitizeAuditDetalhe` + testes |
 
-## Validador Qualidade (V2) — 2026-08-08
+## Validador Qualidade (V2) — 2026-08-08 (reconfirmado 2026-08-20 no ciclo 030)
 
 | Item | OK | Evidência |
 |------|----|-----------|

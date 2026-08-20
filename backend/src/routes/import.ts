@@ -2,7 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
-import { isAllowedExcelUpload } from '../lib/upload-filters.js';
+import { isAllowedExcelBuffer, isAllowedExcelUpload } from '../lib/upload-filters.js';
 
 const router = Router();
 const upload = multer({
@@ -17,6 +17,10 @@ const AI_URL = process.env.AI_SERVICE_URL ?? 'http://localhost:8000';
 router.post('/excel', authenticate, authorize('import', 'write'), upload.single('file'), async (req, res) => {
   if (!req.file) {
     res.status(400).json({ error: 'Arquivo .xlsx obrigatório' });
+    return;
+  }
+  if (!isAllowedExcelBuffer(req.file.buffer)) {
+    res.status(400).json({ error: 'Arquivo inválido: conteúdo não parece .xlsx (ZIP/OOXML)' });
     return;
   }
 

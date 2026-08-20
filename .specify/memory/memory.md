@@ -40,6 +40,7 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 021 Asaas | **Dormant** até chave |
 | 026 contribuintes | ✅ (spec dedicada) |
 | 031 estoque-casa | ✅ Primário (ADR-010) |
+| 030 security-hardening | ✅ Fase 0–2 (2026-08-20) |
 
 ## ADRs
 

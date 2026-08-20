@@ -39,6 +39,29 @@ curl.exe -sI http://casadapaz.inovatitech.com.br/public | Select-String -Pattern
 - `http://128.140.77.31:9080` — sem TLS, apenas diagnóstico interno
 - Acesso direto por IP — sem certificado válido para o domínio
 
+## Smoke — bypass Cloudflare (obrigatório pós-harden)
+
+Origin `:9080` em `0.0.0.0` (tunnel Docker) **deve** estar filtrado por `harden-origin-9080.sh`.
+
+```bash
+# Linux / VPS
+./infra/scripts/smoke-security-origin.sh
+```
+
+```powershell
+# Windows (PC)
+.\infra\scripts\smoke-security-origin.ps1
+# Esperado: 7 ok; http://IP:9080 inacessivel
+```
+
+Secrets (na VPS, sem imprimir valores):
+
+```bash
+cd ~/casadapaz/infra && ./scripts/check-prod-secrets.sh
+```
+
+Inventário portas: [`docs/memory/runbooks/firewall-host-iptables.md`](../docs/memory/runbooks/firewall-host-iptables.md)
+
 ## Origin Certificate (VPS dedicada com nginx 443)
 
 Se usar `infra/nginx/prod.conf` com 443 local:
