@@ -8,3 +8,4 @@ coverage
 .git
 .tmp
 .DS_Store
+**/*.test.ts

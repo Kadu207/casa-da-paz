@@ -56,7 +56,7 @@ No Windows, na pasta do projeto:
 Ou manualmente:
 
 ```powershell
-scp "infra\.env.production" gestaoti@128.140.77.31:~/casadapaz/infra/.env.production
+scp -P 65022 "infra\.env.production" gestaoti@128.140.77.31:~/casadapaz/infra/.env.production
 ```
 
 Variáveis obrigatórias para servidor compartilhado (porta 80 ocupada):

@@ -193,7 +193,7 @@ curl -s https://casadapaz.inovatitech.com.br/health
 No PC:
 
 ```powershell
-ssh -L 9080:127.0.0.1:9080 gestaoti@128.140.77.31
+ssh -p 65022 -L 9080:127.0.0.1:9080 gestaoti@128.140.77.31
 ```
 
 Browser: **http://localhost:9080/login** (`admin` / `admin123`)

@@ -9,7 +9,7 @@
 | Chatwoot Swarm | OK IPv4 (Redis 1/1) | Monitorar Redis pós-reboot |
 | Gastro | OK IPv4 (`:9088` local 200) | CF origin → `http://127.0.0.1:9088` (durável) |
 | **n8n-excellence** | **OK** (2026-08-11) | Porta `0.0.0.0:5678` + harden iptables |
-| SSH | Porta **65025** | `ssh -p 65025 gestaoti@128.140.77.31` |
+| SSH | Porta **65022** | `ssh -p 65022 gestaoti@128.140.77.31` |
 | Swarm n8n / minio | **Manter 0/1** | Não subir — RAM curta; usar excellence-n8n |
 | agenda / healthplataform / api | **301 loop** | Correção no painel Cloudflare (abaixo) |
 
@@ -81,5 +81,5 @@ Ou deixa 502, ou aponta Public Hostname `wf` → `http://127.0.0.1:5678` (excell
 ## SSH
 
 ```bash
-ssh -p 65025 gestaoti@128.140.77.31
+ssh -p 65022 gestaoti@128.140.77.31
 ```

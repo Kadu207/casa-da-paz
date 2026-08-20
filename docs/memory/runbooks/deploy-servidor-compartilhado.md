@@ -1,6 +1,6 @@
 # Proxy no nginx do HOST — servidor compartilhado (inovati-server)
 
-**SSH:** `ssh -p 65025 gestaoti@128.140.77.31` (porta **65025**, não 22).
+**SSH:** `ssh -p 65022 gestaoti@128.140.77.31` (porta **65022**, não 22).
 
 Quando **80/443 já servem outro site** (ex.: Excellence Dental), o Casa da Paz roda em **Docker na porta 9080** (localhost) e o **nginx do host** encaminha o subdomínio.
 
@@ -15,7 +15,7 @@ No PC (Windows), após editar `infra\.env.production`:
 Ou:
 
 ```powershell
-scp "infra\.env.production" gestaoti@128.140.77.31:~/casadapaz/infra/.env.production
+scp -P 65022 "infra\.env.production" gestaoti@128.140.77.31:~/casadapaz/infra/.env.production
 ```
 
 Conteúdo mínimo:
@@ -74,7 +74,7 @@ A porta **9080** só escuta em `127.0.0.1` — não abre no navegador externo (`
 No **Windows** (PowerShell), túnel SSH:
 
 ```powershell
-ssh -L 9080:127.0.0.1:9080 gestaoti@128.140.77.31
+ssh -p 65022 -L 9080:127.0.0.1:9080 gestaoti@128.140.77.31
 ```
 
 Deixe a janela aberta e acesse no browser: **http://localhost:9080/login**  

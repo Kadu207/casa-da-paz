@@ -41,8 +41,8 @@ Cada máquina clona `kadu207/casa-da-paz`. Não há mirror automático de arquiv
 Chave no Linux (uma vez):
 
 ```bash
-ssh-copy-id gestaoti@128.140.77.31
-ssh gestaoti@128.140.77.31   # deve entrar sem senha
+ssh-copy-id -p 65022 gestaoti@128.140.77.31
+ssh -p 65022 gestaoti@128.140.77.31   # deve entrar sem senha
 chmod +x scripts/sync-frontend-vps.sh
 ```
 

@@ -1,10 +1,12 @@
 # Build + sync frontend para VPS (Windows).
 # Da raiz do repo:
 #   .\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend
+#   .\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend -SshPort 65022
 param(
     [switch]$PasswordOnly,
     [switch]$RestartFrontend,
-    [switch]$SkipInstall
+    [switch]$SkipInstall,
+    [int]$SshPort = 0
 )
 
 $ErrorActionPreference = "Stop"
@@ -15,6 +17,12 @@ Write-Host "Repo: $root" -ForegroundColor DarkGray
 
 & (Join-Path $PSScriptRoot "build-frontend-prod.ps1") -SkipInstall:$SkipInstall
 
-& (Join-Path $PSScriptRoot "sync-frontend-vps.ps1") -PasswordOnly:$PasswordOnly -RestartFrontend:$RestartFrontend
+$syncArgs = @{
+    PasswordOnly = $PasswordOnly
+    RestartFrontend = $RestartFrontend
+}
+if ($SshPort -gt 0) { $syncArgs.SshPort = $SshPort }
+
+& (Join-Path $PSScriptRoot "sync-frontend-vps.ps1") @syncArgs
 
 Write-Host "Deploy frontend concluido." -ForegroundColor Green

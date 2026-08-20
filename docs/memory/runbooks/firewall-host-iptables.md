@@ -1,9 +1,9 @@
 # Runbook — Firewall do host (iptables) — Hetzner compartilhado
 
 **Host:** `inovati-server` (`128.140.77.31`)  
-**SSH:** porta **`65025`** (não usar `:22`) — `ssh -p 65025 gestaoti@128.140.77.31`  
+**SSH:** porta **`65022`** (não usar `:22`) — `ssh -p 65022 gestaoti@128.140.77.31`  
 **Política:** preferir **iptables** (+ `iptables-persistent`), não UFW, neste servidor com Docker.  
-**Último inventário:** 2026-08-08 (P0–P2 + Swarm/cloudflared + SSH 65025)
+**Último inventário:** 2026-08-20 (SSH atualizado para **65022**)
 
 ## Por que iptables e não UFW
 
@@ -52,7 +52,7 @@ Helpers no repo: `harden-origin-port.sh`, `harden-host-port.sh` (TCP/UDP), `hard
 
 | Porta | Estado | Provável dono | Ação |
 |------:|--------|---------------|------|
-| **65025** | Baixo | SSH host | Porta SSH atual (desde 2026-08-08); `:22` não escuta |
+| **65022** | Baixo | SSH host | Porta SSH atual; `:22` não escuta |
 | 80 / 443 | Baixo | nginx host | — |
 | **5440** | **OK-filtrado** | `inova-gastro-360-postgres` | publish `0.0.0.0:5440` + harden (app usa `172.17.0.1:5440`; **não** usar só `127.0.0.1`) |
 | **3000** | **OK-local** | `agenda-app` | P1: `127.0.0.1:3000` (+ `3100`) |

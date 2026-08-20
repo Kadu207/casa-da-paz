@@ -1,2 +1,3 @@
-# Copie para vps.local.ps1 (gitignored) e ajuste se o IP/usuário mudar
+# Copie para vps.local.ps1 (gitignored) e ajuste se o IP/usuário/porta mudar
 $script:VpsRemoteHost = "gestaoti@128.140.77.31"
+$script:VpsSshPort = 65022

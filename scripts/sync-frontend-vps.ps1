@@ -7,6 +7,7 @@
 #   .\scripts\sync-frontend-vps.ps1 -PasswordOnly -RestartFrontend
 param(
     [string]$RemoteHost = "",
+    [int]$SshPort = 0,
     [string]$RemotePath = "~/casadapaz/frontend/dist",
     [switch]$RestartFrontend,
     [switch]$PasswordOnly
@@ -17,25 +18,35 @@ $root = Split-Path $PSScriptRoot -Parent
 $localDist = Join-Path $root "frontend\dist"
 $localConfig = Join-Path $PSScriptRoot "vps.local.ps1"
 
+if (Test-Path $localConfig) {
+    . $localConfig
+}
 if (-not $RemoteHost) {
-    if (Test-Path $localConfig) { . $localConfig; $RemoteHost = $script:VpsRemoteHost }
+    if ($script:VpsRemoteHost) { $RemoteHost = $script:VpsRemoteHost }
     if (-not $RemoteHost) { $RemoteHost = "gestaoti@128.140.77.31" }
+}
+if ($SshPort -le 0) {
+    if ($script:VpsSshPort) { $SshPort = [int]$script:VpsSshPort }
+    else { $SshPort = 65022 }
 }
 
 if (-not (Test-Path (Join-Path $localDist "index.html"))) {
     throw "frontend\dist\index.html ausente. Rode: cd frontend; npm ci; npm run build"
 }
 
-$sshExtra = @()
+$sshExtra = @('-p', "$SshPort")
+$scpExtra = @('-P', "$SshPort")
 if ($PasswordOnly) {
-    $sshExtra = @(
+    $authExtra = @(
         '-o', 'PreferredAuthentications=password',
         '-o', 'PubkeyAuthentication=no',
         '-o', 'BatchMode=no'
     )
-    Write-Host "Auth: senha SSH (PasswordOnly)" -ForegroundColor DarkGray
+    $sshExtra += $authExtra
+    $scpExtra += $authExtra
+    Write-Host "Auth: senha SSH (PasswordOnly) port $SshPort" -ForegroundColor DarkGray
 } else {
-    Write-Host "Auth: padrao OpenSSH (chave se existir em ~/.ssh)" -ForegroundColor DarkGray
+    Write-Host "Auth: padrao OpenSSH port $SshPort" -ForegroundColor DarkGray
 }
 
 function Invoke-Ssh {
@@ -45,7 +56,7 @@ function Invoke-Ssh {
 
 function Invoke-Scp {
     param([string[]]$ScpArgs)
-    & scp @sshExtra @ScpArgs
+    & scp @scpExtra @ScpArgs
 }
 
 function Invoke-RemotePermissions {
@@ -63,7 +74,7 @@ function Invoke-RemotePermissions {
     throw "Permissoes nao aplicadas em ${Path}. Na VPS: cd ~/casadapaz/infra && ./scripts/fix-frontend-permissions.sh"
 }
 
-Write-Host "Enviando frontend/dist para ${RemoteHost}" -ForegroundColor Cyan
+Write-Host "Enviando frontend/dist para ${RemoteHost} (ssh -p $SshPort)" -ForegroundColor Cyan
 
 Invoke-Ssh -Target $RemoteHost -Command "mkdir -p $RemotePath && rm -rf ${RemotePath}/*"
 Invoke-Scp -ScpArgs @('-r', "$localDist/.", "${RemoteHost}:${RemotePath}/")
@@ -91,13 +102,13 @@ if ($assetMatch) {
 }
 
 if ($RestartFrontend) {
-    Invoke-Ssh -Target $RemoteHost -Command "cd ~/casadapaz/infra && ./scripts/compose-prod.sh restart frontend"
+    Invoke-Ssh -Target $RemoteHost -Command "cd ~/casadapaz/infra && chmod +x scripts/*.sh && ./scripts/compose-prod.sh restart frontend"
     Write-Host "Frontend reiniciado." -ForegroundColor Green
 }
 
 Write-Host ""
 Write-Host "OK - Proximos passos:" -ForegroundColor Green
-Write-Host ('  ssh ' + $RemoteHost)
+Write-Host ('  ssh -p ' + $SshPort + ' ' + $RemoteHost)
 Write-Host '  cd ~/casadapaz/infra'
 Write-Host '  ./scripts/compose-prod.sh restart frontend'
 Write-Host ""

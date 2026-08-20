@@ -179,7 +179,7 @@ Importados automaticamente por `import-n8n-workflows.sh`. Webhooks (rede Docker)
 
 Header: `X-Webhook-Secret: ${N8N_WEBHOOK_SECRET}`
 
-UI N8N (opcional, túnel SSH): `ssh -L 5678:127.0.0.1:5678 gestaoti@128.140.77.31` — expor porta se necessário.
+UI N8N (opcional, túnel SSH): `ssh -p 65022 -L 5678:127.0.0.1:5678 gestaoti@128.140.77.31` — expor porta se necessário.
 
 ## 8. Smoke test
 

@@ -11,12 +11,13 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $remote = "gestaoti@128.140.77.31"
+$sshPort = 65022
 
 Write-Host "=== Turnstile prod ===" -ForegroundColor Cyan
 
-$sshExtra = @()
+$sshExtra = @('-p', "$sshPort")
 if ($PasswordOnly) {
-  $sshExtra = @('-o', 'PreferredAuthentications=password', '-o', 'PubkeyAuthentication=no', '-o', 'BatchMode=no')
+  $sshExtra += @('-o', 'PreferredAuthentications=password', '-o', 'PubkeyAuthentication=no', '-o', 'BatchMode=no')
 }
 
 $keyLine = "TURNSTILE_SITE_KEY=$SiteKey"

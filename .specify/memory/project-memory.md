@@ -8,38 +8,31 @@
 |------|--------|
 | Fase | Pós-go-live: estoque primário 031 |
 | Versão | 0.1.0-alpha |
-| Commit | `f598951` em `main` (GitHub + GitLab) |
-| Produção | https://casadapaz.inovatitech.com.br (health OK) |
+| Commit | `79a6ace`+ (Docker Prisma fix; SSH port / tsconfig tests) |
+| Produção | https://casadapaz.inovatitech.com.br |
+| SSH VPS | `ssh -p 65022 gestaoti@128.140.77.31` (**não** :22) |
 | Asaas (021) | **Dormant** |
-| Local 031 | ✅ migrate + seed completo OK |
-| Push 031 | ✅ `origin` + `gitlab` |
-| Deploy VPS 031 | ⏳ SSH `gestaoti@128.140.77.31:22` **timeout** deste ambiente — rodar no terminal local do usuário |
+| Deploy 031 | Em andamento — limpar testes órfãos na VPS + rebuild |
 
-## Specs
-
-| Spec | Status |
-|------|--------|
-| 020–030 | ✅ |
-| **031 estoque casa** | ✅ código + docs + push; **deploy VPS pendente SSH local** |
-| 021 Asaas | Dormant |
-
-## Deploy VPS (colar no terminal com acesso SSH)
+## Deploy VPS (colar)
 
 ```bash
 cd ~/casadapaz
-git pull origin main
-cd frontend && npm ci && npm run build && cd ../infra
+git fetch origin && git reset --hard origin/main
+git clean -fd
+chmod +x infra/scripts/*.sh
+
+cd infra
+docker compose --env-file .env.production -f docker-compose.prod.yml build --no-cache backend
 CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh
 ./scripts/compose-prod.sh exec -T backend npx prisma migrate deploy
 ./scripts/compose-prod.sh exec -T backend npx tsx prisma/seed.ts --estoque-casa-only
 curl -s http://127.0.0.1:9080/health
-curl -s https://casadapaz.inovatitech.com.br/health
 ```
 
-**Não** usar seed destroy em produção.
+Frontend (PC):
 
-## Próximos passos
-
-1. Executar bloco SSH acima no PC/VPS  
-2. Smoke: login → menu **Estoque**  
-3. Asaas quando houver chave  
+```powershell
+cd "C:\Projetos DEV\Casa da Paz"
+.\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend -SshPort 65022
+```
