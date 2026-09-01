@@ -249,12 +249,14 @@ model PessoaResponsavel {
 }
 
 model Usuario {
-  id           Int         @id @default(autoincrement())
-  pessoaId     Int         @unique @map("pessoa_id")
-  login        String      @unique @db.VarChar(50)
-  senhaHash    String      @map("senha_hash") @db.VarChar(255)
-  setorAcesso  SetorAcesso @map("setor_acesso")
-  ativo        Boolean     @default(true)
+  id              Int         @id @default(autoincrement())
+  pessoaId        Int         @unique @map("pessoa_id")
+  login           String      @unique @db.VarChar(50)
+  senhaHash       String      @map("senha_hash") @db.VarChar(255)
+  setorAcesso     SetorAcesso @map("setor_acesso")
+  ativo           Boolean     @default(true)
+  /** Seed / reset administrativo: bloqueia API até PUT /auth/me/senha */
+  deveTrocarSenha Boolean     @default(false) @map("deve_trocar_senha")
   pessoa       Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
   fechamentosFinanceiros FinanceiroFechamentoMensal[]
   policy       UsuarioPolicy?

@@ -6,6 +6,7 @@ import { CheckoutForm, type CheckoutFormData } from '../../components/ecommerce/
 import { publicApi } from '../../lib/public-api';
 import { portalAssets } from '../../lib/portal-assets';
 import { useI18n } from '../../i18n/I18nContext';
+import { safeHref } from '../../lib/safe-url';
 
 interface Produto {
   id: number;
@@ -114,9 +115,9 @@ export default function PublicLivraria() {
               {t('shop.protocol')}: <strong className="select-all">{sucesso.protocolo}</strong>
             </p>
             <p className="mt-2 text-foreground/70">{sucesso.mensagem ?? t('shop.asaasPending')}</p>
-            {sucesso.invoiceUrl && (
+            {safeHref(sucesso.invoiceUrl) && (
               <a
-                href={sucesso.invoiceUrl}
+                href={safeHref(sucesso.invoiceUrl)}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-3 inline-block text-primary underline underline-offset-2"

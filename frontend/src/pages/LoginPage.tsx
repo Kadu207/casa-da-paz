@@ -17,8 +17,8 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     try {
-      await doLogin(login.trim(), senha);
-      navigate('/app/dashboard');
+      const user = await doLogin(login.trim(), senha);
+      navigate(user.deveTrocarSenha ? '/app/minha-senha' : '/app/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : t('erp.login.error'));
     }

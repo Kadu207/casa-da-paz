@@ -22,6 +22,7 @@ export interface User {
   pessoa: { id: number; nomeCompleto: string };
   policy?: Partial<Record<string, PolicyGrant>> | null;
   effectiveGrants?: Partial<Record<string, PolicyGrant>>;
+  deveTrocarSenha?: boolean;
 }
 
 function grantAllows(grant: PolicyGrant | undefined, action: 'read' | 'write'): boolean {
@@ -56,8 +57,9 @@ export function hasPermission(
 
 interface AuthContextType {
   user: User | null;
-  login: (login: string, senha: string) => Promise<void>;
+  login: (login: string, senha: string) => Promise<User>;
   logout: () => void;
+  refreshUser: () => Promise<User | null>;
   loading: boolean;
 }
 
@@ -78,6 +80,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const refreshUser = async () => {
+    try {
+      const me = await api<User>('/auth/me');
+      setUser(me);
+      return me;
+    } catch {
+      localStorage.removeItem('token');
+      setUser(null);
+      return null;
+    }
+  };
+
   const login = async (loginName: string, senha: string) => {
     const data = await api<{ token: string; user: User }>('/auth/login', {
       method: 'POST',
@@ -85,6 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     localStorage.setItem('token', data.token);
     setUser(data.user);
+    return data.user;
   };
 
   const logout = () => {
@@ -93,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, refreshUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

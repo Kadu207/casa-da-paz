@@ -1,16 +1,21 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 import { portalAssets } from '../lib/portal-assets';
 import { useI18n } from '../i18n/I18nContext';
 
 export default function AlterarSenhaPage() {
   const { t } = useI18n();
+  const { user, refreshUser } = useAuth();
+  const navigate = useNavigate();
   const [senhaAtual, setSenhaAtual] = useState('');
   const [senhaNova, setSenhaNova] = useState('');
   const [confirmar, setConfirmar] = useState('');
   const [erro, setErro] = useState('');
   const [ok, setOk] = useState(false);
   const [salvando, setSalvando] = useState(false);
+  const obrigatorio = Boolean(user?.deveTrocarSenha);
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +39,10 @@ export default function AlterarSenhaPage() {
       setSenhaNova('');
       setConfirmar('');
       setOk(true);
+      await refreshUser();
+      if (obrigatorio) {
+        navigate('/app/dashboard', { replace: true });
+      }
     } catch (err) {
       setErro(err instanceof Error ? err.message : t('erp.password.error'));
     } finally {
@@ -53,7 +62,9 @@ export default function AlterarSenhaPage() {
         <p className="absolute bottom-3 left-4 font-serif text-[var(--color-accent)] text-lg">{t('erp.layout.tagline')}</p>
       </div>
       <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.password.title')}</h2>
-      <p className="text-sm text-white/70">{t('erp.password.description')}</p>
+      <p className="text-sm text-white/70">
+        {obrigatorio ? t('erp.password.required') : t('erp.password.description')}
+      </p>
 
       <form onSubmit={salvar} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
         {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}

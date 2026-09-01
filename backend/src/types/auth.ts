@@ -7,6 +7,7 @@ export interface JwtPayload {
   setorAcesso: SetorAcesso;
   login: string;
   policies?: PolicyGrants | null;
+  deveTrocarSenha?: boolean;
 }
 
 declare global {

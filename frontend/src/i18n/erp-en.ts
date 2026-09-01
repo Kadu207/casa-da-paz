@@ -29,6 +29,8 @@ export const erpEn: Record<ErpTranslationKey, string> = {
   'erp.password.title': 'Change password',
   'erp.password.description':
     'Use this page to change your account password. The board can reset other users’ passwords under Users.',
+  'erp.password.required':
+    'For security, you must set a new password before continuing (default or admin-reset password).',
   'erp.password.current': 'Current password',
   'erp.password.new': 'New password (min. 6)',
   'erp.password.confirm': 'Confirm new password',

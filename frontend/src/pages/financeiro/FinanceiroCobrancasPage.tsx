@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../lib/api';
 import { useI18n } from '../../i18n/I18nContext';
+import { safeHref } from '../../lib/safe-url';
 
 interface Cobranca {
   id: number;
@@ -98,8 +99,13 @@ export default function FinanceiroCobrancasPage() {
                     {Number(c.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </td>
                   <td className="p-2">
-                    {c.invoiceUrl ? (
-                      <a href={c.invoiceUrl} target="_blank" rel="noreferrer" className="text-[var(--color-accent)] underline">
+                    {safeHref(c.invoiceUrl) ? (
+                      <a
+                        href={safeHref(c.invoiceUrl)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[var(--color-accent)] underline"
+                      >
                         {t('erp.financeiro.cobrancas.open')}
                       </a>
                     ) : (

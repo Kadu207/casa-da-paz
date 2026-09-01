@@ -87,6 +87,7 @@ async function serializeUsuario(u: {
   setorAcesso: import('@prisma/client').SetorAcesso;
   pessoaId: number;
   ativo?: boolean;
+  deveTrocarSenha?: boolean;
   pessoa?: unknown;
   policy?: { grants: unknown } | null;
   senhaHash?: string;
@@ -98,6 +99,7 @@ async function serializeUsuario(u: {
     setorAcesso: u.setorAcesso,
     pessoaId: u.pessoaId,
     ativo: u.ativo ?? true,
+    deveTrocarSenha: u.deveTrocarSenha ?? false,
     pessoa: u.pessoa,
     policy: customGrants,
     effectiveGrants: await enrichEstoqueCasaGrants(u.id, u.setorAcesso, customGrants),
@@ -260,9 +262,12 @@ router.put('/me/senha', authenticate, async (req, res) => {
   }
   await prisma.usuario.update({
     where: { id: usuario.id },
-    data: { senhaHash: await bcrypt.hash(parsed.data.senhaNova, 10) },
+    data: {
+      senhaHash: await bcrypt.hash(parsed.data.senhaNova, 10),
+      deveTrocarSenha: false,
+    },
   });
-  res.json({ ok: true });
+  res.json({ ok: true, deveTrocarSenha: false });
 });
 
 router.get('/usuarios', authenticate, authorize('usuarios', 'read'), async (_req, res) => {
@@ -292,7 +297,7 @@ router.post('/usuarios', authenticate, authorize('usuarios', 'write'), async (re
 
   const usuario = await prisma.$transaction(async (tx) => {
     const created = await tx.usuario.create({
-      data: { login, senhaHash, setorAcesso, pessoaId },
+      data: { login, senhaHash, setorAcesso, pessoaId, deveTrocarSenha: true },
     });
     await tx.usuarioPolicy.create({
       data: {
@@ -342,7 +347,10 @@ router.put('/usuarios/:id', authenticate, authorize('usuarios', 'write'), async 
   const data: Record<string, unknown> = {};
   if (body.data.login) data.login = body.data.login;
   if (body.data.setorAcesso) data.setorAcesso = body.data.setorAcesso;
-  if (body.data.senha) data.senhaHash = await bcrypt.hash(body.data.senha, 10);
+  if (body.data.senha) {
+    data.senhaHash = await bcrypt.hash(body.data.senha, 10);
+    data.deveTrocarSenha = true;
+  }
   if (body.data.ativo !== undefined) data.ativo = body.data.ativo;
 
   const usuario = await prisma.$transaction(async (tx) => {

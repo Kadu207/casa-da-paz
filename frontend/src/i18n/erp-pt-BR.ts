@@ -27,6 +27,8 @@ export const erpPtBR = {
   'erp.password.title': 'Alterar senha',
   'erp.password.description':
     'Use esta página para trocar a senha da sua conta. Diretoria pode redefinir senhas de outros usuários em Usuários.',
+  'erp.password.required':
+    'Por segurança, você precisa definir uma nova senha antes de continuar (conta com senha padrão ou reset administrativo).',
   'erp.password.current': 'Senha atual',
   'erp.password.new': 'Nova senha (mín. 6)',
   'erp.password.confirm': 'Confirmar nova senha',

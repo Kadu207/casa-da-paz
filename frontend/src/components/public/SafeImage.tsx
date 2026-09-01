@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState, type ImgHTMLAttributes } from 'react';
 import { cfImageUrl, cfSrcSet } from '../../lib/cf-image';
+import { safeImgSrc } from '../../lib/safe-url';
 
 /** srcSet responsivo — CDN Lovable aceita ?w=; CF Images quando configurado */
 export function buildSrcSet(url: string, widths: number[]) {
-  if (url.startsWith('http') || url.startsWith('/portal/')) {
-    return widths.map((w) => `${cfImageUrl(url, w)} ${w}w`).join(', ');
+  const safe = safeImgSrc(url);
+  if (!safe) return undefined;
+  if (safe.startsWith('http') || safe.startsWith('/portal/')) {
+    return widths.map((w) => `${cfImageUrl(safe, w)} ${w}w`).join(', ');
   }
-  return cfSrcSet(url, widths);
+  return cfSrcSet(safe, widths);
 }
 
 type Props = ImgHTMLAttributes<HTMLImageElement> & {
@@ -26,17 +29,22 @@ export function SafeImage({
 }: Props) {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
-  const resolvedSrc = typeof src === 'string' ? cfImageUrl(src) : src;
+  const allowed = typeof src === 'string' ? safeImgSrc(src) : null;
+  const resolvedSrc = allowed ? cfImageUrl(allowed) : typeof src === 'string' ? undefined : src;
 
   useEffect(() => {
     const el = imgRef.current;
     if (!el) return;
+    if (!resolvedSrc) {
+      setStatus('error');
+      return;
+    }
     if (el.complete) {
       setStatus(el.naturalWidth > 0 ? 'loaded' : 'error');
     }
   }, [resolvedSrc]);
 
-  if (status === 'error') {
+  if (!resolvedSrc || status === 'error') {
     return (
       <div
         role="img"

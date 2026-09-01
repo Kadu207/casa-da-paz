@@ -102,14 +102,63 @@ export default function App() {
           <Route path="lancamentos" element={<FinanceiroLancamentosPage />} />
           <Route path="fluxo" element={<FinanceiroFluxoPage />} />
           <Route path="atrasados" element={<FinanceiroAtrasadosPage />} />
-          <Route path="pagamentos" element={<FinanceiroPagamentosPage />} />
-          <Route path="contas-pagar" element={<FinanceiroContasPagarPage />} />
-          <Route path="recorrencia" element={<FinanceiroRecorrenciaPage />} />
-          <Route path="contribuintes" element={<FinanceiroContribuintesPage />} />
-          <Route path="dre" element={<FinanceiroDrePage />} />
-          <Route path="ofx" element={<FinanceiroOfxPage />} />
+          <Route
+            path="pagamentos"
+            element={
+              <RequireRole path="/app/financeiro/pagamentos">
+                <FinanceiroPagamentosPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="contas-pagar"
+            element={
+              <RequireRole path="/app/financeiro/contas-pagar">
+                <FinanceiroContasPagarPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="recorrencia"
+            element={
+              <RequireRole path="/app/financeiro/recorrencia">
+                <FinanceiroRecorrenciaPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="contribuintes"
+            element={
+              <RequireRole path="/app/financeiro/contribuintes">
+                <FinanceiroContribuintesPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="dre"
+            element={
+              <RequireRole path="/app/financeiro/dre">
+                <FinanceiroDrePage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="ofx"
+            element={
+              <RequireRole path="/app/financeiro/ofx">
+                <FinanceiroOfxPage />
+              </RequireRole>
+            }
+          />
           <Route path="conciliacao" element={<FinanceiroConciliacaoPage />} />
-          <Route path="contas" element={<FinanceiroContasPage />} />
+          <Route
+            path="contas"
+            element={
+              <RequireRole path="/app/financeiro/contas">
+                <FinanceiroContasPage />
+              </RequireRole>
+            }
+          />
           <Route
             path="cobrancas"
             element={
@@ -207,7 +256,14 @@ export default function App() {
             </RequireRole>
           }
         />
-        <Route path="minha-senha" element={<AlterarSenhaPage />} />
+        <Route
+          path="minha-senha"
+          element={
+            <RequireRole path="/app/minha-senha">
+              <AlterarSenhaPage />
+            </RequireRole>
+          }
+        />
         <Route
           path="integracoes"
           element={

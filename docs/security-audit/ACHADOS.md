@@ -36,3 +36,14 @@ Sem allowlist de esquema.
 
 ### F10 INFO â€” check-prod-secrets.sh:13
 Denylist incompleta (tema F04).
+
+## P2/P3 — corrigidos 2026-09-01
+
+| ID | Tema | Correção |
+|----|------|----------|
+| F06 | Senhas seed | `Usuario.deveTrocarSenha`; seed/create/reset; API bloqueia até PUT /auth/me/senha; FE redireciona |
+| F07 | Sub-rotas financeiras | RequireRole por recurso (pagamentos, contas-pagar, recorrencia, contribuintes, dre, ofx, contas) |
+| F08 | Marketing/Ecommerce write | hasPermission write esconde formulários/ações |
+| F09 | URLs | safe-url.ts + SafeImage + invoiceUrl |
+
+P1 permanece válido (IDOR, estoque limpeza, secrets).

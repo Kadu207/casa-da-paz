@@ -18,6 +18,7 @@
 | Deploy 031 | ✅ migrate + FE na VPS |
 | Audit fix P1 | ✅ 2026-09-01: IDOR financeiro, estoque limpeza, denylist+N8N — `docs/security-audit/` |
 | Deploy P1 | ✅ VPS `0b08dc9` — backend rebuild + FE Docker build; health OK 2026-09-01 |
+| Audit fix P2/P3 | ✅ 2026-09-01: `deveTrocarSenha`, RequireRole sub-rotas financeiras, gates write marketing/ecommerce, `safeUrl` href/src |
 
 ## Security (030) — referência rápida
 

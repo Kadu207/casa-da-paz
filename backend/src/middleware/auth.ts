@@ -29,14 +29,44 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
   try {
     const token = header.slice(7);
     const payload = jwt.verify(token, jwtSecret()) as JwtPayload;
+    const row = await prisma.usuario.findUnique({
+      where: { id: payload.userId },
+      select: {
+        ativo: true,
+        deveTrocarSenha: true,
+        policy: { select: { grants: true } },
+      },
+    });
+    if (!row || row.ativo === false) {
+      res.status(401).json({ error: 'Usuário inválido ou inativo' });
+      return;
+    }
+
     let policies: PolicyGrants | null = null;
     if (payload.setorAcesso !== 'SUPERVISOR' && payload.setorAcesso !== 'ADMIN') {
-      const row = await prisma.usuarioPolicy.findUnique({
-        where: { usuarioId: payload.userId },
-      });
-      policies = (row?.grants as PolicyGrants | null) ?? null;
+      policies = (row.policy?.grants as PolicyGrants | null) ?? null;
     }
-    req.user = { ...payload, policies };
+
+    req.user = {
+      ...payload,
+      policies,
+      deveTrocarSenha: row.deveTrocarSenha,
+    };
+
+    if (row.deveTrocarSenha) {
+      const path = req.originalUrl.split('?')[0] ?? '';
+      const allowed =
+        (req.method === 'GET' && /\/api\/auth\/me$/.test(path)) ||
+        (req.method === 'PUT' && /\/api\/auth\/me\/senha$/.test(path));
+      if (!allowed) {
+        res.status(403).json({
+          error: 'Troca de senha obrigatória',
+          code: 'MUST_CHANGE_PASSWORD',
+        });
+        return;
+      }
+    }
+
     next();
   } catch {
     res.status(401).json({ error: 'Token inválido' });

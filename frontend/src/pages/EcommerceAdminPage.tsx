@@ -4,6 +4,7 @@ import { maskCnpj, maskCpf, maskCep, maskTelefone } from '../lib/masks';
 import { CheckoutForm, emptyCheckoutForm, type CheckoutFormData } from '../components/ecommerce/CheckoutForm';
 import { useI18n } from '../i18n/I18nContext';
 import { formatMoney, labelEnum } from '../i18n/helpers';
+import { hasPermission, useAuth } from '../context/AuthContext';
 
 interface Cliente {
   id: number;
@@ -55,6 +56,8 @@ function clienteToForm(c: Cliente): CheckoutFormData {
 
 export default function EcommerceAdminPage() {
   const { t, locale } = useI18n();
+  const { user } = useAuth();
+  const canWrite = hasPermission(user, 'ecommerce', 'write');
   const [aba, setAba] = useState<'pedidos' | 'clientes'>('pedidos');
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -156,6 +159,7 @@ export default function EcommerceAdminPage() {
                   </td>
                   <td className="p-2">{formatMoney(locale, Number(p.valorTotal))}</td>
                   <td className="p-2">
+                    {canWrite ? (
                     <select
                       value={p.status}
                       onChange={(e) => atualizarStatus(p.id, e.target.value)}
@@ -167,6 +171,9 @@ export default function EcommerceAdminPage() {
                         </option>
                       ))}
                     </select>
+                    ) : (
+                      <span className="text-xs">{labelEnum(t, 'pedido', p.status)}</span>
+                    )}
                   </td>
                   <td className="p-2 text-xs text-white/70">
                     {p.itens.map((i) => `${i.quantidade}× ${i.produto.nome}`).join(', ')}
@@ -183,6 +190,7 @@ export default function EcommerceAdminPage() {
 
       {aba === 'clientes' && (
         <>
+          {canWrite && (
           <button
             type="button"
             onClick={() => {
@@ -193,8 +201,9 @@ export default function EcommerceAdminPage() {
           >
             {t('erp.ecommerce.newClient')}
           </button>
+          )}
 
-          {(novoCliente || editando) && (
+          {canWrite && (novoCliente || editando) && (
             <div className="bg-[var(--color-surface)] p-4 rounded-xl max-w-lg">
               <h3 className="font-medium text-[var(--color-accent)] mb-3">
                 {editando ? t('erp.ecommerce.editClient') : t('erp.ecommerce.registerClient')}
@@ -236,6 +245,8 @@ export default function EcommerceAdminPage() {
                   <td className="p-2">{c.email}</td>
                   <td className="p-2">{c._count?.pedidos ?? 0}</td>
                   <td className="p-2 space-x-2">
+                    {canWrite && (
+                      <>
                     <button
                       type="button"
                       onClick={() => {
@@ -253,6 +264,8 @@ export default function EcommerceAdminPage() {
                     >
                       {t('erp.common.delete')}
                     </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}

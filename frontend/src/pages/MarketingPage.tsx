@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { useI18n } from '../i18n/I18nContext';
+import { hasPermission, useAuth } from '../context/AuthContext';
 
 interface Evento {
   id: number;
@@ -58,6 +59,8 @@ const emptyMaterial = {
 
 export default function MarketingPage() {
   const { t } = useI18n();
+  const { user } = useAuth();
+  const canWrite = hasPermission(user, 'marketing', 'write');
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [conteudos, setConteudos] = useState<Conteudo[]>([]);
@@ -214,6 +217,7 @@ export default function MarketingPage() {
       <section className="space-y-3">
         <h3 className="text-lg text-white/90">{t('erp.marketing.studies')}</h3>
         <p className="text-xs text-white/50">{t('erp.marketing.studiesHint')}</p>
+        {canWrite && (
         <form onSubmit={salvarMaterial} className="space-y-2 p-4 rounded-xl bg-white/5 border border-white/10">
           {materialErro && <p className="text-sm text-[var(--color-danger)]">{materialErro}</p>}
           <div className="grid gap-2 sm:grid-cols-2">
@@ -293,6 +297,7 @@ export default function MarketingPage() {
             )}
           </div>
         </form>
+        )}
         <ul className="space-y-2 text-sm">
           {materiais.map((m) => (
             <li key={m.id} className="flex flex-wrap justify-between gap-2 items-center border-b border-white/5 py-2">
@@ -300,6 +305,7 @@ export default function MarketingPage() {
                 [{m.categoria}] {m.titulo}{' '}
                 <span className="text-white/40">({m.slug})</span>
               </span>
+              {canWrite && (
               <div className="flex gap-2">
                 <button type="button" onClick={() => editarMaterial(m)} className="text-white/70 hover:underline">
                   {t('erp.common.edit')}
@@ -312,6 +318,7 @@ export default function MarketingPage() {
                   {m.publicado ? t('erp.marketing.unpublish') : t('erp.marketing.publish')}
                 </button>
               </div>
+              )}
             </li>
           ))}
           {materiais.length === 0 && (
@@ -322,6 +329,7 @@ export default function MarketingPage() {
 
       <section className="space-y-3">
         <h3 className="text-lg text-white/90">{t('erp.marketing.events')}</h3>
+        {canWrite && (
         <form onSubmit={criarEvento} className="flex flex-wrap gap-2 items-end">
           <input
             value={nomeEvento}
@@ -349,6 +357,7 @@ export default function MarketingPage() {
             {t('erp.marketing.publishEvent')}
           </button>
         </form>
+        )}
         <ul className="space-y-2 text-sm">
           {eventos.map((e) => (
             <li key={e.id} className="flex flex-wrap justify-between gap-2 items-center border-b border-white/5 py-2">
@@ -358,6 +367,7 @@ export default function MarketingPage() {
                   ({new Date(e.dataEvento).toLocaleDateString('pt-BR')} · {e.status})
                 </span>
               </span>
+              {canWrite && (
               <button
                 type="button"
                 onClick={() => toggleEvento(e.id, e.status)}
@@ -365,6 +375,7 @@ export default function MarketingPage() {
               >
                 {e.status === 'ABERTO' ? t('erp.marketing.unpublish') : t('erp.marketing.publish')}
               </button>
+              )}
             </li>
           ))}
         </ul>
@@ -381,6 +392,7 @@ export default function MarketingPage() {
                   ({p.tipo} · {Number(p.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })})
                 </span>
               </span>
+              {canWrite && (
               <button
                 type="button"
                 onClick={() => toggleProduto(p.id, p.publicadoEcommerce)}
@@ -388,6 +400,7 @@ export default function MarketingPage() {
               >
                 {p.publicadoEcommerce ? t('erp.marketing.unpublish') : t('erp.marketing.publish')}
               </button>
+              )}
             </li>
           ))}
         </ul>
@@ -401,6 +414,7 @@ export default function MarketingPage() {
               <span>
                 [{c.tipo}] {c.titulo}
               </span>
+              {canWrite && (
               <button
                 type="button"
                 onClick={() => toggleConteudo(c.id, c.publicado)}
@@ -408,6 +422,7 @@ export default function MarketingPage() {
               >
                 {c.publicado ? t('erp.marketing.unpublish') : t('erp.marketing.publish')}
               </button>
+              )}
             </li>
           ))}
         </ul>
