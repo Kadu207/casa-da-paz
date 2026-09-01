@@ -10,7 +10,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 # Defaults conhecidos de desenvolvimento (rejeitar em prod)
-DEV_BAD=("dev-secret-change-me" "asaas-dev-webhook-token" "pix-dev-secret" "n8n-dev-secret")
+DEV_BAD=("dev-secret-change-me" "dev-secret" "changeme" "change-me-in-production" "asaas-dev-webhook-token" "pix-dev-secret" "n8n-dev-secret")
 
 get_val() {
   local key="$1"

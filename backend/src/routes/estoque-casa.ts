@@ -65,19 +65,38 @@ function serializeItem<T extends { estoqueAtual: number; estoqueMinimo: number }
   };
 }
 
+/** Limpeza bypass: never | read (qualquer grupo) | checklist (grupoId obrigatório para write). */
+type LimpezaBypass = 'never' | 'read' | 'checklist';
+
 async function assertEstoqueCasaAccess(
   req: Request,
   action: 'read' | 'write',
-  grupoId?: number
+  options?: { grupoId?: number; limpezaBypass?: LimpezaBypass }
 ): Promise<boolean> {
   const user = req.user!;
   const setor = user.setorAcesso as SetorAcesso;
   if (canAccessEstoqueCasaGrant(setor, action, user.policies)) return true;
-  return isResponsavelGrupoLimpeza(user.userId, grupoId);
+
+  const mode = options?.limpezaBypass ?? 'never';
+  if (mode === 'never') return false;
+
+  if (mode === 'read') {
+    if (action !== 'read') return false;
+    return isResponsavelGrupoLimpeza(user.userId);
+  }
+
+  // checklist: read/write só no próprio grupo (grupoId obrigatório em write)
+  if (action === 'write' && options?.grupoId === undefined) return false;
+  return isResponsavelGrupoLimpeza(user.userId, options?.grupoId);
 }
 
-async function requireEstoqueCasa(req: Request, res: import('express').Response, action: 'read' | 'write') {
-  if (!(await assertEstoqueCasaAccess(req, action))) {
+async function requireEstoqueCasa(
+  req: Request,
+  res: import('express').Response,
+  action: 'read' | 'write',
+  limpezaBypass: LimpezaBypass = 'never'
+) {
+  if (!(await assertEstoqueCasaAccess(req, action, { limpezaBypass }))) {
     res.status(403).json({ error: 'Acesso negado' });
     return false;
   }
@@ -85,7 +104,7 @@ async function requireEstoqueCasa(req: Request, res: import('express').Response,
 }
 
 router.get('/itens', authenticate, async (req, res) => {
-  if (!(await requireEstoqueCasa(req, res, 'read'))) return;
+  if (!(await requireEstoqueCasa(req, res, 'read', 'read'))) return;
   const abaixoMinimo = req.query.abaixoMinimo === '1' || req.query.abaixoMinimo === 'true';
   const categoria = typeof req.query.categoria === 'string' ? req.query.categoria : undefined;
   const ativoParam = req.query.ativo;
@@ -107,7 +126,7 @@ router.get('/itens', authenticate, async (req, res) => {
 });
 
 router.post('/itens', authenticate, async (req, res) => {
-  if (!(await requireEstoqueCasa(req, res, 'write'))) return;
+  if (!(await requireEstoqueCasa(req, res, 'write', 'never'))) return;
   const body = itemSchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: body.error.flatten() });
@@ -122,7 +141,7 @@ router.post('/itens', authenticate, async (req, res) => {
 });
 
 router.put('/itens/:id', authenticate, async (req, res) => {
-  if (!(await requireEstoqueCasa(req, res, 'write'))) return;
+  if (!(await requireEstoqueCasa(req, res, 'write', 'never'))) return;
   const id = Number(req.params.id);
   const body = itemPatchSchema.safeParse(req.body);
   if (!body.success) {
@@ -138,7 +157,7 @@ router.put('/itens/:id', authenticate, async (req, res) => {
 });
 
 router.post('/movimentacoes', authenticate, async (req, res) => {
-  if (!(await requireEstoqueCasa(req, res, 'write'))) return;
+  if (!(await requireEstoqueCasa(req, res, 'write', 'never'))) return;
   const body = movSchema.safeParse(req.body);
   if (!body.success) {
     res.status(400).json({ error: body.error.flatten() });
@@ -197,7 +216,7 @@ router.post('/movimentacoes', authenticate, async (req, res) => {
 });
 
 router.get('/movimentacoes', authenticate, async (req, res) => {
-  if (!(await requireEstoqueCasa(req, res, 'read'))) return;
+  if (!(await requireEstoqueCasa(req, res, 'read', 'read'))) return;
   const itemId = req.query.itemId ? Number(req.query.itemId) : undefined;
   const take = Math.min(Number(req.query.limit) || 100, 500);
   const movimentacoes = await prisma.movimentacaoEstoqueCasa.findMany({
@@ -213,7 +232,7 @@ router.get('/movimentacoes', authenticate, async (req, res) => {
 });
 
 router.get('/grupos-limpeza', authenticate, async (req, res) => {
-  if (!(await requireEstoqueCasa(req, res, 'read'))) return;
+  if (!(await requireEstoqueCasa(req, res, 'read', 'read'))) return;
   const setor = req.user!.setorAcesso as SetorAcesso;
   const hasWrite = canAccessEstoqueCasaGrant(setor, 'write', req.user!.policies);
   const where = hasWrite
@@ -295,7 +314,7 @@ router.put('/grupos-limpeza/:id', authenticate, async (req, res) => {
 });
 
 router.get('/checklists', authenticate, async (req, res) => {
-  if (!(await requireEstoqueCasa(req, res, 'read'))) return;
+  if (!(await requireEstoqueCasa(req, res, 'read', 'read'))) return;
   const setor = req.user!.setorAcesso as SetorAcesso;
   const hasWrite = canAccessEstoqueCasaGrant(setor, 'write', req.user!.policies);
   const grupoId = req.query.grupoId ? Number(req.query.grupoId) : undefined;
@@ -330,7 +349,7 @@ router.post('/checklists', authenticate, async (req, res) => {
     res.status(400).json({ error: body.error.flatten() });
     return;
   }
-  if (!(await assertEstoqueCasaAccess(req, 'write', body.data.grupoId))) {
+  if (!(await assertEstoqueCasaAccess(req, 'write', { grupoId: body.data.grupoId, limpezaBypass: 'checklist' }))) {
     res.status(403).json({ error: 'Acesso negado' });
     return;
   }
@@ -371,7 +390,7 @@ router.patch('/checklists/:id', authenticate, async (req, res) => {
     res.status(409).json({ error: 'Checklist já concluído' });
     return;
   }
-  if (!(await assertEstoqueCasaAccess(req, 'write', existing.grupoId))) {
+  if (!(await assertEstoqueCasaAccess(req, 'write', { grupoId: existing.grupoId, limpezaBypass: 'checklist' }))) {
     res.status(403).json({ error: 'Acesso negado' });
     return;
   }
@@ -424,7 +443,7 @@ router.post('/checklists/:id/concluir', authenticate, async (req, res) => {
     res.status(409).json({ error: 'Checklist já concluído' });
     return;
   }
-  if (!(await assertEstoqueCasaAccess(req, 'write', existing.grupoId))) {
+  if (!(await assertEstoqueCasaAccess(req, 'write', { grupoId: existing.grupoId, limpezaBypass: 'checklist' }))) {
     res.status(403).json({ error: 'Acesso negado' });
     return;
   }
@@ -486,7 +505,7 @@ router.post('/checklists/:id/concluir', authenticate, async (req, res) => {
 });
 
 router.get('/relatorio', authenticate, async (req, res) => {
-  if (!(await requireEstoqueCasa(req, res, 'read'))) return;
+  if (!(await requireEstoqueCasa(req, res, 'read', 'never'))) return;
   const de = typeof req.query.de === 'string' ? new Date(req.query.de) : new Date(Date.now() - 30 * 86400000);
   const ate = typeof req.query.ate === 'string' ? new Date(req.query.ate) : new Date();
 

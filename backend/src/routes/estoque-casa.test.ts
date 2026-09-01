@@ -28,3 +28,13 @@ describe('RBAC estoque_casa', () => {
     expect(canAccess('FINANCEIRO', 'estoque_casa', 'read')).toBe(false);
   });
 });
+
+describe('enrichEstoqueCasaGrants — limpeza não vira write', () => {
+  it('documenta contrato: write só via matriz/policy (teste unitário de canAccess)', () => {
+    // Responsável limpeza recebe read via enrich (testado em integração);
+    // write de catálogo exige grant explícito.
+    expect(canAccess('MEDIUM', 'estoque_casa', 'write')).toBe(false);
+    expect(canAccess('MEDIUM', 'estoque_casa', 'write', { estoque_casa: 'read' })).toBe(false);
+    expect(canAccess('MEDIUM', 'estoque_casa', 'read', { estoque_casa: 'read' })).toBe(true);
+  });
+});

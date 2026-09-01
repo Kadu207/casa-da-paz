@@ -1,3 +1,5 @@
+import { resolveSecret } from './runtime-env.js';
+
 export type N8nWorkflow =
   | 'novo_agendamento'
   | 'agendamento_confirmado'
@@ -24,8 +26,14 @@ export async function dispararN8n(
     return { enviado: false, motivo: 'N8N_URL não configurado' };
   }
 
+  let secret: string;
+  try {
+    secret = resolveSecret('N8N_WEBHOOK_SECRET', 'n8n-dev-secret');
+  } catch {
+    return { enviado: false, motivo: 'N8N_WEBHOOK_SECRET inválido em produção' };
+  }
+
   const path = WEBHOOK_PATHS[workflow];
-  const secret = process.env.N8N_WEBHOOK_SECRET ?? 'n8n-dev-secret';
 
   try {
     const res = await fetch(`${baseUrl.replace(/\/$/, '')}${path}`, {

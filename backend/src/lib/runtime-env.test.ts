@@ -6,7 +6,7 @@ import {
   timingSafeEqualString,
 } from './runtime-env.js';
 
-const ENV_KEYS = ['NODE_ENV', 'CASADAPAZ_ENV', 'JWT_SECRET', 'CORS_ORIGIN'] as const;
+const ENV_KEYS = ['NODE_ENV', 'CASADAPAZ_ENV', 'JWT_SECRET', 'CORS_ORIGIN', 'N8N_WEBHOOK_SECRET'] as const;
 
 function snapshotEnv(): Record<string, string | undefined> {
   const out: Record<string, string | undefined> = {};
@@ -27,7 +27,11 @@ describe('runtime-env security helpers', () => {
 
   it('detecta defaults de desenvolvimento', () => {
     expect(isDevDefaultSecret('dev-secret-change-me')).toBe(true);
+    expect(isDevDefaultSecret('dev-secret')).toBe(true);
+    expect(isDevDefaultSecret('changeme')).toBe(true);
+    expect(isDevDefaultSecret('change-me-in-production')).toBe(true);
     expect(isDevDefaultSecret('pix-dev-secret')).toBe(true);
+    expect(isDevDefaultSecret('n8n-dev-secret')).toBe(true);
     expect(isDevDefaultSecret('asaas-dev-webhook-token')).toBe(true);
     expect(isDevDefaultSecret('forte-aleatorio-xyz')).toBe(false);
   });
@@ -51,11 +55,24 @@ describe('runtime-env security helpers', () => {
     expect(() => resolveSecret('JWT_SECRET', 'dev-secret-change-me')).toThrow(/JWT_SECRET/);
     process.env.JWT_SECRET = 'dev-secret-change-me';
     expect(() => resolveSecret('JWT_SECRET', 'dev-secret-change-me')).toThrow(/JWT_SECRET/);
+    process.env.JWT_SECRET = 'dev-secret';
+    expect(() => resolveSecret('JWT_SECRET', 'dev-secret')).toThrow(/JWT_SECRET/);
     process.env.JWT_SECRET = 'prod-forte-nao-default-xyz';
     expect(resolveSecret('JWT_SECRET', 'dev-secret-change-me')).toBe('prod-forte-nao-default-xyz');
   });
 
-  it('isProductionRuntime reconhece NODE_ENV e CASADAPAZ_ENV', () => {
+  it('resolveSecret rejeita n8n-dev-secret em produção', () => {
+    process.env.CASADAPAZ_ENV = 'production';
+    process.env.N8N_WEBHOOK_SECRET = 'n8n-dev-secret';
+    expect(() => resolveSecret('N8N_WEBHOOK_SECRET', 'n8n-dev-secret')).toThrow(/N8N_WEBHOOK_SECRET/);
+  });
+});
+
+describe('isProductionRuntime', () => {
+  const snap = snapshotEnv();
+  afterEach(() => restoreEnv(snap));
+
+  it('reconhece NODE_ENV e CASADAPAZ_ENV', () => {
     delete process.env.NODE_ENV;
     delete process.env.CASADAPAZ_ENV;
     expect(isProductionRuntime()).toBe(false);

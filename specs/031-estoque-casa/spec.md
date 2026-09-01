@@ -21,7 +21,7 @@ Almoxarifado **primário** de insumos de funcionamento/ritualística (charutos, 
 
 ## RBAC
 
-Resource `estoque_casa`: write para SUPERVISOR, ADMIN, DIRETORIA, TESOURARIA. MEDIUM via policy override **ou** como responsável de grupo ativo.
+Resource `estoque_casa`: write para SUPERVISOR, ADMIN, DIRETORIA, TESOURARIA (e MEDIUM via policy `write`). Responsável de grupo de limpeza recebe **read** + bypass só em rotas de checklist do próprio grupo (não CRUD de itens/movimentações/relatório).
 
 ## API
 

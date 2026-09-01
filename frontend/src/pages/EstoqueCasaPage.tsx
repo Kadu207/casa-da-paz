@@ -306,7 +306,7 @@ export default function EstoqueCasaPage() {
     { id: 'movimentacoes', label: t('erp.estoque.tabMov') },
     { id: 'grupos', label: t('erp.estoque.tabGrupos') },
     { id: 'checklist', label: t('erp.estoque.tabChecklist') },
-    { id: 'relatorio', label: t('erp.estoque.tabRelatorio') },
+    ...(canWrite ? [{ id: 'relatorio' as const, label: t('erp.estoque.tabRelatorio') }] : []),
   ];
 
   return (

@@ -98,6 +98,15 @@ export function whereAdimplencia(
   };
 }
 
+/** Extrai pessoaId escalar do scope own (não sobrescrevível pela query). */
+function scopedPessoaId(
+  scope?: Prisma.FinanceiroTransacaoWhereInput
+): number | undefined {
+  if (!scope || typeof scope !== 'object') return undefined;
+  const pid = (scope as { pessoaId?: unknown }).pessoaId;
+  return typeof pid === 'number' && Number.isInteger(pid) && pid > 0 ? pid : undefined;
+}
+
 export function buildListagemWhere(
   filtros: ListagemFiltros,
   scope?: Prisma.FinanceiroTransacaoWhereInput
@@ -107,7 +116,14 @@ export function buildListagemWhere(
   if (filtros.tipo) base.tipo = filtros.tipo;
   if (filtros.categoria) base.categoria = filtros.categoria;
   if (filtros.status) base.status = filtros.status;
-  if (filtros.pessoaId) base.pessoaId = filtros.pessoaId;
+
+  // Escopo own: nunca permitir que ?pessoaId= sobrescreva o dono autenticado (IDOR).
+  const ownId = scopedPessoaId(scope);
+  if (ownId != null) {
+    base.pessoaId = ownId;
+  } else if (filtros.pessoaId) {
+    base.pessoaId = filtros.pessoaId;
+  }
 
   if (filtros.de || filtros.ate) {
     if (!filtros.de || !filtros.ate) return 'Informe de e ate juntos';

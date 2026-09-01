@@ -45,6 +45,27 @@ describe('buildListagemWhere', () => {
   it('rejeita de sem ate', () => {
     expect(buildListagemWhere({ de: '2026-06-01' })).toBe('Informe de e ate juntos');
   });
+  it('não deixa ?pessoaId sobrescrever escopo own (IDOR)', () => {
+    const w = buildListagemWhere({ pessoaId: 99, tipo: 'RECEITA' }, { pessoaId: 5 });
+    expect(typeof w).not.toBe('string');
+    if (typeof w === 'string') return;
+    expect(w.pessoaId).toBe(5);
+    expect(w.tipo).toBe('RECEITA');
+  });
+
+  it('staff sem scope own ainda filtra por pessoaId da query', () => {
+    const w = buildListagemWhere({ pessoaId: 99 });
+    expect(typeof w).not.toBe('string');
+    if (typeof w === 'string') return;
+    expect(w.pessoaId).toBe(99);
+  });
+
+  it('own scope sem pessoaId na query mantém o dono', () => {
+    const w = buildListagemWhere({ tipo: 'DESPESA' }, { pessoaId: 5 });
+    expect(typeof w).not.toBe('string');
+    if (typeof w === 'string') return;
+    expect(w.pessoaId).toBe(5);
+  });
 });
 
 describe('whereAdimplencia', () => {

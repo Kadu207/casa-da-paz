@@ -14,7 +14,10 @@ export async function isResponsavelGrupoLimpeza(usuarioId: number, grupoId?: num
   return Boolean(row);
 }
 
-/** Mescla write em estoque_casa se o usuário for responsável de grupo ativo. */
+/**
+ * Responsável de limpeza ganha apenas `read` (abre UI / checklist).
+ * Write de catálogo/movimentações exige policy ou setor privilegiado — não bypass.
+ */
 export async function enrichEstoqueCasaGrants(
   usuarioId: number,
   setor: SetorAcesso,
@@ -25,7 +28,7 @@ export async function enrichEstoqueCasaGrants(
     return base;
   }
   if (await isResponsavelGrupoLimpeza(usuarioId)) {
-    return { ...base, estoque_casa: 'write' };
+    return { ...base, estoque_casa: 'read' };
   }
   return base;
 }

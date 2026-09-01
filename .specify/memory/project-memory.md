@@ -1,6 +1,6 @@
 ﻿# Memória Viva — Casa da Paz
 
-**Última atualização:** 2026-08-20
+**Última atualização:** 2026-09-01
 
 ## Estado do projeto
 
@@ -16,6 +16,7 @@
 | SSH allowlist | Script `infra/scripts/allowlist-ssh-65025.sh` (opcional; gate humano) |
 | Security 030 | ✅ Fase 0–2: `:9080` filtrado (smoke TIMEOUT), headers OK, Helmet+magic uploads, CI GL test, CodeRabbit no Git, validators 028/029/030 |
 | Deploy 031 | ✅ migrate + FE na VPS |
+| Audit fix P1 | ✅ 2026-09-01: IDOR financeiro (`buildListagemWhere`), estoque limpeza (checklist-only), denylist `dev-secret` + N8N `resolveSecret` — ver `docs/security-audit/` |
 
 ## Security (030) — referência rápida
 

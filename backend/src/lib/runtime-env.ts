@@ -2,6 +2,9 @@ import { timingSafeEqual } from 'node:crypto';
 
 const DEV_DEFAULTS = new Set([
   'dev-secret-change-me',
+  'dev-secret',
+  'changeme',
+  'change-me-in-production',
   'asaas-dev-webhook-token',
   'pix-dev-secret',
   'n8n-dev-secret',

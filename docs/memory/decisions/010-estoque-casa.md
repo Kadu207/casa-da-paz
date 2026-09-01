@@ -19,7 +19,7 @@ Manter **estoques separados** (sem tabela unificada):
 
 Estoque mínimo é **derivado** (`estoqueAtual <= estoqueMinimo`), sem status duplicado (espírito ADR-003).
 
-Acesso MEDIUM: policy `estoque_casa` **ou** vínculo como `GrupoLimpeza.responsavelUsuarioId`.
+Acesso MEDIUM: policy `estoque_casa` **write** para catálogo/movimentações; vínculo como `GrupoLimpeza.responsavelUsuarioId` concede **read** + checklist do próprio grupo (não write org-wide de itens).
 
 ## Consequências
 
