@@ -16,7 +16,8 @@
 | SSH allowlist | Script `infra/scripts/allowlist-ssh-65025.sh` (opcional; gate humano) |
 | Security 030 | ✅ Fase 0–2: `:9080` filtrado (smoke TIMEOUT), headers OK, Helmet+magic uploads, CI GL test, CodeRabbit no Git, validators 028/029/030 |
 | Deploy 031 | ✅ migrate + FE na VPS |
-| Audit fix P1 | ✅ 2026-09-01: IDOR financeiro (`buildListagemWhere`), estoque limpeza (checklist-only), denylist `dev-secret` + N8N `resolveSecret` — ver `docs/security-audit/` |
+| Audit fix P1 | ✅ 2026-09-01: IDOR financeiro, estoque limpeza, denylist+N8N — `docs/security-audit/` |
+| Deploy P1 | ✅ VPS `0b08dc9` — backend rebuild + FE Docker build; health OK 2026-09-01 |
 
 ## Security (030) — referência rápida
 
