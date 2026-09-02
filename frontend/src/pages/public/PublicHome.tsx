@@ -46,7 +46,8 @@ export default function PublicHome() {
   ] as const;
 
   const maps = portalMapLinks();
-  const [mapUseEmbed, setMapUseEmbed] = useState(false);
+  /** Preferir embed OSM (CSP frame-src liberado); static só se o iframe falhar no ambiente. */
+  const [mapUseEmbed, setMapUseEmbed] = useState(true);
 
   return (
     <PublicLayout showBack={false}>
