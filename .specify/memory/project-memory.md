@@ -16,6 +16,7 @@
 | SSH allowlist | Script `infra/scripts/allowlist-ssh-65025.sh` (opcional; gate humano) |
 | Security 030 | ✅ Fase 0–2 |
 | Audit fix P1/P2/P3 | ✅ Deployed 2026-09-01/02 |
+| Auditoria F01–F10 | ✅ **GREEN** Remediado/Validado 2026-09-02 — smoke `scripts/smoke-audit-f01-f10-prod.ps1` PASS 11/0; `ACHADOS.md` atualizado |
 
 ## Security (030) — referência rápida
 

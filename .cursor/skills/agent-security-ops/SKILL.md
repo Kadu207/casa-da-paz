@@ -21,11 +21,12 @@ description: Segurança contínua pós-go-live Casa da Paz — OWASP light, VPS,
 
 ### App
 - [x] Login rate-limit ativo; usuário inativo não autentica — 2026-08-20
-- [x] Produção: JWT_SECRET / CORS_ORIGIN sem default de dev — 2026-08-20
+- [x] Produção: JWT_SECRET / CORS_ORIGIN sem default de dev — 2026-08-20 / revalidado 2026-09-02 (F04/F10)
 - [x] Webhooks rejeitam token ausente/errado (timing-safe) — 2026-08-20
-- [x] Headers: X-Frame-Options, nosniff, CSP (Helmet API + nginx FE) — 2026-08-20
+- [x] Headers: X-Frame-Options, nosniff, CSP (Helmet API + nginx FE) — 2026-08-20 / frame-src OSM 2026-09-02
 - [x] Uploads com limite de tamanho + MIME + magic bytes — 2026-08-20
 - [x] `npm audit` BE/FE sem critical/high abertos (ou waiver em ADR) — 2026-08-20
+- [x] Auditoria F01–F10 remediada + smoke prod — 2026-09-02 (`ACHADOS.md` GREEN)
 
 ### VPS
 - [x] `:9080` não acessível da internet pública (só loopback/Docker bridge + proxy) — 2026-08-20 smoke
