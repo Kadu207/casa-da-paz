@@ -12,7 +12,7 @@
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (**não** :22) |
 | Asaas (021) | **Dormant** — runbook [`docs/memory/runbooks/asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
 | Spec 032 ingressos | 📋 Stub em `specs/032-ingressos-eventos/` (não implementar) |
-| Spec 033 delegações | ✅ Spec/API/FE/N8N — **deploy VPS pendente confirmação** (migrate + seed funções + rebuild) |
+| Spec 033 delegações | ✅ Deploy VPS `2975b46` 2026-09-02 — migrate OK; seed `--funcoes-casa-only`; FE `index-Bw2ZWhMW.js`; health OK |
 | SSH allowlist | Script `infra/scripts/allowlist-ssh-65025.sh` (opcional; gate humano) |
 | Security 030 | ✅ Fase 0–2 |
 | Audit fix P1/P2/P3 | ✅ Deployed 2026-09-01/02 |
