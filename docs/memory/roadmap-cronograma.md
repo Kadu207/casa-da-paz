@@ -1,6 +1,6 @@
 # Cronograma — Casa da Paz
 
-**Atualizado:** 2026-08-20
+**Atualizado:** 2026-09-02
 
 ## Concluído
 
@@ -12,23 +12,26 @@
 | 014 alertas UI | Badge + N8N lembrete | ✅ |
 | 017–019 | Dashboard, painel médium, auditoria export | ✅ |
 | 020 RBAC + policies | Hierarquia + `UsuarioPolicy` | ✅ |
-| 021 Asaas + marketing | Código completo | ✅ **dormant** — ver `docs/memory/runbooks/asaas-dormant.md` |
+| 021 Asaas + marketing | Código completo | ✅ **dormant** |
 | 022–025 tesouraria | AP, recorrência, DRE, OFX | ✅ Prod |
 | Contribuintes | Patrocínios / padrinhos | ✅ Prod |
-| 030 security | Hardening | ✅ Prod |
+| 027 Materiais de estudo | Portal + Marketing | ✅ Prod |
+| 030 security | Hardening + CSP mapa OSM | ✅ Prod |
 | **031 estoque casa** | Almoxarifado primário | ✅ Prod |
-| Stash VPS `vps-before-031` | Removido | ✅ |
+| Auditoria F01–F10 | Remediação + smoke prod | ✅ **GREEN** |
+| **033 delegações** | Funções da casa + tarefas + N8N | ✅ Prod |
 
 ## Sequência atual
 
 ```
-✅ 031 Estoque em produção
+✅ 033 Delegações em produção
+✅ Auditoria F01–F10 GREEN
     ↓
-📋 032 Ingressos/eventos (spec stub — ADR-010) — aguarda abertura
+🔧 Mensageria polish (SMTP + WhatsApp Meta + Chatwoot 502)
+    ↓
+📋 032 Ingressos/eventos (stub — aguarda abertura)
     ↓
 021 Asaas — dormant até chave + confirmação
-    ↓
-012 Chatwoot/N8N polish
     ↓
 016 Next.js — ADR-008
 ```
@@ -37,7 +40,7 @@
 
 | Prioridade | Item | Notas |
 |------------|------|-------|
-| **1** | Spec 032 detalhada | Só quando priorizar ingressos |
-| **2** | Asaas sandbox | `asaas-dormant.md` gate |
-| **3** | SSH allowlist :65025 | Script `infra/scripts/allowlist-ssh-65025.sh` (opcional) |
-| **4** | Chatwoot/N8N | Tokens Meta / widget |
+| **1** | Chatwoot/N8N polish | Credencial SMTP N8N; inbox WhatsApp; corrigir 502 `casadapaz-chat` |
+| **2** | Spec 032 detalhada | Só quando priorizar ingressos |
+| **3** | Asaas sandbox | `asaas-dormant.md` gate |
+| **4** | SSH allowlist :65025 | Opcional |

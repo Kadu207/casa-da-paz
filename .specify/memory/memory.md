@@ -40,12 +40,17 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 021 Asaas | **Dormant** até chave |
 | 026 contribuintes | ✅ (spec dedicada) |
 | 031 estoque-casa | ✅ Primário (ADR-010) |
-| 030 security-hardening | ✅ Fase 0–2 (2026-08-20) |
-| 033 delegacoes-casa | ✅ Funções + tarefas + N8N (ADR-011) |
+| 030 security-hardening | ✅ Fase 0–2 + CSP mapa OSM (2026-09-02) |
+| 033 delegacoes-casa | ✅ Prod (ADR-011) — N8N workflow importado |
+| Auditoria F01–F10 | ✅ GREEN — [`docs/security-audit/ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
 
 ## ADRs
 
 001–011 em `docs/memory/decisions/` — 002 (RBAC+policies), 009 Asaas opcional, **010 estoque primário**, **011 delegações**.
+
+## Pendências vivas
+
+Ver `project-memory.md` e `docs/memory/roadmap-cronograma.md` (mensageria SMTP/WhatsApp, 032, Asaas).
 
 ## Regras
 

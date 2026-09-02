@@ -32,6 +32,7 @@ ERP/CRM + portal público do terreiro de Umbanda afroindígena **Casa da Paz** (
 | [ADRs](./memory/decisions/) | Decisões arquiteturais |
 | [Runbooks](./memory/runbooks/) | Deploy, import, LGPD, messaging |
 | [Playbooks](./memory/playbooks/) | Operação por domínio |
+| [Auditoria de segurança](./security-audit/ACHADOS.md) | F01–F10 GREEN (Remediado/Validado) |
 | [Agentes Cursor](./11-agentes-e-operacao-cursor.md) | Skills e fluxo SDD |
 
 ## Referência histórica (Lovable)

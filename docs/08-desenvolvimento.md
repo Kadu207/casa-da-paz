@@ -29,6 +29,8 @@ npx prisma migrate deploy
 npm run db:seed
 # Ou só catálogo do estoque primário (idempotente):
 # npx tsx prisma/seed.ts --estoque-casa-only
+# Ou só funções da casa 033 (idempotente):
+# npx tsx prisma/seed.ts --funcoes-casa-only
 npm run dev
 
 # outro terminal
@@ -46,8 +48,13 @@ npm run dev
 |--------|-----|
 | `scripts/test-tesouraria-022.ps1` | Smoke tesouraria 022–025 |
 | `scripts/test-financeiro-asaas.ps1` | Smoke Asaas (configured ou não) |
+| `scripts/smoke-audit-f01-f10-prod.ps1` | Matriz auditoria F01–F10 em produção |
+| `infra/scripts/smoke-security-origin.ps1` | Smoke origin :9080 / headers |
+| `infra/scripts/check-prod-secrets.sh` | Gate secrets VPS (sem imprimir valores) |
 | `scripts/build-frontend-prod.ps1` | Build produção FE |
 | `scripts/sync-frontend-vps.ps1` | Envia `dist` à VPS |
+| `infra/scripts/build-frontend-on-vps.sh` | Build FE na VPS (Docker node) |
+| `infra/scripts/setup-n8n-delegacao-vps.sh` | Import workflow 033 + token Chatwoot |
 | `infra/scripts/deploy.sh` | Deploy containers (**gate** `CASADAPAZ_DEPLOY_CONFIRMED=yes`) |
 
 ## 8.4. Variáveis (resumo)

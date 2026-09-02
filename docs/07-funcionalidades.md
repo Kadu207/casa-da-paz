@@ -11,6 +11,7 @@
 
 Listas por função: Presidente, Diretoria, Tesouraria, Conselheiro, **Médium**, Consulente, Suporte TI.  
 Menores: `PessoaResponsavel`.  
+Campo opcional **e-mail** (`Pessoa.email`) — usado em alertas de delegações.  
 **Médiuns:** coluna Mensalidade (edição por quem tem `recorrencia` write).
 
 ## 7.3. Tesouraria (`/app/financeiro`)
@@ -39,6 +40,7 @@ Menores: `PessoaResponsavel`.
 | Módulo | Descrição |
 |--------|-----------|
 | Dashboard | KPIs por período; painel próprio para MEDIUM |
+| **Delegações** | Funções da casa (`/app/delegacoes`): responsáveis, tarefas com check, alertas e-mail/WhatsApp via N8N |
 | Recepção | Check-in / presença |
 | Eventos | Gestão + inscrições |
 | **Estoque** | Almoxarifado **primário** (`/app/estoque`): itens, mínimo/alertas, grupos de limpeza, checklist, relatório |
@@ -54,7 +56,7 @@ Menores: `PessoaResponsavel`.
 |------------|--------|----------|
 | Primário | Estoque da Casa | `estoque_casa` |
 | Secundário | Livraria/PDV | `estoque` |
-| Futuro | Ingressos/eventos | módulo eventos |
+| Futuro | Ingressos/eventos | módulo eventos (032 stub) |
 
 ## 7.5. Specs de referência
 
@@ -70,3 +72,6 @@ Menores: `PessoaResponsavel`.
 | 027 Materiais de estudo | ✅ |
 | 030 Security hardening | ✅ |
 | **031 Estoque primário da casa** | ✅ |
+| 032 Ingressos/eventos | 📋 Stub — não implementar ainda |
+| **033 Delegações / funções da casa** | ✅ |
+| Auditoria F01–F10 | ✅ GREEN |

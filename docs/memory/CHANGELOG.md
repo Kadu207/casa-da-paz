@@ -14,11 +14,23 @@
 - **Auditoria F01–F10:** Remediado/Validado 2026-09-02 — smoke prod PASS; ver `docs/security-audit/ACHADOS.md`
 
 ### Documentação
+- **Refresh 2026-09-02:** docs 00–09, README, roadmap, memória, ACHADOS F01–F10 GREEN, 033/delegações, CSP mapa OSM, smokes de auditoria
 - **Refresh 2026-08-06:** `docs/00–09`, README, roadmap, playbooks, constitution IX, specs 022–026 status, OpenAPI/RBAC alinhados à stack Express/Vite (Lovable movido para `docs/reference/lovable/`)
 - Cloudflare DNS + runbook firewall: smoke scripts e inventário secrets
 
+### Corrigido
+- **Mapa “Onde nos encontrar”:** CSP nginx `frame-src` para OpenStreetMap (bloqueio de iframe) — 2026-09-02
+- **Auditoria F01–F10:** remediações P1/P2/P3 + smoke prod PASS — 2026-09-02
+
+### Validado
+- Smoke auditoria F01–F10 prod (`scripts/smoke-audit-f01-f10-prod.ps1`) PASS 11/0 — 2026-09-02
+- Smoke local tesouraria 022–025 + contribuintes + migrate (2026-08-06)
+- Deploy VPS + smoke manual produção (2026-06-09)
+- Smoke local 017–019 + alertas reenvio N8N (2026-06-29)
+- Unit tests Asaas webhook mappers (2026-08-02)
+
 ### Adicionado (anterior)
-- **027 Materiais de estudo:** portal `/public/estudos` (ervas/banhos/defumação); edição em Marketing; home galeria ervas → estudos
+- **027 Materiais de estudo:** portal `/public/estudos` (ervas/banhos/defumação); edição via Marketing; home galeria ervas → estudos
 - **Policies no cadastro de usuário:** `POST /auth/usuarios` cria `UsuarioPolicy` com snapshot do setor (+ overrides); UI define nível de acesso no ato
 - **Patrocínios / Padrinhos:** aba Financeiro + API `/contribuintes`; coluna mensalidade na lista de médiuns
 - **022–025 Tesouraria completa (sem Asaas):** contas a pagar, agenda a pagar, recorrência mensalidade, DRE/orçamento/centros, OFX; agentes ops em `agents.md`

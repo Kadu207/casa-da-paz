@@ -8,7 +8,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 
 | Domínio | Models chave |
 |---------|----------------|
-| Pessoas / auth | `Pessoa`, `PessoaResponsavel`, `Usuario`, `UsuarioPolicy` |
+| Pessoas / auth | `Pessoa` (+ `email` opcional), `PessoaResponsavel`, `Usuario` (+ `deveTrocarSenha`), `UsuarioPolicy` |
 | Financeiro ledger | `FinanceiroTransacao`, `ContaFinanceira`, `FinanceiroFechamentoMensal` |
 | Contas a pagar (022) | `Fornecedor`, `ContaPagar`, `ContaPagarParcela` |
 | Recorrência (023) | `MensalidadePlano` |
@@ -18,9 +18,10 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | Asaas (021, opcional) | `AsaasCliente`, `AsaasCobranca`, `AsaasAssinatura`, `AsaasWebhookEvent` |
 | Eventos | `Evento`, `Inscricao`, `Presenca` |
 | Estoque primário (031) | `ItemEstoqueCasa`, `MovimentacaoEstoqueCasa`, `GrupoLimpeza`, `ChecklistLimpeza`, `ChecklistLimpezaItem` |
+| Delegações (033) | `FuncaoCasa`, `FuncaoResponsavel`, `TarefaDelegacao` |
 | Livraria / ecommerce | `Produto`, `EstoqueMovimentacao`, `EcommercePedido` (venda — ADR-004) |
 | Portal | `AgendamentoPublico`, newsletter, consentimentos LGPD |
-| Ops | `Alerta`, auditoria, marketing |
+| Ops | `Alerta` (inclui tipos `DELEGACAO_*`), auditoria, marketing |
 
 ## 4.2. Enums relevantes (tesouraria)
 
@@ -38,6 +39,10 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 - `TipoMovEstoqueCasa`: ENTRADA, SAIDA, AJUSTE  
 - `StatusChecklistLimpeza`: RASCUNHO, CONCLUIDO  
 
+### Delegações (033)
+
+- `StatusTarefaDelegacao`: PENDENTE, CONCLUIDA, CANCELADA  
+
 ## 4.3. Regras de dados
 
 | Regra | Detalhe |
@@ -49,6 +54,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | Import Excel | Transação atômica com rollback total |
 | Estoque mínimo (casa) | Derivado: `estoqueAtual <= estoqueMinimo` (não status persistido) |
 | Multi-estoque | Primário (`itens_estoque_casa`) ≠ livraria (`produtos`) — ADR-010 |
+| Delegações | Funções + tarefas checáveis; alertas `DELEGACAO_*` — ADR-011 |
 
 ## 4.4. Migrations recentes
 
@@ -58,6 +64,8 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | `20260806120000_tesouraria_022_025` | Contas a pagar, planos, DRE, OFX |
 | `20260806140000_contribuintes_patrocinio_padrinho` | Contribuintes |
 | `20260820120000_estoque_casa_031` | Almoxarifado primário + grupos limpeza + checklist |
+| `20260901140000_usuario_deve_trocar_senha` | `Usuario.deveTrocarSenha` (F06) |
+| `20260902120000_delegacoes_casa_033` | Funções/tarefas + `Pessoa.email` |
 
 ```bash
 cd backend
@@ -65,6 +73,8 @@ npx prisma migrate deploy
 npx prisma generate
 # Catálogo primário (idempotente, seguro em prod):
 npx tsx prisma/seed.ts --estoque-casa-only
+# Funções da casa 033 (idempotente):
+npx tsx prisma/seed.ts --funcoes-casa-only
 ```
 
 ## 4.5. Porta local

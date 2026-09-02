@@ -1,6 +1,6 @@
 # Feature 033 — Delegações / Funções da Casa
 
-**Status:** ✅ Implementado (deploy VPS pendente confirmação) | **Atualizado:** 2026-09-02
+**Status:** ✅ Implementado e em produção | **Atualizado:** 2026-09-02
 
 ## Objetivo
 
@@ -31,8 +31,14 @@ Resource `delegacoes`: read amplo; write DIRETORIA/SUPERVISOR/ADMIN.
 
 Menu **Delegações** → `/app/delegacoes` (após Dashboard)
 
+## Produção
+
+- Deploy migrate + seed `--funcoes-casa-only` + rebuild BE/FE  
+- Workflow N8N `tarefa-delegacao` importado e webhook ativo  
+- Pendente operacional: credencial SMTP N8N + inbox WhatsApp Meta  
+
 ## Referências
 
 - ADR: `docs/memory/decisions/011-delegacoes-casa.md`
 - Matriz: `docs/contracts/rbac-matrix.md`
-- Mensageria: ADR-006
+- Mensageria: ADR-006 · `infra/n8n/README.md`

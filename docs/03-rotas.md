@@ -24,6 +24,7 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 |-----|---------------------|-----------|
 | `/app/login` | — | Login JWT |
 | `/app` | dashboard | Dashboard / painel médium |
+| `/app/delegacoes` | delegacoes | Funções da casa, responsáveis, tarefas (check) |
 | `/app/financeiro/lancamentos` | financeiro | Lançamentos |
 | `/app/financeiro/fluxo` | financeiro | Fluxo de caixa |
 | `/app/financeiro/atrasados` | financeiro | Recebíveis atrasados |
@@ -64,6 +65,7 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | * | `/api/cobrancas`, `/api/webhooks/asaas` | Asaas (se chave) |
 | * | `/api/livraria` | PDV / produtos |
 | * | `/api/estoque-casa` | Estoque primário (itens, movimentações, grupos, checklists) |
+| * | `/api/delegacoes` | Funções, responsáveis, tarefas, toggle, sync-alertas, resumo |
 | * | `/api/public/*` | Portal anônimo |
 
 Contrato parcial: [`docs/contracts/openapi.yaml`](./contracts/openapi.yaml).

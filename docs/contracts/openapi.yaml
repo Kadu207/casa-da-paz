@@ -7,6 +7,7 @@ info:
     Tesouraria 022–025 e contribuintes não dependem de Asaas.
     POST /auth/usuarios cria UsuarioPolicy (snapshot de grants) no ato do cadastro.
     Estoque primário (031): /estoque-casa/* — separado da livraria (ADR-010).
+    Delegações (033): /delegacoes/* — funções, tarefas, sync-alertas (ADR-011).
 servers:
   - url: /api
 paths:
@@ -174,6 +175,48 @@ paths:
   /estoque-casa/relatorio:
     get:
       security: [{ bearerAuth: [] }]
+  /delegacoes/resumo:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Totais pendentes / atrasadas (badge menu)
+  /delegacoes/funcoes:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Lista funções + responsáveis + pendentes
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Criar função (write)
+  /delegacoes/funcoes/{id}:
+    patch:
+      security: [{ bearerAuth: [] }]
+      summary: Atualizar função (write)
+  /delegacoes/funcoes/{id}/responsaveis:
+    put:
+      security: [{ bearerAuth: [] }]
+      summary: Definir responsáveis (write)
+  /delegacoes/tarefas:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Listar tarefas (filtros)
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Criar tarefa (write)
+  /delegacoes/tarefas/{id}:
+    patch:
+      security: [{ bearerAuth: [] }]
+      summary: Editar tarefa (write)
+  /delegacoes/tarefas/{id}/toggle:
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Alterna PENDENTE/CONCLUIDA (read)
+  /delegacoes/tarefas/{id}/notificar:
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Disparo manual e-mail/WhatsApp (write)
+  /delegacoes/sync-alertas:
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: D-1 e atrasadas (write / job)
   /public/eventos:
     get:
       summary: Eventos abertos (sem auth)

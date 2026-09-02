@@ -12,6 +12,10 @@
 | Ago/2026 | Policies **no ato do cadastro** de usuário |
 | Ago/2026 | Harness `agents.md` + 5 agentes de operação pós-construção |
 | Ago/2026 | **031 Estoque primário** (almoxarifado casa, grupos limpeza, checklist) — ADR-010 |
+| Ago/2026 | **030 Security hardening** (Helmet, uploads, :9080, secrets) |
+| Set/2026 | Auditoria F01–F10 remediada + smoke prod **GREEN** |
+| Set/2026 | **033 Delegações** (funções/tarefas/N8N) — ADR-011 |
+| Set/2026 | CSP mapa OSM no portal (“Onde nos encontrar”) |
 
 ## 9.2. Estado atual
 
@@ -19,9 +23,9 @@ Ver [`.specify/memory/project-memory.md`](../.specify/memory/project-memory.md) 
 
 ## 9.3. Próximos passos
 
-1. Ativar Asaas sandbox/produção **somente** com chave e confirmação  
-2. Chatwoot/N8N polish (tokens Meta / widget)  
-3. Controle de **ingressos/eventos** como estoque secundário (documentado no ADR-010)  
+1. Mensageria polish: SMTP N8N, inbox WhatsApp Meta, corrigir Chatwoot público 502  
+2. Ativar Asaas sandbox/produção **somente** com chave e confirmação  
+3. Controle de **ingressos/eventos** (032) — aguarda priorização  
 4. Next.js (016) — bloqueado por ADR-008 até aprovação  
 
 ## 9.4. Referência Lovable

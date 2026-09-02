@@ -25,6 +25,7 @@ flowchart LR
   API --> Asaas[Asaas opcional]
   API --> N8N[N8N webhooks]
   N8N --> Chatwoot[Chatwoot]
+  N8N --> Mail[SMTP e-mail]
   CF[Cloudflare Tunnel] --> Nginx[Nginx :9080]
   Nginx --> FE
   Nginx --> API
@@ -45,8 +46,9 @@ flowchart LR
 | Sistema | Uso |
 |---------|-----|
 | Asaas | Cobranças/assinaturas — **dormant** sem chave |
-| N8N | Alertas, agendamentos, lembretes |
-| Chatwoot | Atendimento WhatsApp |
+| N8N | Alertas financeiros, agendamentos, **delegações (033)** |
+| Chatwoot | Atendimento WhatsApp (inbox Meta pendente polish) |
+| SMTP | E-mail via N8N (credencial `SMTP Casa da Paz` — configurar) |
 | Cloudflare Images | Upload portal (quando tokens presentes) |
 
 ## 2.3. Princípios (constitution)
@@ -58,3 +60,4 @@ flowchart LR
 5. Deploy VPS só com confirmação humana
 6. Tesouraria **não depende** de Asaas
 7. Estoques separados: primário (casa) ≠ livraria/PDV ≠ ingressos futuros (ADR-010)
+8. Delegações (033) separadas do checklist de limpeza do estoque (ADR-011)

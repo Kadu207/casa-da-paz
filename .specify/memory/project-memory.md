@@ -6,64 +6,52 @@
 
 | Item | Status |
 |------|--------|
-| Fase | Pós-go-live: **033 Delegações** + estoque 031 + security harden 030 |
+| Fase | Pós-go-live estável: **033 Delegações** + 031 Estoque + 030 Security + auditoria F01–F10 GREEN |
 | Versão | 0.1.0-alpha |
+| Commit referência docs | `70774ba` (auditoria Green) / feature 033 `2975b46` |
 | Produção | https://casadapaz.inovatitech.com.br |
-| SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (**não** :22) |
-| Asaas (021) | **Dormant** — runbook [`docs/memory/runbooks/asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
-| Spec 032 ingressos | 📋 Stub em `specs/032-ingressos-eventos/` (não implementar) |
-| Spec 033 delegações | ✅ Deploy VPS `2975b46` 2026-09-02 — migrate OK; seed `--funcoes-casa-only`; FE `index-Bw2ZWhMW.js`; health OK |
-| SSH allowlist | Script `infra/scripts/allowlist-ssh-65025.sh` (opcional; gate humano) |
-| Security 030 | ✅ Fase 0–2 |
-| Audit fix P1/P2/P3 | ✅ Deployed 2026-09-01/02 |
-| Auditoria F01–F10 | ✅ **GREEN** Remediado/Validado 2026-09-02 — smoke `scripts/smoke-audit-f01-f10-prod.ps1` PASS 11/0; `ACHADOS.md` atualizado |
+| SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (Host `inovati`; **não** :22) |
+| Asaas (021) | **Dormant** — [`asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
+| Spec 032 ingressos | 📋 Stub — não implementar até priorizar |
+| Spec 033 delegações | ✅ Prod — migrate + seed funções + menu `/app/delegacoes` + N8N workflow importado |
+| Auditoria F01–F10 | ✅ **GREEN** Remediado/Validado — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
+| Mapa portal | ✅ CSP `frame-src` OSM — “Onde nos encontrar” OK |
+| Security 030 | ✅ Fase 0–2 + CSP mapa |
 
-## Security (030) — referência rápida
+## Pendências operacionais (próxima onda)
+
+| Prioridade | Item | Notas |
+|------------|------|-------|
+| 1 | Mensageria polish | SMTP N8N (`SMTP Casa da Paz`); inbox WhatsApp Meta; Chatwoot público **502** |
+| 2 | Spec 032 | Ingressos — só com decisão explícita |
+| 3 | Asaas | Sandbox/prod com chave + confirmação |
+| 4 | SSH allowlist :65025 | Opcional |
+
+## Security — referência rápida
 
 ```powershell
-# Do PC
 .\infra\scripts\smoke-security-origin.ps1
-# Esperado: 7 ok; http://IP:9080 inacessível
+.\scripts\smoke-audit-f01-f10-prod.ps1
 ```
 
 ```bash
-# Na VPS — secrets sem imprimir valores
 cd ~/casadapaz/infra && ./scripts/check-prod-secrets.sh
-# Reaplicar filtro 9080 se necessário
-sudo ./scripts/harden-origin-9080.sh
+# Esperado: APROVADO
 ```
-
-Inventário portas: `docs/memory/runbooks/firewall-host-iptables.md`  
-Spec: `specs/030-security-hardening/`
 
 ## Deploy VPS (colar)
 
 ```bash
 cd ~/casadapaz
-git fetch origin && git reset --hard origin/main
-git clean -fd
+git fetch origin && git pull origin main
 chmod +x infra/scripts/*.sh
-
 cd infra
-docker compose --env-file .env.production -f docker-compose.prod.yml build --no-cache backend
+./scripts/build-frontend-on-vps.sh   # se FE mudou
 CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh
 ./scripts/compose-prod.sh exec -T backend npx prisma migrate deploy
+# Seed idempotente 033:
+./scripts/compose-prod.sh exec -T backend npx tsx prisma/seed.ts --funcoes-casa-only
 curl -s http://127.0.0.1:9080/health
 ```
 
-Frontend (PC):
-
-```powershell
-cd "C:\Projetos DEV\Casa da Paz"
-.\scripts\deploy-frontend-vps.ps1 -PasswordOnly -RestartFrontend
-```
-
-Se SSH do PC der **timeout**, build FE na VPS:
-
-```bash
-cd ~/casadapaz && git pull origin main && cd infra
-./scripts/build-frontend-on-vps.sh
-./scripts/compose-prod.sh restart frontend
-```
-
-**Gate:** nunca `deploy.sh` sem confirmação explícita do usuário.
+**Gate:** nunca `deploy.sh` sem confirmação explícita.

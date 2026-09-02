@@ -12,13 +12,19 @@
 
 ## Passos
 1. `git pull origin main`
-2. `cd frontend && npm ci && npm run build`
-3. `cd ../infra`
+2. FE: `./scripts/build-frontend-on-vps.sh` **ou** build local + sync
+3. `cd infra`
 4. `CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh`
-5. Conferir UI: Financeiro → Patrocínios / Padrinhos · **Estoque** (`/app/estoque`) · Cadastros → Médiuns
-6. Catálogo estoque (idempotente, sem apagar dados):  
+5. Conferir UI: **Delegações** · Estoque · Financeiro → Patrocínios · Cadastros
+6. Seeds idempotentes (sem destroy):  
    `./scripts/compose-prod.sh exec backend npx tsx prisma/seed.ts --estoque-casa-only`  
+   `./scripts/compose-prod.sh exec backend npx tsx prisma/seed.ts --funcoes-casa-only`  
    **Não** rodar seed completo destroy em produção.
+
+## Pós-deploy útil
+- Auditoria: `.\scripts\smoke-audit-f01-f10-prod.ps1`
+- Secrets: `./scripts/check-prod-secrets.sh`
+- N8N 033: `./scripts/setup-n8n-delegacao-vps.sh`
 
 ## Rollback
 `docker compose -f docker-compose.prod.yml down`

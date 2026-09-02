@@ -56,6 +56,16 @@ npm run dev
 - Portal: http://localhost:5173/public  
 - Seed: `admin` / `admin123` (trocar em produção)
 
+## Features (resumo)
+
+- Tesouraria **022–025** completa sem Asaas (contas a pagar, recorrência, DRE, OFX)  
+- Patrocínios / padrinhos + mensalidade na lista de médiuns  
+- Estoque primário da casa (**031**)  
+- **Delegações / funções da casa (033)** — `/app/delegacoes`  
+- Policies de acesso definidas **no cadastro** do usuário  
+- Asaas 021 opcional (dormant)  
+- Auditoria de segurança F01–F10 **GREEN**  
+
 ## Documentação
 
 | Documento | Link |
@@ -64,17 +74,13 @@ npm run dev
 | Requisitos | [docs/analise-requisitos-consolidada.md](docs/analise-requisitos-consolidada.md) |
 | Agentes | [agents.md](agents.md) |
 | Memória viva | [.specify/memory/memory.md](.specify/memory/memory.md) |
+| Estado atual | [.specify/memory/project-memory.md](.specify/memory/project-memory.md) |
 | RBAC | [docs/contracts/rbac-matrix.md](docs/contracts/rbac-matrix.md) |
 | CHANGELOG | [docs/memory/CHANGELOG.md](docs/memory/CHANGELOG.md) |
+| Roadmap | [docs/memory/roadmap-cronograma.md](docs/memory/roadmap-cronograma.md) |
+| Auditoria segurança | [docs/security-audit/ACHADOS.md](docs/security-audit/ACHADOS.md) |
 | ADRs | [docs/memory/decisions/](docs/memory/decisions/) |
 | Deploy | [docs/memory/runbooks/deploy.md](docs/memory/runbooks/deploy.md) |
-
-## Features financeiras (resumo)
-
-- Tesouraria **022–025** completa sem Asaas (contas a pagar, recorrência, DRE, OFX)  
-- Patrocínios / padrinhos + mensalidade na lista de médiuns  
-- Policies de acesso definidas **no cadastro** do usuário  
-- Asaas 021 opcional  
 
 ## Deploy
 
