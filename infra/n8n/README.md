@@ -37,7 +37,10 @@ Header opcional: `X-Webhook-Secret: n8n-dev-secret` (mesmo valor de `N8N_WEBHOOK
 
 1. Importe `workflows/tarefa-delegacao.json` e ative
 2. Conecte Chatwoot (WhatsApp) e nó **Send Email** (SMTP) no lugar dos stubs
-3. Schedule diário (opcional): HTTP POST ` /api/delegacoes/sync-alertas` com JWT de DIRETORIA/SUPERVISOR (D-1 + atrasadas)
+3. Na VPS: `./scripts/setup-n8n-delegacao-vps.sh` (importa + token Chatwoot)
+4. SMTP: crie credencial N8N **SMTP Casa da Paz** (Credentials → SMTP) com host/user/pass; opcionalmente defina `SMTP_FROM` no `.env.production`
+5. WhatsApp real: inbox **WhatsApp** no Chatwoot (Meta) + `CHATWOOT_INBOX_ID` apontando para ela (hoje só há WebWidget id=3)
+6. Schedule diário (opcional): HTTP POST `/api/delegacoes/sync-alertas` com JWT de DIRETORIA/SUPERVISOR (D-1 + atrasadas)
 
 Payload esperado:
 ```json

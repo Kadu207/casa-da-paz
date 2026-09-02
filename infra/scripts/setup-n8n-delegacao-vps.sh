@@ -21,16 +21,22 @@ puts "INBOXES=#{Inbox.count}"
 Inbox.find_each { |i| puts "INBOX id=#{i.id} name=#{i.name} channel=#{i.channel_type}" }
 if u
   t = AccessToken.find_or_create_by!(owner: u)
+  File.write('/tmp/cw-token.txt', t.token)
   puts "TOKEN_PRESENT=yes"
-  puts "TOKEN=#{t.token}"
 else
   puts "TOKEN_PRESENT=no"
 end
 RUBY
 docker cp /tmp/cw-check.rb "$CID:/tmp/cw-check.rb"
-$COMPOSE exec -T chatwoot bundle exec rails runner /tmp/cw-check.rb 2>/dev/null | tee /tmp/cw-out.txt | grep -E '^(USER|ACCOUNT|INBOX|TOKEN)' || true
+$COMPOSE exec -T chatwoot bundle exec rails runner /tmp/cw-check.rb 2>/dev/null | tee /tmp/cw-out.txt | grep -E '^(USER|ACCOUNT|INBOX|TOKEN_PRESENT)' || true
 
-TOKEN=$(grep '^TOKEN=' /tmp/cw-out.txt | head -1 | cut -d= -f2- || true)
+TOKEN=""
+if docker exec "$CID" test -f /tmp/cw-token.txt; then
+  docker cp "$CID:/tmp/cw-token.txt" /tmp/cw-token.txt
+  TOKEN=$(cat /tmp/cw-token.txt)
+  rm -f /tmp/cw-token.txt
+  docker exec -u root "$CID" rm -f /tmp/cw-token.txt 2>/dev/null || true
+fi
 INBOX_WA=$(grep '^INBOX ' /tmp/cw-out.txt | grep -i whatsapp | head -1 | sed -n 's/.*id=\([0-9]*\).*/\1/p' || true)
 INBOX_ANY=$(grep '^INBOX ' /tmp/cw-out.txt | head -1 | sed -n 's/.*id=\([0-9]*\).*/\1/p' || true)
 INBOX_ID="${INBOX_WA:-${INBOX_ANY:-1}}"
