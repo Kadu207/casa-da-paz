@@ -19,6 +19,7 @@
 | Audit fix P1 | ✅ 2026-09-01: IDOR financeiro, estoque limpeza, denylist+N8N — `docs/security-audit/` |
 | Deploy P1 | ✅ VPS `0b08dc9` — backend rebuild + FE Docker build; health OK 2026-09-01 |
 | Audit fix P2/P3 | ✅ 2026-09-01: `deveTrocarSenha`, RequireRole sub-rotas financeiras, gates write marketing/ecommerce, `safeUrl` href/src |
+| Deploy P2/P3 | ✅ VPS `cb9c3d6` 2026-09-02 — migrate OK; 13 logins seed com `deve_trocar_senha=true`; FE `index-CIPQp1tW.js` |
 
 ## Security (030) — referência rápida
 
