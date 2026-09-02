@@ -156,39 +156,59 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ ($env.CHATWOOT_PUBLIC_URL || 'http://localhost:3001').replace(/\\/$/, '') + '/api/v1/accounts/1/conversations' }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ ($env.CHATWOOT_INTERNAL_URL || 'http://chatwoot:3000').replace(/\\/$/, '') + '/api/v1/accounts/' + ($env.CHATWOOT_ACCOUNT_ID || '1') + '/conversations' }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "api_access_token",
               "value": "={{ $env.CHATWOOT_API_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"source_id\": \"{{ $json.telefone }}\",\n  \"inbox_id\": 1,\n  \"message\": { \"content\": \"{{ $json.mensagem }}\" }\n}",
-        "options": {}
+        "jsonBody": "={\n  \"source_id\": \"{{ $json.telefone }}\",\n  \"inbox_id\": {{ Number($env.CHATWOOT_INBOX_ID || 1) }},\n  \"message\": { \"content\": \"{{ $json.mensagem }}\" }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
       },
       "id": "d5-chatwoot",
-      "name": "Chatwoot WhatsApp (stub)",
+      "name": "Chatwoot WhatsApp",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [980, 120],
-      "disabled": true,
-      "notes": "Ativar com CHATWOOT_API_TOKEN em produção."
+      "notes": "Usa CHATWOOT_API_TOKEN + inbox WhatsApp. URL interna Docker chatwoot:3000."
     },
     {
-      "parameters": {},
-      "id": "d6-email-stub",
-      "name": "Send Email (configurar SMTP)",
-      "type": "n8n-nodes-base.noOp",
-      "typeVersion": 1,
+      "parameters": {
+        "fromEmail": "={{ $env.SMTP_FROM || 'noreply@casadapaz.inovatitech.com.br' }}",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ '[Casa da Paz] ' + ($json.funcao || 'Delegação') + ' — ' + ($json.titulo || '') }}",
+        "emailType": "text",
+        "message": "={{ $json.mensagem }}",
+        "options": {}
+      },
+      "id": "d6-email",
+      "name": "Send Email SMTP",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [980, 420],
-      "notes": "Substituir por nó Send Email (SMTP) com $json.email e $json.mensagem."
+      "credentials": {
+        "smtp": {
+          "id": "smtp-casadapaz",
+          "name": "SMTP Casa da Paz"
+        }
+      },
+      "notes": "Credencial N8N 'SMTP Casa da Paz' (host/user/pass). Defina SMTP_* no .env.production."
     },
     {
       "parameters": {},
@@ -213,13 +233,13 @@
     },
     "Canal WhatsApp?": {
       "main": [
-        [{ "node": "Chatwoot WhatsApp (stub)", "type": "main", "index": 0 }],
+        [{ "node": "Chatwoot WhatsApp", "type": "main", "index": 0 }],
         [{ "node": "Outro canal (log)", "type": "main", "index": 0 }]
       ]
     },
     "Canal E-mail?": {
       "main": [
-        [{ "node": "Send Email (configurar SMTP)", "type": "main", "index": 0 }],
+        [{ "node": "Send Email SMTP", "type": "main", "index": 0 }],
         [{ "node": "Outro canal (log)", "type": "main", "index": 0 }]
       ]
     }

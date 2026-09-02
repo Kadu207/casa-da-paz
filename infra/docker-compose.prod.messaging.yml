@@ -23,6 +23,12 @@ services:
       N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
       WEBHOOK_URL: ${N8N_WEBHOOK_URL:-http://n8n:5678/}
       GENERIC_TIMEZONE: America/Sao_Paulo
+      CHATWOOT_INTERNAL_URL: http://chatwoot:3000
+      CHATWOOT_PUBLIC_URL: ${CHATWOOT_PUBLIC_URL:-}
+      CHATWOOT_API_TOKEN: ${CHATWOOT_API_TOKEN:-}
+      CHATWOOT_ACCOUNT_ID: ${CHATWOOT_ACCOUNT_ID:-1}
+      CHATWOOT_INBOX_ID: ${CHATWOOT_INBOX_ID:-1}
+      SMTP_FROM: ${SMTP_FROM:-noreply@casadapaz.inovatitech.com.br}
     volumes:
       - n8n_data:/home/node/.n8n
     networks:
