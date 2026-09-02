@@ -203,6 +203,12 @@ enum CanalAlerta {
   SISTEMA
 }
 
+enum StatusTarefaDelegacao {
+  PENDENTE
+  CONCLUIDA
+  CANCELADA
+}
+
 enum StatusPedidoEcommerce {
   PENDENTE_PAGAMENTO
   PAGO
@@ -219,6 +225,7 @@ model Pessoa {
   id            Int       @id @default(autoincrement())
   nomeCompleto  String    @map("nome_completo") @db.VarChar(150)
   telefone      String?   @db.VarChar(20)
+  email         String?   @db.VarChar(150)
   maiorDeIdade  Boolean   @default(true) @map("maior_de_idade")
   tipoPerfil    TipoPerfil @map("tipo_perfil")
   dataCadastro  DateTime  @default(now()) @map("data_cadastro")
@@ -231,6 +238,8 @@ model Pessoa {
   asaasClientes AsaasCliente[]
   asaasAssinaturas AsaasAssinatura[]
   mensalidadePlano MensalidadePlano?
+  funcoesResponsavel FuncaoResponsavel[]
+  tarefasDelegacao   TarefaDelegacao[]
 
   @@map("pessoas")
 }
@@ -263,6 +272,7 @@ model Usuario {
   gruposLimpezaResponsavel GrupoLimpeza[]            @relation("GrupoLimpezaResponsavel")
   movimentacoesEstoqueCasa MovimentacaoEstoqueCasa[]
   checklistsCriados        ChecklistLimpeza[]        @relation("ChecklistCriadoPor")
+  tarefasDelegacaoConcluidas TarefaDelegacao[]       @relation("TarefaDelegacaoConcluidaPor")
 
   @@map("usuarios")
 }
@@ -874,4 +884,57 @@ model ChecklistLimpezaItem {
 
   @@unique([checklistId, itemId])
   @@map("checklist_limpeza_itens")
+}
+
+/// Feature 033 — funções/delegações da casa
+model FuncaoCasa {
+  id          Int                 @id @default(autoincrement())
+  nome        String              @db.VarChar(120)
+  slug        String              @unique @db.VarChar(80)
+  descricao   String?             @db.VarChar(500)
+  ordem       Int                 @default(0)
+  ativo       Boolean             @default(true)
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+  responsaveis FuncaoResponsavel[]
+  tarefas     TarefaDelegacao[]
+
+  @@index([ativo, ordem])
+  @@map("funcoes_casa")
+}
+
+model FuncaoResponsavel {
+  id        Int        @id @default(autoincrement())
+  funcaoId  Int        @map("funcao_id")
+  pessoaId  Int        @map("pessoa_id")
+  papel     String?    @db.VarChar(80)
+  createdAt DateTime   @default(now()) @map("created_at")
+  funcao    FuncaoCasa @relation(fields: [funcaoId], references: [id], onDelete: Cascade)
+  pessoa    Pessoa     @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+
+  @@unique([funcaoId, pessoaId])
+  @@index([pessoaId])
+  @@map("funcao_responsaveis")
+}
+
+model TarefaDelegacao {
+  id                   Int                   @id @default(autoincrement())
+  funcaoId             Int                   @map("funcao_id")
+  pessoaId             Int?                  @map("pessoa_id")
+  titulo               String                @db.VarChar(200)
+  descricao            String?               @db.VarChar(2000)
+  status               StatusTarefaDelegacao @default(PENDENTE)
+  vencimento           DateTime?             @db.Date
+  concluidaEm          DateTime?             @map("concluida_em")
+  concluidaPorUsuarioId Int?                 @map("concluida_por_usuario_id")
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+  funcao               FuncaoCasa            @relation(fields: [funcaoId], references: [id], onDelete: Cascade)
+  pessoa               Pessoa?               @relation(fields: [pessoaId], references: [id], onDelete: SetNull)
+  concluidaPor         Usuario?              @relation("TarefaDelegacaoConcluidaPor", fields: [concluidaPorUsuarioId], references: [id], onDelete: SetNull)
+
+  @@index([funcaoId, status])
+  @@index([status, vencimento])
+  @@index([pessoaId])
+  @@map("tarefas_delegacao")
 }

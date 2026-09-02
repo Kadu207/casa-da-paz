@@ -1,25 +1,21 @@
 ﻿# Memória Viva — Casa da Paz
 
-**Última atualização:** 2026-09-01
+**Última atualização:** 2026-09-02
 
 ## Estado do projeto
 
 | Item | Status |
 |------|--------|
-| Fase | Pós-go-live: estoque 031 + **security harden 030** |
+| Fase | Pós-go-live: **033 Delegações** + estoque 031 + security harden 030 |
 | Versão | 0.1.0-alpha |
-| Commit | `e18a63c` (030 Helmet/uploads; backend rebuild na VPS 2026-08-20) |
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (**não** :22) |
 | Asaas (021) | **Dormant** — runbook [`docs/memory/runbooks/asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
 | Spec 032 ingressos | 📋 Stub em `specs/032-ingressos-eventos/` (não implementar) |
+| Spec 033 delegações | ✅ Spec/API/FE/N8N — **deploy VPS pendente confirmação** (migrate + seed funções + rebuild) |
 | SSH allowlist | Script `infra/scripts/allowlist-ssh-65025.sh` (opcional; gate humano) |
-| Security 030 | ✅ Fase 0–2: `:9080` filtrado (smoke TIMEOUT), headers OK, Helmet+magic uploads, CI GL test, CodeRabbit no Git, validators 028/029/030 |
-| Deploy 031 | ✅ migrate + FE na VPS |
-| Audit fix P1 | ✅ 2026-09-01: IDOR financeiro, estoque limpeza, denylist+N8N — `docs/security-audit/` |
-| Deploy P1 | ✅ VPS `0b08dc9` — backend rebuild + FE Docker build; health OK 2026-09-01 |
-| Audit fix P2/P3 | ✅ 2026-09-01: `deveTrocarSenha`, RequireRole sub-rotas financeiras, gates write marketing/ecommerce, `safeUrl` href/src |
-| Deploy P2/P3 | ✅ VPS `cb9c3d6` 2026-09-02 — migrate OK; 13 logins seed com `deve_trocar_senha=true`; FE `index-CIPQp1tW.js` |
+| Security 030 | ✅ Fase 0–2 |
+| Audit fix P1/P2/P3 | ✅ Deployed 2026-09-01/02 |
 
 ## Security (030) — referência rápida
 

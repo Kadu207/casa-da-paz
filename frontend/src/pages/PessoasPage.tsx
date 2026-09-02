@@ -24,6 +24,7 @@ const emptyResponsavel = (): ResponsavelForm => ({ nomeCompleto: '', telefone: '
 const emptyForm = {
   nomeCompleto: '',
   telefone: '',
+  email: '',
   maiorDeIdade: true,
   tipoPerfil: 'CONSULENTE' as TipoPerfil,
   responsaveis: [] as ResponsavelForm[],
@@ -132,6 +133,7 @@ export default function PessoasPage() {
     setForm({
       nomeCompleto: p.nomeCompleto,
       telefone: p.telefone ?? '',
+      email: p.email ?? '',
       maiorDeIdade: p.maiorDeIdade,
       tipoPerfil: p.tipoPerfil,
       responsaveis:
@@ -152,6 +154,7 @@ export default function PessoasPage() {
     const payload = {
       nomeCompleto: form.nomeCompleto.trim(),
       telefone: form.telefone.trim() || undefined,
+      email: form.email.trim() || null,
       maiorDeIdade: form.maiorDeIdade,
       tipoPerfil: form.tipoPerfil,
       responsaveis: exigeResponsavel
@@ -265,6 +268,13 @@ export default function PessoasPage() {
             value={form.telefone}
             onChange={(e) => setForm({ ...form, telefone: e.target.value })}
             placeholder={t('erp.common.phone')}
+            className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+          />
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            placeholder={t('erp.common.email')}
             className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
           />
           <div>

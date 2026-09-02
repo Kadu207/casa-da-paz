@@ -41,10 +41,11 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 026 contribuintes | ✅ (spec dedicada) |
 | 031 estoque-casa | ✅ Primário (ADR-010) |
 | 030 security-hardening | ✅ Fase 0–2 (2026-08-20) |
+| 033 delegacoes-casa | ✅ Funções + tarefas + N8N (ADR-011) |
 
 ## ADRs
 
-001–010 em `docs/memory/decisions/` — 002 (RBAC+policies), 009 Asaas opcional, **010 estoque primário**.
+001–011 em `docs/memory/decisions/` — 002 (RBAC+policies), 009 Asaas opcional, **010 estoque primário**, **011 delegações**.
 
 ## Regras
 

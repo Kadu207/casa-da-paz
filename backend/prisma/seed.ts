@@ -568,8 +568,29 @@ async function main() {
   });
 
   await seedEstoqueCasaCatalogo();
+  await seedFuncoesCasa();
 
   console.log('Seed completo OK — usuários com policies + dados de exemplo');
+}
+
+async function seedFuncoesCasa() {
+  const funcoes: { nome: string; slug: string; ordem: number; descricao: string }[] = [
+    { nome: 'Manutenção', slug: 'manutencao', ordem: 10, descricao: 'Reparos e conservação do espaço' },
+    { nome: 'Obras', slug: 'obras', ordem: 20, descricao: 'Reformas e melhorias estruturais' },
+    { nome: 'Financeiro', slug: 'financeiro', ordem: 30, descricao: 'Tesouraria e obrigações financeiras' },
+    { nome: 'Eventos e agenda', slug: 'eventos-agenda', ordem: 40, descricao: 'Agenda ritualística e eventos' },
+    { nome: 'Compras', slug: 'compras', ordem: 50, descricao: 'Aquisições e suprimentos' },
+    { nome: 'Limpeza', slug: 'limpeza', ordem: 60, descricao: 'Limpeza e organização da casa' },
+    { nome: 'Comunicação', slug: 'comunicacao', ordem: 70, descricao: 'Avisos, redes e comunicação interna' },
+  ];
+
+  for (const f of funcoes) {
+    await prisma.funcaoCasa.upsert({
+      where: { slug: f.slug },
+      create: f,
+      update: { nome: f.nome, ordem: f.ordem, descricao: f.descricao, ativo: true },
+    });
+  }
 }
 
 async function seedEstoqueCasaCatalogo() {
@@ -652,6 +673,12 @@ if (hasFlag('--supervisor-only')) {
   // Idempotente — seguro em produção (só upsert do catálogo primário)
   seedEstoqueCasaCatalogo()
     .then(() => console.log('Seed estoque casa (catálogo) OK'))
+    .catch(console.error)
+    .finally(() => prisma.$disconnect());
+} else if (hasFlag('--funcoes-casa-only')) {
+  // Idempotente — Feature 033
+  seedFuncoesCasa()
+    .then(() => console.log('Seed funções da casa (delegações) OK'))
     .catch(console.error)
     .finally(() => prisma.$disconnect());
 } else if (hasFlag('--portal-content')) {

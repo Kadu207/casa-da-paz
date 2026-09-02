@@ -43,6 +43,7 @@ Usuário → agent-orquestrador → agente-domínio → validador-integracao →
 | 021 | Asaas PSP | Dormant até `ASAAS_API_KEY` — [`asaas-dormant.md`](docs/memory/runbooks/asaas-dormant.md) |
 | 031 | Estoque primário da casa | **Não depende** |
 | 032 | Ingressos/eventos (secundário) | 📋 Planejado — não implementar ainda |
+| 033 | Delegações / funções da casa | **Não depende** (N8N para alertas) |
 
 Docs: [`docs/00-index.md`](docs/00-index.md)
 

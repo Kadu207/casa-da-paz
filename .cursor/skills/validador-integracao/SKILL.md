@@ -19,3 +19,4 @@ Tabela sim/não com referência de arquivo — ver `specs/*/tasks.md` por featur
 ## Última execução formal
 - Specs **028** e **029**: ver `specs/028-auditoria-completa-supervisor/tasks.md` e `specs/029-crud-usuarios-livraria-eventos/tasks.md` (2026-08-08).
 - Spec **030** security: `specs/030-security-hardening/tasks.md` (2026-08-20) — headers, uploads, firewall, CI.
+- Spec **033** delegações: `specs/033-delegacoes-casa/tasks.md` (2026-09-02) — API/FE/N8N/RBAC alinhados.

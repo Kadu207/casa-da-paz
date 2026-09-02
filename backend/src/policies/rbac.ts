@@ -10,6 +10,7 @@ export const RBAC_RESOURCES = [
   'livraria',
   'estoque',
   'estoque_casa',
+  'delegacoes',
   'dashboard',
   'agendamentos',
   'logs',
@@ -77,6 +78,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     livraria: 'write',
     estoque: 'write',
     estoque_casa: 'write',
+    delegacoes: 'write',
     dashboard: 'read',
     agendamentos: 'write',
     logs: 'write',
@@ -98,6 +100,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     logs: 'write',
     manutencao: 'read',
     estoque_casa: 'write',
+    delegacoes: 'write',
   },
   DIRETORIA: {
     pessoas: 'write',
@@ -108,6 +111,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     livraria: 'write',
     estoque: 'write',
     estoque_casa: 'write',
+    delegacoes: 'write',
     dashboard: 'read',
     agendamentos: 'write',
     logs: 'read',
@@ -131,6 +135,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     transparencia: 'read',
     contas: 'write',
     cobrancas: 'write',
+    delegacoes: 'read',
     ...treasuryWrite,
   },
   /** Setor operacional Tesouraria — mesma matriz financeira (usuários tesouraria01–04). */
@@ -147,6 +152,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     contas: 'write',
     cobrancas: 'write',
     estoque_casa: 'write',
+    delegacoes: 'read',
     ...treasuryWrite,
   },
   MARKETING: {
@@ -154,6 +160,7 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     eventos: 'write',
     livraria: 'write',
     ecommerce: 'write',
+    delegacoes: 'read',
   },
   RECEPCAO: {
     pessoas: 'write',
@@ -161,23 +168,27 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     checkin: 'write',
     agendamentos: 'write',
     alertas: 'read',
+    delegacoes: 'read',
   },
   LIVRARIA: {
     pessoas: 'read',
     livraria: 'write',
     estoque: 'write',
     ecommerce: 'write',
+    delegacoes: 'read',
   },
   MEDIUM: {
     financeiro: 'own',
     dashboard: 'own',
     cobrancas: 'own',
+    delegacoes: 'read',
   },
   SUPORTE: {
     pessoas: 'read',
     logs: 'write',
     alertas: 'read',
     manutencao: 'write',
+    delegacoes: 'read',
   },
 };
 

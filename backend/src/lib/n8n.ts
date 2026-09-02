@@ -6,7 +6,8 @@ export type N8nWorkflow =
   | 'agendamento_cancelado'
   | 'lembrete_atraso'
   | 'recibo_pago'
-  | 'ingresso_oficina';
+  | 'ingresso_oficina'
+  | 'tarefa_delegacao';
 
 const WEBHOOK_PATHS: Record<N8nWorkflow, string> = {
   novo_agendamento: '/webhook/casadapaz-agendamento',
@@ -15,6 +16,7 @@ const WEBHOOK_PATHS: Record<N8nWorkflow, string> = {
   lembrete_atraso: '/webhook/casadapaz-lembrete-atraso',
   recibo_pago: '/webhook/casadapaz-recibo-pago',
   ingresso_oficina: '/webhook/casadapaz-ingresso-oficina',
+  tarefa_delegacao: '/webhook/casadapaz-tarefa-delegacao',
 };
 
 export async function dispararN8n(

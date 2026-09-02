@@ -27,6 +27,7 @@
 | Eventos / check-in | ✅ | 👁️ | 👁️ | ✅ (publicar) | ✅ | ❌ | ❌ | ❌ |
 | PDV/Livraria/Estoque (venda) | ✅ | 👁️ | 👁️ | ✅ (publicar conteúdo; **sem** `estoque`) | ❌ | ✅ | ❌ | ❌ |
 | Estoque da Casa (`estoque_casa`) | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌* | ❌ |
+| Delegações (`delegacoes`) | ✅ | 👁️ | 👁️ | 👁️ | 👁️ | 👁️ | 👁️ | 👁️ |
 | Ecommerce | ✅ | 👁️ | 👁️ | ✅ (publicar) | ❌ | ✅ | ❌ | ❌ |
 | Dashboard | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 👁️ próprio | ❌ |
 | Agendamentos | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
@@ -39,6 +40,8 @@
 **MARKETING** publica eventos/conteúdo (`eventos`/`livraria`/`marketing` write) mas **não** cadastra estoque (`estoque` só DIRETORIA/LIVRARIA/SUPERVISOR). Cadastro de livros: setor LIVRARIA.
 
 **Estoque da Casa (`estoque_casa`):** almoxarifado primário (ADR-010). Write default: SUPERVISOR, ADMIN, DIRETORIA, TESOURARIA. \*MEDIUM: policy `write` para catálogo/movimentações; responsável de `GrupoLimpeza` ativo recebe **read** + checklist do próprio grupo (não write org-wide). Separado do estoque de venda da livraria.
+
+**Delegações (`delegacoes`):** quadro de funções da casa (ADR-011). Write: SUPERVISOR, ADMIN, DIRETORIA. Read: todos os setores operacionais (+ MEDIUM). Toggle de tarefa exige apenas `read`.
 
 **TESOURARIA** = setor operacional dos logins `tesouraria01`–`04` (mesma matriz financeira que FINANCEIRO; FINANCEIRO permanece por compatibilidade).
 

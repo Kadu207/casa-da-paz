@@ -21,6 +21,7 @@ export const responsavelSchema = z.object({
 export const pessoaInputSchema = z.object({
   nomeCompleto: z.string().min(2).max(150),
   telefone: z.string().max(20).optional(),
+  email: z.string().email().max(150).optional().nullable(),
   maiorDeIdade: z.boolean().default(true),
   tipoPerfil: z.enum(TIPOS_PERFIL),
   responsaveis: z.array(responsavelSchema).optional(),

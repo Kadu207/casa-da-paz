@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth, hasPermission } from '../context/AuthContext';
 import { portalAssets } from '../lib/portal-assets';
+import { api } from '../lib/api';
 import { useI18n } from '../i18n/I18nContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import type { ErpTranslationKey } from '../i18n/erp-pt-BR';
 
 const nav: { path: string; labelKey: ErpTranslationKey; resource: string }[] = [
   { path: '/app/dashboard', labelKey: 'erp.nav.dashboard', resource: 'dashboard' },
+  { path: '/app/delegacoes', labelKey: 'erp.nav.delegacoes', resource: 'delegacoes' },
   { path: '/app/financeiro', labelKey: 'erp.nav.financeiro', resource: 'financeiro' },
   { path: '/app/marketing', labelKey: 'erp.nav.marketing', resource: 'marketing' },
   { path: '/app/recepcao', labelKey: 'erp.nav.recepcao', resource: 'eventos' },
@@ -25,6 +27,20 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const { user } = useAuth();
   const { t } = useI18n();
   const location = useLocation();
+  const [atrasadas, setAtrasadas] = useState(0);
+
+  useEffect(() => {
+    if (!user || !hasPermission(user, 'delegacoes', 'read')) return;
+    let cancelled = false;
+    api<{ atrasadas: number }>('/delegacoes/resumo')
+      .then((r) => {
+        if (!cancelled) setAtrasadas(r.atrasadas ?? 0);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [user, location.pathname]);
 
   return (
     <>
@@ -42,6 +58,11 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             }`}
           >
             {t(n.labelKey)}
+            {n.path === '/app/delegacoes' && atrasadas > 0 ? (
+              <span className="ml-1.5 inline-flex min-w-[1.25rem] justify-center rounded-full bg-red-500/80 text-white text-[10px] px-1.5 py-0.5">
+                {atrasadas}
+              </span>
+            ) : null}
           </Link>
         ))}
     </>

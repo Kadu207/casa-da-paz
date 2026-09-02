@@ -18,6 +18,7 @@ import FinanceiroContribuintesPage from './pages/financeiro/FinanceiroContribuin
 import RecepcaoPage from './pages/RecepcaoPage';
 import LivrariaPage from './pages/LivrariaPage';
 import EstoqueCasaPage from './pages/EstoqueCasaPage';
+import DelegacoesPage from './pages/DelegacoesPage';
 import UsuariosPage from './pages/UsuariosPage';
 import PessoasPage from './pages/PessoasPage';
 import EventosPage from './pages/EventosPage';
@@ -87,6 +88,14 @@ export default function App() {
           element={
             <RequireRole path="/app/dashboard">
               <DashboardPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="delegacoes"
+          element={
+            <RequireRole path="/app/delegacoes">
+              <DelegacoesPage />
             </RequireRole>
           }
         />

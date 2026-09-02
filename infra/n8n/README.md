@@ -28,8 +28,32 @@ Importa JSON de `workflows/`, publica e reinicia o n8n.
 | novo-agendamento | `/webhook/casadapaz-agendamento` | POST `/api/public/agendamentos` |
 | agendamento-confirmado | `/webhook/casadapaz-agendamento-confirmado` | Recepção confirma |
 | agendamento-cancelado | `/webhook/casadapaz-agendamento-cancelado` | Recepção cancela |
+| lembrete-atraso | `/webhook/casadapaz-lembrete-atraso` | Alertas financeiros |
+| tarefa-delegacao | `/webhook/casadapaz-tarefa-delegacao` | Feature 033 — nova/vencimento/atrasada/concluída |
 
 Header opcional: `X-Webhook-Secret: n8n-dev-secret` (mesmo valor de `N8N_WEBHOOK_SECRET` no backend).
+
+## Workflow tarefa delegação (033)
+
+1. Importe `workflows/tarefa-delegacao.json` e ative
+2. Conecte Chatwoot (WhatsApp) e nó **Send Email** (SMTP) no lugar dos stubs
+3. Schedule diário (opcional): HTTP POST ` /api/delegacoes/sync-alertas` com JWT de DIRETORIA/SUPERVISOR (D-1 + atrasadas)
+
+Payload esperado:
+```json
+{
+  "workflow": "tarefa_delegacao",
+  "tarefaId": 1,
+  "titulo": "...",
+  "funcao": "Manutenção",
+  "pessoaNome": "...",
+  "telefone": "...",
+  "email": "...",
+  "vencimento": "2026-09-10",
+  "tipoEvento": "CRIADA|VENCIMENTO|ATRASADA|CONCLUIDA",
+  "canal": "WHATSAPP|EMAIL"
+}
+```
 
 ## Workflow lembrete atraso (cron)
 

@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Adicionado
+- **033 Delegações / Funções da Casa:** menu `/app/delegacoes`, API `/api/delegacoes`, modelos `FuncaoCasa`/`TarefaDelegacao`, `Pessoa.email`, RBAC `delegacoes`, N8N `tarefa_delegacao` + `sync-alertas` (ADR-011)
 - **030 Security hardening:** Helmet/CSP API, magic bytes em uploads (media/OFX/Excel), rate-limit `/api`, smoke bypass `:9080`, `check-prod-secrets.sh`, Spec 030 (spec/plan/tasks), skill `agent-security-ops` checklist datado
 - **031 Estoque primário da Casa:** menu `/app/estoque`, API `/api/estoque-casa`, catálogo seedado (ritualística/limpeza), estoque mínimo/alertas, grupos de limpeza + checklist com baixas, RBAC `estoque_casa` (ADR-010) — separado da Livraria/PDV
 

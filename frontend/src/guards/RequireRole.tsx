@@ -3,6 +3,7 @@ import { hasPermission, useAuth } from '../context/AuthContext';
 
 const routeResources: Record<string, string> = {
   '/app/dashboard': 'dashboard',
+  '/app/delegacoes': 'delegacoes',
   '/app/financeiro': 'financeiro',
   '/app/financeiro/pagamentos': 'contas_pagar',
   '/app/financeiro/contas-pagar': 'contas_pagar',

@@ -11,6 +11,7 @@ export interface PessoaCadastro {
   id: number;
   nomeCompleto: string;
   telefone: string | null;
+  email?: string | null;
   maiorDeIdade: boolean;
   tipoPerfil: TipoPerfil;
   dataCadastro: string;
