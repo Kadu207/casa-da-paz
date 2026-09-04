@@ -48,8 +48,18 @@ interface MaterialEstudo {
 }
 
 type TipoMidia = 'FOTO' | 'VIDEO';
-type VisibilidadeMidia = 'PUBLICO' | 'INTERNO';
+type VisibilidadeMidia = 'PUBLICO' | 'PRIVADO';
 type StatusMidia = 'RASCUNHO' | 'PUBLICADO';
+
+interface MidiaAlbum {
+  id: number;
+  nome: string;
+  slug: string;
+  descricao?: string | null;
+  ano?: number | null;
+  ordem?: number;
+  ativo?: boolean;
+}
 
 interface MidiaPublicacao {
   id: number;
@@ -62,6 +72,8 @@ interface MidiaPublicacao {
   visibilidade: VisibilidadeMidia;
   status: StatusMidia;
   publicadoEm: string | null;
+  albumId: number | null;
+  album?: MidiaAlbum | null;
   ordem: number;
 }
 
@@ -86,6 +98,7 @@ const emptyMidia = {
   visibilidade: 'PUBLICO' as VisibilidadeMidia,
   status: 'RASCUNHO' as StatusMidia,
   publicadoEm: '',
+  albumId: '',
   ordem: '0',
 };
 
@@ -98,6 +111,8 @@ export default function MarketingPage() {
   const [conteudos, setConteudos] = useState<Conteudo[]>([]);
   const [materiais, setMateriais] = useState<MaterialEstudo[]>([]);
   const [midias, setMidias] = useState<MidiaPublicacao[]>([]);
+  const [albuns, setAlbuns] = useState<MidiaAlbum[]>([]);
+  const [novoAlbumNome, setNovoAlbumNome] = useState('');
   const [resumo, setResumo] = useState<{
     eventosAbertos: number;
     produtosPublicados: number;
@@ -116,13 +131,14 @@ export default function MarketingPage() {
   const [showMidiaForm, setShowMidiaForm] = useState(false);
 
   const load = useCallback(async () => {
-    const [r, e, p, c, m, g] = await Promise.all([
+    const [r, e, p, c, m, g, a] = await Promise.all([
       api<typeof resumo>('/marketing/resumo'),
       api<Evento[]>('/marketing/eventos'),
       api<Produto[]>('/marketing/produtos'),
       api<Conteudo[]>('/marketing/conteudos'),
       api<MaterialEstudo[]>('/marketing/materiais-estudo'),
       api<MidiaPublicacao[]>('/marketing/galeria'),
+      api<MidiaAlbum[]>('/marketing/galeria/albuns'),
     ]);
     setResumo(r);
     setEventos(e);
@@ -130,6 +146,7 @@ export default function MarketingPage() {
     setConteudos(c);
     setMateriais(m);
     setMidias(g);
+    setAlbuns(a);
   }, []);
 
   useEffect(() => {
@@ -248,6 +265,7 @@ export default function MarketingPage() {
       visibilidade: midiaForm.visibilidade,
       status: midiaForm.status,
       publicadoEm,
+      albumId: midiaForm.albumId ? Number(midiaForm.albumId) : null,
       ordem: Number(midiaForm.ordem) || 0,
     };
     try {
@@ -287,11 +305,28 @@ export default function MarketingPage() {
       descricao: m.descricao ?? '',
       imagemUrl: m.imagemUrl ?? '',
       videoUrl: m.videoUrl ?? '',
-      visibilidade: m.visibilidade,
+      visibilidade: m.visibilidade === 'PRIVADO' ? 'PRIVADO' : 'PUBLICO',
       status: m.status,
       publicadoEm: toDatetimeLocal(m.publicadoEm),
+      albumId: m.albumId ? String(m.albumId) : '',
       ordem: String(m.ordem),
     });
+  };
+
+  const criarAlbum = async () => {
+    const nome = novoAlbumNome.trim();
+    if (!nome) return;
+    try {
+      const created = await api<MidiaAlbum>('/marketing/galeria/albuns', {
+        method: 'POST',
+        body: JSON.stringify({ nome }),
+      });
+      setNovoAlbumNome('');
+      await load();
+      setMidiaForm((f) => ({ ...f, albumId: String(created.id) }));
+    } catch (err) {
+      setMidiaErro(err instanceof Error ? err.message : t('erp.marketing.galleryAlbumError'));
+    }
   };
 
   const toggleMidiaStatus = async (m: MidiaPublicacao) => {
@@ -372,16 +407,60 @@ export default function MarketingPage() {
                 <option value="FOTO">{t('erp.galeria.typePhoto')}</option>
                 <option value="VIDEO">{t('erp.galeria.typeVideo')}</option>
               </select>
+              <fieldset className="flex items-center gap-4 px-2 py-1 rounded bg-black/20 border border-white/10">
+                <legend className="sr-only">{t('erp.galeria.visibility')}</legend>
+                <label className="flex items-center gap-1.5 text-sm text-white/85">
+                  <input
+                    type="radio"
+                    name="visibilidade-midia"
+                    checked={midiaForm.visibilidade === 'PUBLICO'}
+                    onChange={() => setMidiaForm({ ...midiaForm, visibilidade: 'PUBLICO' })}
+                  />
+                  {t('erp.galeria.visibilityPublic')}
+                </label>
+                <label className="flex items-center gap-1.5 text-sm text-white/85">
+                  <input
+                    type="radio"
+                    name="visibilidade-midia"
+                    checked={midiaForm.visibilidade === 'PRIVADO'}
+                    onChange={() => setMidiaForm({ ...midiaForm, visibilidade: 'PRIVADO' })}
+                  />
+                  {t('erp.galeria.visibilityPrivate')}
+                </label>
+              </fieldset>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-xs text-white/50">{t('erp.marketing.galleryAlbum')}</label>
               <select
-                value={midiaForm.visibilidade}
-                onChange={(e) =>
-                  setMidiaForm({ ...midiaForm, visibilidade: e.target.value as VisibilidadeMidia })
-                }
-                className="px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+                value={midiaForm.albumId}
+                onChange={(e) => setMidiaForm({ ...midiaForm, albumId: e.target.value })}
+                className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
               >
-                <option value="PUBLICO">{t('erp.galeria.visibilityPublic')}</option>
-                <option value="INTERNO">{t('erp.galeria.visibilityInternal')}</option>
+                <option value="">{t('erp.marketing.galleryAlbumNone')}</option>
+                {albuns.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.nome}
+                    {a.ano ? ` (${a.ano})` : ''}
+                  </option>
+                ))}
               </select>
+              {canWrite && (
+                <div className="flex flex-wrap gap-2">
+                  <input
+                    value={novoAlbumNome}
+                    onChange={(e) => setNovoAlbumNome(e.target.value)}
+                    placeholder={t('erp.marketing.galleryAlbumNew')}
+                    className="flex-1 min-w-[12rem] px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={criarAlbum}
+                    className="px-3 py-2 rounded border border-white/20 text-sm text-white/80 hover:bg-white/5"
+                  >
+                    {t('erp.marketing.galleryAlbumCreate')}
+                  </button>
+                </div>
+              )}
             </div>
             <input
               required
@@ -502,7 +581,10 @@ export default function MarketingPage() {
               <span>
                 [{m.tipo}] {m.titulo}{' '}
                 <span className="text-white/40">
-                  ({m.visibilidade} · {m.status}
+                  ({m.visibilidade === 'PRIVADO' ? t('erp.galeria.visibilityPrivate') : t('erp.galeria.visibilityPublic')}
+                  {m.album ? ` · ${m.album.nome}` : ''}
+                  {' · '}
+                  {m.status}
                   {m.publicadoEm
                     ? ` · ${new Date(m.publicadoEm).toLocaleString('pt-BR')}`
                     : ''}

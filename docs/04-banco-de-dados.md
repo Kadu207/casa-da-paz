@@ -19,7 +19,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | Eventos | `Evento`, `Inscricao`, `Presenca` |
 | Estoque primário (031) | `ItemEstoqueCasa`, `MovimentacaoEstoqueCasa`, `GrupoLimpeza`, `ChecklistLimpeza`, `ChecklistLimpezaItem` |
 | Delegações (033) | `FuncaoCasa`, `FuncaoResponsavel`, `TarefaDelegacao` |
-| Galeria (034) | `MidiaPublicacao` (FOTO/VIDEO, PUBLICO/INTERNO, RASCUNHO/PUBLICADO) |
+| Galeria (034) | `MidiaAlbum`, `MidiaPublicacao` (FOTO/VIDEO, PUBLICO/PRIVADO, álbum) |
 | Livraria / ecommerce | `Produto`, `EstoqueMovimentacao`, `EcommercePedido` (venda — ADR-004) |
 | Portal | `AgendamentoPublico`, newsletter, consentimentos LGPD |
 | Ops | `Alerta` (inclui tipos `DELEGACAO_*`), auditoria, marketing |
@@ -47,8 +47,9 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 ### Galeria (034)
 
 - `TipoMidiaPublicacao`: FOTO, VIDEO  
-- `VisibilidadeMidia`: PUBLICO, INTERNO  
+- `VisibilidadeMidia`: PUBLICO, PRIVADO  
 - `StatusMidiaPublicacao`: RASCUNHO, PUBLICADO  
+- `MidiaAlbum`: nome/slug (ex. Batizado 2026, Festa dos Erês 2026)  
 
 ## 4.3. Regras de dados
 
@@ -75,6 +76,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | `20260901140000_usuario_deve_trocar_senha` | `Usuario.deveTrocarSenha` (F06) |
 | `20260902120000_delegacoes_casa_033` | Funções/tarefas + `Pessoa.email` |
 | `20260904120000_galeria_midia_034` | `midias_publicacao` + enums |
+| `20260904160000_galeria_albuns_privado_034` | Álbuns + `PRIVADO` (ex-INTERNO) |
 
 ```bash
 cd backend

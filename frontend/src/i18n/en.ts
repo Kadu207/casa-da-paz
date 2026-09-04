@@ -210,6 +210,7 @@ export const en: Record<PortalTranslationKey, string> = {
   'gallery.filterAll': 'All',
   'gallery.filterPhoto': 'Photos',
   'gallery.filterVideo': 'Videos',
+  'gallery.filterAlbumAll': 'All albums',
   'gallery.typePhoto': 'Photo',
   'gallery.typeVideo': 'Video',
   'gallery.empty': 'New photos and videos coming soon.',

@@ -162,7 +162,7 @@ enum TipoMidiaPublicacao {
 
 enum VisibilidadeMidia {
   PUBLICO
-  INTERNO
+  PRIVADO
 }
 
 enum StatusMidiaPublicacao {
@@ -955,7 +955,24 @@ model TarefaDelegacao {
   @@map("tarefas_delegacao")
 }
 
-/// Galeria de fotos/vídeos (Spec 034) — público no portal ou interno no ERP
+/// Álbum / referência da galeria (ex.: Batizado 2026, Festa dos Eres 2026)
+model MidiaAlbum {
+  id          Int               @id @default(autoincrement())
+  nome        String            @db.VarChar(150)
+  slug        String            @unique @db.VarChar(120)
+  descricao   String?           @db.VarChar(500)
+  ano         Int?
+  ordem       Int               @default(0)
+  ativo       Boolean           @default(true)
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  midias      MidiaPublicacao[]
+
+  @@index([ativo, ordem])
+  @@map("midias_albuns")
+}
+
+/// Galeria de fotos/vídeos (Spec 034) — público no portal ou privado (interno ERP)
 model MidiaPublicacao {
   id            Int                   @id @default(autoincrement())
   tipo          TipoMidiaPublicacao
@@ -967,13 +984,16 @@ model MidiaPublicacao {
   visibilidade  VisibilidadeMidia     @default(PUBLICO)
   status        StatusMidiaPublicacao @default(RASCUNHO)
   publicadoEm   DateTime?             @map("publicado_em")
+  albumId       Int?                  @map("album_id")
   ordem         Int                   @default(0)
   createdById   Int?                  @map("created_by_id")
   createdAt     DateTime              @default(now()) @map("created_at")
   updatedAt     DateTime              @updatedAt @map("updated_at")
+  album         MidiaAlbum?           @relation(fields: [albumId], references: [id], onDelete: SetNull)
   createdBy     Usuario?              @relation("MidiaPublicacaoCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
 
   @@index([status, visibilidade, publicadoEm])
   @@index([tipo, ordem])
+  @@index([albumId])
   @@map("midias_publicacao")
 }

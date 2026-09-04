@@ -208,6 +208,7 @@ export const ptBR = {
   'gallery.filterAll': 'Todos',
   'gallery.filterPhoto': 'Fotos',
   'gallery.filterVideo': 'Vídeos',
+  'gallery.filterAlbumAll': 'Todos os álbuns',
   'gallery.typePhoto': 'Foto',
   'gallery.typeVideo': 'Vídeo',
   'gallery.empty': 'Em breve novas fotos e vídeos.',

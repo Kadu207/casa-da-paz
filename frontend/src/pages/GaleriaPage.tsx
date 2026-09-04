@@ -8,6 +8,12 @@ import { hasPermission, useAuth } from '../context/AuthContext';
 
 type Tipo = 'FOTO' | 'VIDEO';
 
+interface MidiaAlbum {
+  id: number;
+  nome: string;
+  slug: string;
+}
+
 interface MidiaCard {
   id: number;
   tipo: Tipo;
@@ -16,8 +22,9 @@ interface MidiaCard {
   descricao: string | null;
   imagemUrl: string | null;
   videoUrl: string | null;
-  visibilidade: 'PUBLICO' | 'INTERNO';
+  visibilidade: 'PUBLICO' | 'PRIVADO';
   embedUrl?: string | null;
+  album?: MidiaAlbum | null;
 }
 
 export default function GaleriaPage() {
@@ -26,18 +33,27 @@ export default function GaleriaPage() {
   const { user } = useAuth();
   const canPublish = hasPermission(user, 'marketing', 'write');
   const [itens, setItens] = useState<MidiaCard[]>([]);
+  const [albuns, setAlbuns] = useState<MidiaAlbum[]>([]);
   const [filtro, setFiltro] = useState<Tipo | 'TODOS'>('TODOS');
+  const [albumSlug, setAlbumSlug] = useState('TODOS');
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
   const [detalhe, setDetalhe] = useState<MidiaCard | null>(null);
 
   useEffect(() => {
+    api<MidiaAlbum[]>('/galeria/albuns')
+      .then(setAlbuns)
+      .catch(() => setAlbuns([]));
+  }, []);
+
+  useEffect(() => {
     setLoading(true);
-    api<MidiaCard[]>('/galeria')
+    const qs = albumSlug !== 'TODOS' ? `?album=${encodeURIComponent(albumSlug)}` : '';
+    api<MidiaCard[]>(`/galeria${qs}`)
       .then(setItens)
       .catch(() => setErro(t('erp.galeria.loadError')))
       .finally(() => setLoading(false));
-  }, [t]);
+  }, [t, albumSlug]);
 
   useEffect(() => {
     if (!slug) {
@@ -67,9 +83,10 @@ export default function GaleriaPage() {
         <p className="text-xs uppercase tracking-wider text-white/50">
           {detalhe.tipo === 'VIDEO' ? t('erp.galeria.typeVideo') : t('erp.galeria.typePhoto')}
           {' · '}
-          {detalhe.visibilidade === 'INTERNO'
-            ? t('erp.galeria.visibilityInternal')
+          {detalhe.visibilidade === 'PRIVADO'
+            ? t('erp.galeria.visibilityPrivate')
             : t('erp.galeria.visibilityPublic')}
+          {detalhe.album ? ` · ${detalhe.album.nome}` : ''}
         </p>
         <h2 className="text-xl font-serif text-[var(--color-accent)]">{detalhe.titulo}</h2>
         {detalhe.descricao && <p className="text-sm text-white/70">{detalhe.descricao}</p>}
@@ -145,6 +162,36 @@ export default function GaleriaPage() {
         ))}
       </div>
 
+      {albuns.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setAlbumSlug('TODOS')}
+            className={`min-h-9 px-3 rounded-lg text-sm ${
+              albumSlug === 'TODOS'
+                ? 'bg-[var(--color-accent)] text-black'
+                : 'border border-white/20 text-white/80 hover:bg-white/5'
+            }`}
+          >
+            {t('erp.galeria.filterAlbumAll')}
+          </button>
+          {albuns.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => setAlbumSlug(a.slug)}
+              className={`min-h-9 px-3 rounded-lg text-sm ${
+                albumSlug === a.slug
+                  ? 'bg-[var(--color-accent)] text-black'
+                  : 'border border-white/20 text-white/80 hover:bg-white/5'
+              }`}
+            >
+              {a.nome}
+            </button>
+          ))}
+        </div>
+      )}
+
       {loading && <p className="text-white/60 text-sm">{t('erp.galeria.loading')}</p>}
       {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
       {!loading && !erro && filtrados.length === 0 && (
@@ -173,9 +220,14 @@ export default function GaleriaPage() {
                     {m.tipo}
                   </div>
                 )}
-                {m.visibilidade === 'INTERNO' && (
+                {m.visibilidade === 'PRIVADO' && (
                   <span className="absolute top-2 left-2 text-[10px] uppercase bg-amber-500/90 text-black px-2 py-0.5 rounded">
-                    {t('erp.galeria.visibilityInternal')}
+                    {t('erp.galeria.visibilityPrivate')}
+                  </span>
+                )}
+                {m.album && (
+                  <span className="absolute bottom-2 left-2 text-[10px] bg-black/70 text-white px-2 py-0.5 rounded">
+                    {m.album.nome}
                   </span>
                 )}
               </div>
