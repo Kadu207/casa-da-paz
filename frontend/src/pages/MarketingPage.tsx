@@ -113,6 +113,7 @@ export default function MarketingPage() {
   const [midiaForm, setMidiaForm] = useState(emptyMidia);
   const [editMidiaId, setEditMidiaId] = useState<number | null>(null);
   const [midiaErro, setMidiaErro] = useState('');
+  const [showMidiaForm, setShowMidiaForm] = useState(false);
 
   const load = useCallback(async () => {
     const [r, e, p, c, m, g] = await Promise.all([
@@ -263,14 +264,23 @@ export default function MarketingPage() {
       }
       setMidiaForm(emptyMidia);
       setEditMidiaId(null);
+      setShowMidiaForm(false);
       await load();
     } catch (err) {
       setMidiaErro(err instanceof Error ? err.message : t('erp.marketing.gallerySaveError'));
     }
   };
 
+  const abrirFormMidia = (tipo: TipoMidia) => {
+    setEditMidiaId(null);
+    setMidiaErro('');
+    setMidiaForm({ ...emptyMidia, tipo });
+    setShowMidiaForm(true);
+  };
+
   const editarMidia = (m: MidiaPublicacao) => {
     setEditMidiaId(m.id);
+    setShowMidiaForm(true);
     setMidiaForm({
       tipo: m.tipo,
       titulo: m.titulo,
@@ -322,11 +332,36 @@ export default function MarketingPage() {
         </div>
       )}
 
-      <section className="space-y-3">
+      <section id="galeria" className="space-y-3 scroll-mt-4">
         <h3 className="text-lg text-white/90">{t('erp.marketing.gallery')}</h3>
         <p className="text-xs text-white/50">{t('erp.marketing.galleryHint')}</p>
         {canWrite && (
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => abrirFormMidia('FOTO')}
+              className="min-h-11 px-4 rounded-lg bg-[var(--color-accent)] text-black text-sm font-medium"
+            >
+              {t('erp.marketing.galleryAddPhoto')}
+            </button>
+            <button
+              type="button"
+              onClick={() => abrirFormMidia('VIDEO')}
+              className="min-h-11 px-4 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] text-sm font-medium hover:bg-white/5"
+            >
+              {t('erp.marketing.galleryAddVideo')}
+            </button>
+          </div>
+        )}
+        {canWrite && showMidiaForm && (
           <form onSubmit={salvarMidia} className="space-y-2 p-4 rounded-xl bg-white/5 border border-white/10">
+            <p className="text-sm text-[var(--color-accent)]">
+              {editMidiaId
+                ? t('erp.marketing.galleryEdit')
+                : midiaForm.tipo === 'VIDEO'
+                  ? t('erp.marketing.galleryFormVideo')
+                  : t('erp.marketing.galleryFormPhoto')}
+            </p>
             {midiaErro && <p className="text-sm text-[var(--color-danger)]">{midiaErro}</p>}
             <div className="grid gap-2 sm:grid-cols-2">
               <select
@@ -362,7 +397,7 @@ export default function MarketingPage() {
               placeholder={t('erp.marketing.galleryDesc')}
               className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
             />
-            {midiaForm.tipo === 'FOTO' || midiaForm.tipo === 'VIDEO' ? (
+            {(midiaForm.tipo === 'FOTO' || midiaForm.tipo === 'VIDEO') && (
               <>
                 <MediaUploadPanel
                   compact
@@ -380,7 +415,7 @@ export default function MarketingPage() {
                   className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
                 />
               </>
-            ) : null}
+            )}
             {midiaForm.tipo === 'VIDEO' && (
               <>
                 <input
@@ -440,18 +475,18 @@ export default function MarketingPage() {
               >
                 {editMidiaId ? t('erp.marketing.galleryUpdate') : t('erp.marketing.galleryCreate')}
               </button>
-              {editMidiaId && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditMidiaId(null);
-                    setMidiaForm(emptyMidia);
-                  }}
-                  className="px-4 py-2 rounded border border-white/20 text-sm text-white/80"
-                >
-                  {t('erp.marketing.galleryCancel')}
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setEditMidiaId(null);
+                  setMidiaForm(emptyMidia);
+                  setShowMidiaForm(false);
+                  setMidiaErro('');
+                }}
+                className="px-4 py-2 rounded border border-white/20 text-sm text-white/80"
+              >
+                {t('erp.marketing.galleryCancel')}
+              </button>
             </div>
           </form>
         )}

@@ -74,6 +74,8 @@ export function portalMapLinks() {
   return {
     googleSearch: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`,
     googleDirections: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`,
+    /** Embed clássico (sem API key) — preferido ao OSM quando CSP/iframe bloqueia */
+    googleEmbed: `https://maps.google.com/maps?q=${encodeURIComponent(coords)}&hl=pt-BR&z=17&output=embed`,
     waze: `https://www.waze.com/ul?q=${encodeURIComponent(query)}&navigate=yes`,
     osmStatic: `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=17&size=800x480&maptype=mapnik&markers=${lat},${lng},red-pushpin`,
     osmEmbed: `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`,

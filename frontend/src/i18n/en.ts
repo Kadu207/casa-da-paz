@@ -43,6 +43,8 @@ export const en: Record<PortalTranslationKey, string> = {
   'home.map.waze': 'Open in Waze',
   'home.map.iframeTitle': 'Casa da Paz map',
   'home.map.staticAlt': 'Map — Rua Valério Eugénio, 570, Areal, Conselheiro Lafaiete, MG',
+  'home.map.openInMaps': 'Open map in Google Maps',
+  'home.map.useStatic': 'Show static map',
   'shop.eyebrow': 'Shop',
   'shop.title': 'Bookstore',
   'shop.subtitle':

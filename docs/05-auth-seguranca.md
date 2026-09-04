@@ -77,7 +77,7 @@ Médiuns só enxergam dados financeiros ligados ao próprio `pessoa_id` (`financ
 ## 5.4. Headers / CSP
 
 - API: Helmet CSP estrito  
-- Frontend nginx: CSP com `frame-src` OpenStreetMap (mapa) + YouTube/youtube-nocookie + Vimeo (galeria 034)  
+- Frontend nginx: CSP com `frame-src` OpenStreetMap (mapa) + Google Maps + YouTube/youtube-nocookie + Vimeo (galeria 034)  
 - `X-Frame-Options: DENY`, nosniff  
 
 ## 5.5. Auditoria de segurança (F01–F10)

@@ -46,8 +46,8 @@ export default function PublicHome() {
   ] as const;
 
   const maps = portalMapLinks();
-  /** Preferir embed OSM (CSP frame-src liberado); static só se o iframe falhar no ambiente. */
-  const [mapUseEmbed, setMapUseEmbed] = useState(true);
+  /** Google Maps embed; se falhar, mostra mapa estático clicável. */
+  const [mapMode, setMapMode] = useState<'embed' | 'static'>('embed');
 
   return (
     <PublicLayout showBack={false}>
@@ -242,24 +242,47 @@ export default function PublicHome() {
               </a>
             </div>
           </div>
-          <div className="aspect-[4/3] sm:aspect-[16/10] w-full bg-background">
-            {mapUseEmbed ? (
+          <div className="aspect-[4/3] sm:aspect-[16/10] w-full bg-background relative">
+            {mapMode === 'embed' ? (
               <iframe
                 title={t('home.map.iframeTitle')}
-                src={maps.osmEmbed}
+                src={maps.googleEmbed}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
                 className="h-full w-full border-0"
+                onError={() => setMapMode('static')}
               />
             ) : (
-              <img
-                src={maps.osmStatic}
-                alt={t('home.map.staticAlt')}
-                loading="lazy"
-                decoding="async"
-                className="h-full w-full object-cover bg-background"
-                onError={() => setMapUseEmbed(true)}
-              />
+              <a
+                href={maps.googleSearch}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <img
+                  src={maps.osmStatic}
+                  alt={t('home.map.staticAlt')}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover bg-background"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+                <span className="absolute inset-x-0 bottom-0 bg-background/90 text-center text-sm text-primary py-2">
+                  {t('home.map.openInMaps')}
+                </span>
+              </a>
+            )}
+            {mapMode === 'embed' && (
+              <button
+                type="button"
+                className="absolute top-2 right-2 text-xs rounded-lg bg-background/90 border border-border px-2 py-1 text-foreground/80 hover:text-primary"
+                onClick={() => setMapMode('static')}
+              >
+                {t('home.map.useStatic')}
+              </button>
             )}
           </div>
         </div>

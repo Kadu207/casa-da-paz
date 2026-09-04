@@ -358,7 +358,11 @@ export const erpEn: Record<ErpTranslationKey, string> = {
   'erp.marketing.unpublish': 'Unpublish',
   'erp.marketing.gallery': 'Gallery (photos & videos)',
   'erp.marketing.galleryHint':
-    'Photos: upload. Videos: paste a YouTube link (preferred; Vimeo also works). Choose Public or Internal and optionally schedule. On the site the video plays embedded (preview/player).',
+    'Use the buttons below to add a photo or video. Videos: paste a YouTube link. Photos: upload. Choose Public or Internal and optionally schedule.',
+  'erp.marketing.galleryAddPhoto': 'Add photo',
+  'erp.marketing.galleryAddVideo': 'Add video',
+  'erp.marketing.galleryFormPhoto': 'New photo',
+  'erp.marketing.galleryFormVideo': 'New video',
   'erp.marketing.galleryTitle': 'Title',
   'erp.marketing.galleryDesc': 'Description (optional)',
   'erp.marketing.galleryImageRequired': 'Image URL (required for photos)',

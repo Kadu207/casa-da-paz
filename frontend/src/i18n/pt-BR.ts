@@ -41,6 +41,8 @@ export const ptBR = {
   'home.map.waze': 'Abrir no Waze',
   'home.map.iframeTitle': 'Mapa da Casa da Paz',
   'home.map.staticAlt': 'Mapa — Rua Valério Eugênio, 570, Bairro Areal, Conselheiro Lafaiete, MG',
+  'home.map.openInMaps': 'Abrir mapa no Google Maps',
+  'home.map.useStatic': 'Ver mapa estático',
   'shop.eyebrow': 'Loja',
   'shop.title': 'Livraria',
   'shop.subtitle':

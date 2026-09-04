@@ -356,7 +356,11 @@ export const erpPtBR = {
   'erp.marketing.unpublish': 'Despublicar',
   'erp.marketing.gallery': 'Galeria (fotos e vídeos)',
   'erp.marketing.galleryHint':
-    'Fotos: upload. Vídeos: cole o link do YouTube (preferencial; Vimeo também funciona). Escolha Público ou Interno e, se quiser, agende a data. No site o vídeo abre embutido (prévia/player).',
+    'Use os botões abaixo para adicionar foto ou vídeo. Vídeos: cole o link do YouTube. Fotos: faça upload. Escolha Público ou Interno e, se quiser, agende a data.',
+  'erp.marketing.galleryAddPhoto': 'Adicionar foto',
+  'erp.marketing.galleryAddVideo': 'Adicionar vídeo',
+  'erp.marketing.galleryFormPhoto': 'Nova foto',
+  'erp.marketing.galleryFormVideo': 'Novo vídeo',
   'erp.marketing.galleryTitle': 'Título',
   'erp.marketing.galleryDesc': 'Descrição (opcional)',
   'erp.marketing.galleryImageRequired': 'URL da imagem (obrigatória para foto)',

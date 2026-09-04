@@ -4,6 +4,7 @@ import { SafeImage } from '../components/public/SafeImage';
 import { api } from '../lib/api';
 import { parseVideoEmbed } from '../lib/video-embed';
 import { useI18n } from '../i18n/I18nContext';
+import { hasPermission, useAuth } from '../context/AuthContext';
 
 type Tipo = 'FOTO' | 'VIDEO';
 
@@ -22,6 +23,8 @@ interface MidiaCard {
 export default function GaleriaPage() {
   const { slug } = useParams<{ slug?: string }>();
   const { t } = useI18n();
+  const { user } = useAuth();
+  const canPublish = hasPermission(user, 'marketing', 'write');
   const [itens, setItens] = useState<MidiaCard[]>([]);
   const [filtro, setFiltro] = useState<Tipo | 'TODOS'>('TODOS');
   const [loading, setLoading] = useState(true);
@@ -101,6 +104,22 @@ export default function GaleriaPage() {
       <div>
         <h2 className="text-xl font-serif text-[var(--color-accent)]">{t('erp.galeria.title')}</h2>
         <p className="text-sm text-white/70 mt-1">{t('erp.galeria.subtitle')}</p>
+        {canPublish && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link
+              to="/app/marketing#galeria"
+              className="min-h-10 inline-flex items-center px-4 rounded-lg bg-[var(--color-accent)] text-black text-sm font-medium"
+            >
+              {t('erp.marketing.galleryAddPhoto')}
+            </Link>
+            <Link
+              to="/app/marketing#galeria"
+              className="min-h-10 inline-flex items-center px-4 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] text-sm font-medium"
+            >
+              {t('erp.marketing.galleryAddVideo')}
+            </Link>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2">
