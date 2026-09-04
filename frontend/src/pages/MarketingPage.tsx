@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { useI18n } from '../i18n/I18nContext';
 import { hasPermission, useAuth } from '../context/AuthContext';
+import { MediaUploadPanel } from '../components/MediaUploadPanel';
+import { parseVideoEmbed } from '../lib/video-embed';
 
 interface Evento {
   id: number;
@@ -45,6 +47,24 @@ interface MaterialEstudo {
   publicado: boolean;
 }
 
+type TipoMidia = 'FOTO' | 'VIDEO';
+type VisibilidadeMidia = 'PUBLICO' | 'INTERNO';
+type StatusMidia = 'RASCUNHO' | 'PUBLICADO';
+
+interface MidiaPublicacao {
+  id: number;
+  tipo: TipoMidia;
+  titulo: string;
+  descricao: string | null;
+  slug: string;
+  imagemUrl: string | null;
+  videoUrl: string | null;
+  visibilidade: VisibilidadeMidia;
+  status: StatusMidia;
+  publicadoEm: string | null;
+  ordem: number;
+}
+
 const CATEGORIAS: CategoriaEstudo[] = ['ERVAS', 'BANHOS', 'DEFUMACAO', 'OUTROS'];
 
 const emptyMaterial = {
@@ -57,6 +77,18 @@ const emptyMaterial = {
   publicado: false,
 };
 
+const emptyMidia = {
+  tipo: 'FOTO' as TipoMidia,
+  titulo: '',
+  descricao: '',
+  imagemUrl: '',
+  videoUrl: '',
+  visibilidade: 'PUBLICO' as VisibilidadeMidia,
+  status: 'RASCUNHO' as StatusMidia,
+  publicadoEm: '',
+  ordem: '0',
+};
+
 export default function MarketingPage() {
   const { t } = useI18n();
   const { user } = useAuth();
@@ -65,6 +97,7 @@ export default function MarketingPage() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [conteudos, setConteudos] = useState<Conteudo[]>([]);
   const [materiais, setMateriais] = useState<MaterialEstudo[]>([]);
+  const [midias, setMidias] = useState<MidiaPublicacao[]>([]);
   const [resumo, setResumo] = useState<{
     eventosAbertos: number;
     produtosPublicados: number;
@@ -77,20 +110,25 @@ export default function MarketingPage() {
   const [materialForm, setMaterialForm] = useState(emptyMaterial);
   const [editMaterialId, setEditMaterialId] = useState<number | null>(null);
   const [materialErro, setMaterialErro] = useState('');
+  const [midiaForm, setMidiaForm] = useState(emptyMidia);
+  const [editMidiaId, setEditMidiaId] = useState<number | null>(null);
+  const [midiaErro, setMidiaErro] = useState('');
 
   const load = useCallback(async () => {
-    const [r, e, p, c, m] = await Promise.all([
+    const [r, e, p, c, m, g] = await Promise.all([
       api<typeof resumo>('/marketing/resumo'),
       api<Evento[]>('/marketing/eventos'),
       api<Produto[]>('/marketing/produtos'),
       api<Conteudo[]>('/marketing/conteudos'),
       api<MaterialEstudo[]>('/marketing/materiais-estudo'),
+      api<MidiaPublicacao[]>('/marketing/galeria'),
     ]);
     setResumo(r);
     setEventos(e);
     setProdutos(p);
     setConteudos(c);
     setMateriais(m);
+    setMidias(g);
   }, []);
 
   useEffect(() => {
@@ -186,6 +224,76 @@ export default function MarketingPage() {
     await load();
   };
 
+  const toDatetimeLocal = (iso: string | null) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const salvarMidia = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    setMidiaErro('');
+    const publicadoEm = midiaForm.publicadoEm
+      ? new Date(midiaForm.publicadoEm).toISOString()
+      : null;
+    const payload = {
+      tipo: midiaForm.tipo,
+      titulo: midiaForm.titulo.trim(),
+      descricao: midiaForm.descricao.trim() || null,
+      imagemUrl: midiaForm.imagemUrl.trim() || null,
+      videoUrl: midiaForm.videoUrl.trim() || null,
+      visibilidade: midiaForm.visibilidade,
+      status: midiaForm.status,
+      publicadoEm,
+      ordem: Number(midiaForm.ordem) || 0,
+    };
+    try {
+      if (editMidiaId) {
+        await api(`/marketing/galeria/${editMidiaId}`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await api('/marketing/galeria', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+      }
+      setMidiaForm(emptyMidia);
+      setEditMidiaId(null);
+      await load();
+    } catch (err) {
+      setMidiaErro(err instanceof Error ? err.message : t('erp.marketing.gallerySaveError'));
+    }
+  };
+
+  const editarMidia = (m: MidiaPublicacao) => {
+    setEditMidiaId(m.id);
+    setMidiaForm({
+      tipo: m.tipo,
+      titulo: m.titulo,
+      descricao: m.descricao ?? '',
+      imagemUrl: m.imagemUrl ?? '',
+      videoUrl: m.videoUrl ?? '',
+      visibilidade: m.visibilidade,
+      status: m.status,
+      publicadoEm: toDatetimeLocal(m.publicadoEm),
+      ordem: String(m.ordem),
+    });
+  };
+
+  const toggleMidiaStatus = async (m: MidiaPublicacao) => {
+    await api(`/marketing/galeria/${m.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        status: m.status === 'PUBLICADO' ? 'RASCUNHO' : 'PUBLICADO',
+      }),
+    });
+    await load();
+  };
+
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
@@ -213,6 +321,183 @@ export default function MarketingPage() {
           </div>
         </div>
       )}
+
+      <section className="space-y-3">
+        <h3 className="text-lg text-white/90">{t('erp.marketing.gallery')}</h3>
+        <p className="text-xs text-white/50">{t('erp.marketing.galleryHint')}</p>
+        {canWrite && (
+          <form onSubmit={salvarMidia} className="space-y-2 p-4 rounded-xl bg-white/5 border border-white/10">
+            {midiaErro && <p className="text-sm text-[var(--color-danger)]">{midiaErro}</p>}
+            <div className="grid gap-2 sm:grid-cols-2">
+              <select
+                value={midiaForm.tipo}
+                onChange={(e) => setMidiaForm({ ...midiaForm, tipo: e.target.value as TipoMidia })}
+                className="px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+              >
+                <option value="FOTO">{t('erp.galeria.typePhoto')}</option>
+                <option value="VIDEO">{t('erp.galeria.typeVideo')}</option>
+              </select>
+              <select
+                value={midiaForm.visibilidade}
+                onChange={(e) =>
+                  setMidiaForm({ ...midiaForm, visibilidade: e.target.value as VisibilidadeMidia })
+                }
+                className="px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+              >
+                <option value="PUBLICO">{t('erp.galeria.visibilityPublic')}</option>
+                <option value="INTERNO">{t('erp.galeria.visibilityInternal')}</option>
+              </select>
+            </div>
+            <input
+              required
+              value={midiaForm.titulo}
+              onChange={(e) => setMidiaForm({ ...midiaForm, titulo: e.target.value })}
+              placeholder={t('erp.marketing.galleryTitle')}
+              className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+            />
+            <textarea
+              rows={2}
+              value={midiaForm.descricao}
+              onChange={(e) => setMidiaForm({ ...midiaForm, descricao: e.target.value })}
+              placeholder={t('erp.marketing.galleryDesc')}
+              className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+            />
+            {midiaForm.tipo === 'FOTO' || midiaForm.tipo === 'VIDEO' ? (
+              <>
+                <MediaUploadPanel
+                  compact
+                  onUploaded={(url) => setMidiaForm((f) => ({ ...f, imagemUrl: url }))}
+                />
+                <input
+                  value={midiaForm.imagemUrl}
+                  onChange={(e) => setMidiaForm({ ...midiaForm, imagemUrl: e.target.value })}
+                  placeholder={
+                    midiaForm.tipo === 'FOTO'
+                      ? t('erp.marketing.galleryImageRequired')
+                      : t('erp.marketing.galleryThumb')
+                  }
+                  required={midiaForm.tipo === 'FOTO'}
+                  className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+                />
+              </>
+            ) : null}
+            {midiaForm.tipo === 'VIDEO' && (
+              <>
+                <input
+                  required
+                  value={midiaForm.videoUrl}
+                  onChange={(e) => setMidiaForm({ ...midiaForm, videoUrl: e.target.value })}
+                  placeholder={t('erp.marketing.galleryVideoUrl')}
+                  className="w-full px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+                />
+                {(() => {
+                  const emb = parseVideoEmbed(midiaForm.videoUrl);
+                  if (!emb) return null;
+                  return (
+                    <div className="rounded-lg overflow-hidden border border-white/10 aspect-video bg-black/40">
+                      <iframe
+                        title={t('erp.marketing.galleryPreview')}
+                        src={emb.embedUrl}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  );
+                })()}
+              </>
+            )}
+            <div className="grid gap-2 sm:grid-cols-3">
+              <select
+                value={midiaForm.status}
+                onChange={(e) => setMidiaForm({ ...midiaForm, status: e.target.value as StatusMidia })}
+                className="px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+              >
+                <option value="RASCUNHO">{t('erp.marketing.galleryDraft')}</option>
+                <option value="PUBLICADO">{t('erp.marketing.galleryPublished')}</option>
+              </select>
+              <input
+                type="datetime-local"
+                value={midiaForm.publicadoEm}
+                onChange={(e) => setMidiaForm({ ...midiaForm, publicadoEm: e.target.value })}
+                className="px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+                title={t('erp.marketing.gallerySchedule')}
+              />
+              <input
+                type="number"
+                min={0}
+                value={midiaForm.ordem}
+                onChange={(e) => setMidiaForm({ ...midiaForm, ordem: e.target.value })}
+                placeholder={t('erp.marketing.studyOrder')}
+                className="px-3 py-2 rounded bg-black/30 border border-white/20 text-sm"
+              />
+            </div>
+            <p className="text-[11px] text-white/40">{t('erp.marketing.galleryScheduleHint')}</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="submit"
+                className="px-4 py-2 rounded bg-[var(--color-accent)] text-black text-sm font-medium"
+              >
+                {editMidiaId ? t('erp.marketing.galleryUpdate') : t('erp.marketing.galleryCreate')}
+              </button>
+              {editMidiaId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditMidiaId(null);
+                    setMidiaForm(emptyMidia);
+                  }}
+                  className="px-4 py-2 rounded border border-white/20 text-sm text-white/80"
+                >
+                  {t('erp.marketing.galleryCancel')}
+                </button>
+              )}
+            </div>
+          </form>
+        )}
+        <ul className="space-y-2 text-sm">
+          {midias.length === 0 && (
+            <li className="text-white/50">{t('erp.marketing.galleryEmpty')}</li>
+          )}
+          {midias.map((m) => (
+            <li
+              key={m.id}
+              className="flex flex-wrap justify-between gap-2 items-center border-b border-white/5 py-2"
+            >
+              <span>
+                [{m.tipo}] {m.titulo}{' '}
+                <span className="text-white/40">
+                  ({m.visibilidade} · {m.status}
+                  {m.publicadoEm
+                    ? ` · ${new Date(m.publicadoEm).toLocaleString('pt-BR')}`
+                    : ''}
+                  )
+                </span>
+              </span>
+              {canWrite && (
+                <span className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => editarMidia(m)}
+                    className="text-[var(--color-accent)] hover:underline"
+                  >
+                    {t('erp.marketing.galleryEdit')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleMidiaStatus(m)}
+                    className="text-[var(--color-accent)] hover:underline"
+                  >
+                    {m.status === 'PUBLICADO'
+                      ? t('erp.marketing.unpublish')
+                      : t('erp.marketing.publish')}
+                  </button>
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="space-y-3">
         <h3 className="text-lg text-white/90">{t('erp.marketing.studies')}</h3>

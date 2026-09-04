@@ -8,6 +8,7 @@ export const en: Record<PortalTranslationKey, string> = {
   'nav.internal': 'Staff area',
   'nav.shop': 'Bookstore',
   'nav.studies': 'Herbs & baths',
+  'nav.gallery': 'Gallery',
   'site.documentTitle': 'Welcome to Casa da Paz',
   'home.title': 'Welcome to Casa da Paz',
   'home.subtitle':
@@ -200,4 +201,19 @@ export const en: Record<PortalTranslationKey, string> = {
   'studies.back': 'Study materials',
   'studies.updated': 'Updated on {date}',
   'studies.loading': 'Loading…',
+  'gallery.eyebrow': 'House memories',
+  'gallery.title': 'Photo & video gallery',
+  'gallery.subtitle':
+    'Records of giras, events and atmosphere at Casa da Paz — public content prepared by communications.',
+  'gallery.filterAll': 'All',
+  'gallery.filterPhoto': 'Photos',
+  'gallery.filterVideo': 'Videos',
+  'gallery.typePhoto': 'Photo',
+  'gallery.typeVideo': 'Video',
+  'gallery.empty': 'New photos and videos coming soon.',
+  'gallery.loadError': 'Could not load the gallery.',
+  'gallery.notFound': 'Item not found or not published yet.',
+  'gallery.back': 'Gallery',
+  'gallery.loading': 'Loading…',
+  'gallery.noMedia': 'Media unavailable.',
 };

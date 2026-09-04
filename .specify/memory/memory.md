@@ -42,11 +42,12 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 031 estoque-casa | ✅ Primário (ADR-010) |
 | 030 security-hardening | ✅ Fase 0–2 + CSP mapa OSM (2026-09-02) |
 | 033 delegacoes-casa | ✅ Prod (ADR-011) — N8N workflow importado |
+| 034 galeria-midia | 🚧 Repo pronto (ADR-012) — deploy pendente |
 | Auditoria F01–F10 | ✅ GREEN — [`docs/security-audit/ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
 
 ## ADRs
 
-001–011 em `docs/memory/decisions/` — 002 (RBAC+policies), 009 Asaas opcional, **010 estoque primário**, **011 delegações**.
+001–012 em `docs/memory/decisions/` — 002 (RBAC+policies), 009 Asaas opcional, **010 estoque primário**, **011 delegações**, **012 galeria mídia**.
 
 ## Pendências vivas
 

@@ -119,6 +119,12 @@ export default function PublicHome() {
       <section className="max-w-2xl mx-auto px-4 pb-12">
         <div className="flex flex-col gap-3">
           <Link
+            to="/public/galeria"
+            className="min-h-12 inline-flex items-center justify-center rounded-xl border border-border text-foreground font-medium px-6 py-3 hover:bg-card transition-colors"
+          >
+            {t('nav.gallery')}
+          </Link>
+          <Link
             to="/public/eventos"
             className="min-h-12 inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground font-medium px-6 py-3 hover:bg-primary/90 transition-colors shadow"
           >

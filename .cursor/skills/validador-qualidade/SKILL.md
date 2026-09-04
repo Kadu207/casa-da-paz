@@ -21,3 +21,4 @@ Aprovação antes de commit/push e antes de solicitar deploy.
 - Specs **028** e **029**: ver tasks.md datados 2026-08-08.
 - Spec **030**: tasks.md 2026-08-20 — Vitest 123; audit 0 vulns; memory/CHANGELOG atualizados.
 - Spec **033**: tasks.md 2026-09-02 — Vitest delegacoes+rbac OK; FE tsc OK; deploy aguarda confirmação.
+- Spec **034**: tasks.md 2026-09-04 — Vitest video-url OK; BE/FE tsc OK; deploy VPS aguarda confirmação.

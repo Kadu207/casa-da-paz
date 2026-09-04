@@ -7,9 +7,10 @@ import { useI18n } from '../i18n/I18nContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import type { ErpTranslationKey } from '../i18n/erp-pt-BR';
 
-const nav: { path: string; labelKey: ErpTranslationKey; resource: string }[] = [
+const nav: { path: string; labelKey: ErpTranslationKey; resource?: string }[] = [
   { path: '/app/dashboard', labelKey: 'erp.nav.dashboard', resource: 'dashboard' },
   { path: '/app/delegacoes', labelKey: 'erp.nav.delegacoes', resource: 'delegacoes' },
+  { path: '/app/galeria', labelKey: 'erp.nav.galeria' },
   { path: '/app/financeiro', labelKey: 'erp.nav.financeiro', resource: 'financeiro' },
   { path: '/app/marketing', labelKey: 'erp.nav.marketing', resource: 'marketing' },
   { path: '/app/recepcao', labelKey: 'erp.nav.recepcao', resource: 'eventos' },
@@ -45,7 +46,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       {nav
-        .filter((n) => user && hasPermission(user, n.resource, 'read'))
+        .filter((n) => user && (!n.resource || hasPermission(user, n.resource, 'read')))
         .map((n) => (
           <Link
             key={n.path}

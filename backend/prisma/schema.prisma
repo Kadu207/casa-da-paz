@@ -155,6 +155,21 @@ enum CategoriaMaterialEstudo {
   OUTROS
 }
 
+enum TipoMidiaPublicacao {
+  FOTO
+  VIDEO
+}
+
+enum VisibilidadeMidia {
+  PUBLICO
+  INTERNO
+}
+
+enum StatusMidiaPublicacao {
+  RASCUNHO
+  PUBLICADO
+}
+
 enum TipoMovimentacao {
   ENTRADA
   SAIDA
@@ -273,6 +288,7 @@ model Usuario {
   movimentacoesEstoqueCasa MovimentacaoEstoqueCasa[]
   checklistsCriados        ChecklistLimpeza[]        @relation("ChecklistCriadoPor")
   tarefasDelegacaoConcluidas TarefaDelegacao[]       @relation("TarefaDelegacaoConcluidaPor")
+  midiasPublicadas           MidiaPublicacao[]       @relation("MidiaPublicacaoCreatedBy")
 
   @@map("usuarios")
 }
@@ -937,4 +953,27 @@ model TarefaDelegacao {
   @@index([status, vencimento])
   @@index([pessoaId])
   @@map("tarefas_delegacao")
+}
+
+/// Galeria de fotos/vídeos (Spec 034) — público no portal ou interno no ERP
+model MidiaPublicacao {
+  id            Int                   @id @default(autoincrement())
+  tipo          TipoMidiaPublicacao
+  titulo        String                @db.VarChar(150)
+  descricao     String?               @db.VarChar(2000)
+  slug          String                @unique @db.VarChar(120)
+  imagemUrl     String?               @map("imagem_url") @db.VarChar(500)
+  videoUrl      String?               @map("video_url") @db.VarChar(500)
+  visibilidade  VisibilidadeMidia     @default(PUBLICO)
+  status        StatusMidiaPublicacao @default(RASCUNHO)
+  publicadoEm   DateTime?             @map("publicado_em")
+  ordem         Int                   @default(0)
+  createdById   Int?                  @map("created_by_id")
+  createdAt     DateTime              @default(now()) @map("created_at")
+  updatedAt     DateTime              @updatedAt @map("updated_at")
+  createdBy     Usuario?              @relation("MidiaPublicacaoCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([status, visibilidade, publicadoEm])
+  @@index([tipo, ordem])
+  @@map("midias_publicacao")
 }

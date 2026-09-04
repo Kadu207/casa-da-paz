@@ -6,6 +6,7 @@ export const ptBR = {
   'nav.internal': 'Área interna',
   'nav.shop': 'Livraria',
   'nav.studies': 'Ervas & banhos',
+  'nav.gallery': 'Galeria',
   'site.documentTitle': 'Bem vindo a Casa da Paz',
   'home.title': 'Bem vindo a Casa da Paz',
   'home.subtitle':
@@ -198,6 +199,21 @@ export const ptBR = {
   'studies.back': 'Materiais de estudo',
   'studies.updated': 'Atualizado em {date}',
   'studies.loading': 'Carregando…',
+  'gallery.eyebrow': 'Memórias da casa',
+  'gallery.title': 'Galeria de fotos e vídeos',
+  'gallery.subtitle':
+    'Registros de giras, eventos e atmosfera da Casa da Paz — conteúdo público preparado pela comunicação.',
+  'gallery.filterAll': 'Todos',
+  'gallery.filterPhoto': 'Fotos',
+  'gallery.filterVideo': 'Vídeos',
+  'gallery.typePhoto': 'Foto',
+  'gallery.typeVideo': 'Vídeo',
+  'gallery.empty': 'Em breve novas fotos e vídeos.',
+  'gallery.loadError': 'Não foi possível carregar a galeria.',
+  'gallery.notFound': 'Item não encontrado ou ainda não publicado.',
+  'gallery.back': 'Galeria',
+  'gallery.loading': 'Carregando…',
+  'gallery.noMedia': 'Mídia indisponível.',
 } as const;
 
 export type PortalTranslationKey = keyof typeof ptBR;

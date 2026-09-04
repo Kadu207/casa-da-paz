@@ -217,6 +217,32 @@ paths:
     post:
       security: [{ bearerAuth: [] }]
       summary: D-1 e atrasadas (write / job)
+  /marketing/galeria:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: CRUD listagem galeria (marketing)
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Criar foto/vídeo (marketing write)
+  /marketing/galeria/{id}:
+    patch:
+      security: [{ bearerAuth: [] }]
+    delete:
+      security: [{ bearerAuth: [] }]
+      summary: Soft unpublish (status RASCUNHO)
+  /galeria:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Público + interno ao vivo (JWT)
+  /galeria/{slug}:
+    get:
+      security: [{ bearerAuth: [] }]
+  /public/galeria:
+    get:
+      summary: Galeria pública ao vivo
+  /public/galeria/{slug}:
+    get:
+      summary: Detalhe público
   /public/eventos:
     get:
       summary: Eventos abertos (sem auth)

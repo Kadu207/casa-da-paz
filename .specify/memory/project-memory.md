@@ -6,14 +6,15 @@
 
 | Item | Status |
 |------|--------|
-| Fase | Pós-go-live estável: **033 Delegações** + 031 Estoque + 030 Security + auditoria F01–F10 GREEN |
+| Fase | Pós-go-live: **034 Galeria** (código) + 033 Delegações + 031 Estoque + 030 Security + auditoria F01–F10 GREEN |
 | Versão | 0.1.0-alpha |
-| Commit referência docs | `70774ba` (auditoria Green) / feature 033 `2975b46` |
+| Commit referência docs | feature 034 em andamento / 033 `2975b46` |
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (Host `inovati`; **não** :22) |
 | Asaas (021) | **Dormant** — [`asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
 | Spec 032 ingressos | 📋 Stub — não implementar até priorizar |
 | Spec 033 delegações | ✅ Prod — migrate + seed funções + menu `/app/delegacoes` + N8N workflow importado |
+| Spec 034 galeria | 🚧 Implementado no repo — **deploy VPS pendente confirmação** |
 | Auditoria F01–F10 | ✅ **GREEN** Remediado/Validado — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
 | Mapa portal | ✅ CSP `frame-src` OSM — “Onde nos encontrar” OK |
 | Security 030 | ✅ Fase 0–2 + CSP mapa |
@@ -22,6 +23,7 @@
 
 | Prioridade | Item | Notas |
 |------------|------|-------|
+| 0 | Spec 034 Galeria | Deploy migrate + rebuild BE/FE + nginx CSP YouTube/Vimeo |
 | 1 | Mensageria polish | SMTP N8N (`SMTP Casa da Paz`); inbox WhatsApp Meta; Chatwoot público **502** |
 | 2 | Spec 032 | Ingressos — só com decisão explícita |
 | 3 | Asaas | Sandbox/prod com chave + confirmação |

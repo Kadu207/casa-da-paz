@@ -16,6 +16,8 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/public/livraria` | Catálogo / checkout (Asaas se configurado) |
 | `/public/estudos` | Materiais de estudo (ervas, banhos, defumação) |
 | `/public/estudos/:slug` | Detalhe do material |
+| `/public/galeria` | Galeria pública de fotos e vídeos (Spec 034) |
+| `/public/galeria/:slug` | Detalhe da mídia pública |
 | `/public/termos` | Termos / LGPD |
 
 ## 3.2. ERP (`/app`)
@@ -45,7 +47,8 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/app/livraria` | livraria | PDV / estoque de venda |
 | `/app/estoque` | estoque_casa | Estoque primário da casa (insumos) |
 | `/app/ecommerce` | ecommerce | Pedidos |
-| `/app/marketing` | marketing | Marketing + materiais de estudo |
+| `/app/marketing` | marketing | Marketing + materiais de estudo + galeria CRUD |
+| `/app/galeria` | (autenticado) | Consumo fotos/vídeos públicos e internos |
 | `/app/usuarios` | usuarios | Usuários + policies (SUPERVISOR) |
 | `/app/auditoria` | auditoria | Auditoria / export |
 

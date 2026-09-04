@@ -87,6 +87,27 @@ export function authorize(resource: Parameters<typeof canAccess>[1], action: 're
   };
 }
 
+/** Concede acesso se o usuário tiver a ação em **qualquer** dos resources. */
+export function authorizeAny(
+  resources: Parameters<typeof canAccess>[1][],
+  action: 'read' | 'write' = 'read'
+) {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({ error: 'Não autenticado' });
+      return;
+    }
+    const ok = resources.some((resource) =>
+      canAccess(req.user!.setorAcesso as SetorAcesso, resource, action, req.user!.policies)
+    );
+    if (!ok) {
+      res.status(403).json({ error: 'Acesso negado' });
+      return;
+    }
+    next();
+  };
+}
+
 export function requireSupervisor(req: Request, res: Response, next: NextFunction): void {
   if (!req.user || req.user.setorAcesso !== 'SUPERVISOR') {
     res.status(403).json({ error: 'Apenas SUPERVISOR' });

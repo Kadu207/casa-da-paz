@@ -32,11 +32,14 @@ import PublicEventoDetalhe from './pages/public/PublicEventoDetalhe';
 import PublicLivraria from './pages/public/PublicLivraria';
 import PublicEstudos from './pages/public/PublicEstudos';
 import PublicEstudoDetalhe from './pages/public/PublicEstudoDetalhe';
+import PublicGaleria from './pages/public/PublicGaleria';
+import PublicGaleriaDetalhe from './pages/public/PublicGaleriaDetalhe';
 import PublicTermos from './pages/public/PublicTermos';
 import EcommerceAdminPage from './pages/EcommerceAdminPage';
 import AuditoriaPage from './pages/AuditoriaPage';
 import AlertasPage from './pages/AlertasPage';
 import AlterarSenhaPage from './pages/AlterarSenhaPage';
+import GaleriaPage from './pages/GaleriaPage';
 import AppLayout from './components/AppLayout';
 import { RequireRole } from './guards/RequireRole';
 
@@ -70,6 +73,8 @@ export default function App() {
       <Route path="/public/livraria" element={<PublicLivraria />} />
       <Route path="/public/estudos" element={<PublicEstudos />} />
       <Route path="/public/estudos/:slug" element={<PublicEstudoDetalhe />} />
+      <Route path="/public/galeria" element={<PublicGaleria />} />
+      <Route path="/public/galeria/:slug" element={<PublicGaleriaDetalhe />} />
       <Route path="/public/termos" element={<PublicTermos />} />
       <Route path="/public/acompanhar/:protocolo" element={<PublicAcompanhar />} />
       {/* aliases Lovable → rotas canônicas */}
@@ -96,6 +101,22 @@ export default function App() {
           element={
             <RequireRole path="/app/delegacoes">
               <DelegacoesPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="galeria"
+          element={
+            <RequireRole path="/app/galeria">
+              <GaleriaPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="galeria/:slug"
+          element={
+            <RequireRole path="/app/galeria">
+              <GaleriaPage />
             </RequireRole>
           }
         />

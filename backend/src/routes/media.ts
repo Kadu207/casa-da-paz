@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { authenticate, authorize } from '../middleware/auth.js';
+import { authenticate, authorizeAny } from '../middleware/auth.js';
 import { cloudflareImagesEnabled, uploadToCloudflareImages } from '../lib/cloudflare-images.js';
 import { registrarAuditoria } from '../lib/auditoria.js';
 import { isAllowedImageBuffer, isAllowedImageMime } from '../lib/upload-filters.js';
@@ -14,14 +14,17 @@ const upload = multer({
   },
 });
 
-router.get('/status', authenticate, authorize('eventos', 'write'), (_req, res) => {
+/** MARKETING (galeria) ou EVENTOS — Spec 034 */
+const canUploadImages = authorizeAny(['marketing', 'eventos'], 'write');
+
+router.get('/status', authenticate, canUploadImages, (_req, res) => {
   res.json({ cloudflareImages: cloudflareImagesEnabled() });
 });
 
 router.post(
   '/images',
   authenticate,
-  authorize('eventos', 'write'),
+  canUploadImages,
   upload.single('file'),
   async (req, res) => {
     if (!cloudflareImagesEnabled()) {

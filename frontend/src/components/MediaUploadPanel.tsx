@@ -4,7 +4,13 @@ import { useI18n } from '../i18n/I18nContext';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
 
-export function MediaUploadPanel() {
+export function MediaUploadPanel({
+  onUploaded,
+  compact,
+}: {
+  onUploaded?: (url: string) => void;
+  compact?: boolean;
+} = {}) {
   const { t } = useI18n();
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -46,6 +52,7 @@ export function MediaUploadPanel() {
       const data = (await res.json()) as { id?: string; url?: string; error?: string };
       if (!res.ok) throw new Error(data.error ?? t('erp.media.uploadFail'));
       setResult({ id: data.id!, url: data.url! });
+      onUploaded?.(data.url!);
       setFile(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : t('erp.media.uploadError'));
@@ -55,8 +62,10 @@ export function MediaUploadPanel() {
   };
 
   return (
-    <div className="mb-6 p-4 rounded-xl bg-[var(--color-surface)] space-y-3">
-      <h3 className="text-sm font-medium text-[var(--color-accent)]">{t('erp.media.title')}</h3>
+    <div className={`${compact ? 'mb-2' : 'mb-6'} p-4 rounded-xl bg-[var(--color-surface)] space-y-3`}>
+      {!compact && (
+        <h3 className="text-sm font-medium text-[var(--color-accent)]">{t('erp.media.title')}</h3>
+      )}
       <input
         type="file"
         accept="image/jpeg,image/png,image/webp"

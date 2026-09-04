@@ -37,7 +37,9 @@
 
 **Auditoria:** somente **SUPERVISOR** (fora da tabela operacional). Menu ERP → **Auditoria** (`/app/auditoria`). DIRETORIA/SUPORTE não têm acesso.
 
-**MARKETING** publica eventos/conteúdo (`eventos`/`livraria`/`marketing` write) mas **não** cadastra estoque (`estoque` só DIRETORIA/LIVRARIA/SUPERVISOR). Cadastro de livros: setor LIVRARIA.
+**MARKETING** publica eventos/conteúdo/galeria (`eventos`/`livraria`/`marketing` write; upload Cloudflare Images via `marketing` **ou** `eventos` write) mas **não** cadastra estoque (`estoque` só DIRETORIA/LIVRARIA/SUPERVISOR). Cadastro de livros: setor LIVRARIA.
+
+**Galeria (Spec 034):** CRUD em `/api/marketing/galeria` com resource `marketing`. Consumo interno `/api/galeria` e menu `/app/galeria` para **qualquer usuário autenticado**. Portal público `/public/galeria` só itens `PUBLICO` ao vivo.
 
 **Estoque da Casa (`estoque_casa`):** almoxarifado primário (ADR-010). Write default: SUPERVISOR, ADMIN, DIRETORIA, TESOURARIA. \*MEDIUM: policy `write` para catálogo/movimentações; responsável de `GrupoLimpeza` ativo recebe **read** + checklist do próprio grupo (não write org-wide). Separado do estoque de venda da livraria.
 
