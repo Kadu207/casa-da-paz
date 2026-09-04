@@ -581,7 +581,7 @@ async function seedFuncoesCasa() {
     { nome: 'Eventos e agenda', slug: 'eventos-agenda', ordem: 40, descricao: 'Agenda ritualística e eventos' },
     { nome: 'Compras', slug: 'compras', ordem: 50, descricao: 'Aquisições e suprimentos' },
     { nome: 'Limpeza', slug: 'limpeza', ordem: 60, descricao: 'Limpeza e organização da casa' },
-    { nome: 'Comunicação', slug: 'comunicacao', ordem: 70, descricao: 'Avisos, redes e comunicação interna' },
+    { nome: 'Comunicação', slug: 'comunicacao', ordem: 70, descricao: 'Avisos, redes, galeria (fotos/vídeos YouTube) e comunicação da casa' },
   ];
 
   for (const f of funcoes) {
@@ -591,6 +591,80 @@ async function seedFuncoesCasa() {
       update: { nome: f.nome, ordem: f.ordem, descricao: f.descricao, ativo: true },
     });
   }
+}
+
+/** Spec 034 — policies marketing + responsáveis da função Comunicação */
+async function seedGaleriaPoliciesEDelegacao() {
+  await seedFuncoesCasa();
+
+  // Garante Mãe de Santo (DIRETORIA) e logins de marketing/sistema se ainda não existirem
+  await ensureUsuarioWithPolicy({
+    pessoaId: 30,
+    nomeCompleto: 'Mãe de Santo Casa da Paz',
+    telefone: '31999990030',
+    tipoPerfil: 'DIRETORIA',
+    login: 'maedesanto',
+    senha: 'maedesanto123',
+    setorAcesso: 'DIRETORIA',
+  });
+
+  const logins = [
+    'admin',
+    'supervisor',
+    'admin.integracoes',
+    'maedesanto',
+    'marketing01',
+    'marketing02',
+    'marketing03',
+    'marketing04',
+  ] as const;
+
+  for (const login of logins) {
+    const u = await prisma.usuario.findUnique({
+      where: { login },
+      select: { id: true, setorAcesso: true, pessoaId: true },
+    });
+    if (!u) {
+      console.warn(`[galeria-034] login ausente: ${login} — rode seed users se necessário`);
+      continue;
+    }
+    const grants = snapshotGrantsForSetor(u.setorAcesso);
+    // Garante marketing write explícito no snapshot (DIRETORIA/MARKETING/ADMIN/SUPERVISOR)
+    const merged = { ...grants, marketing: 'write' as const, eventos: grants.eventos ?? ('write' as const) };
+    await prisma.usuarioPolicy.upsert({
+      where: { usuarioId: u.id },
+      create: { usuarioId: u.id, grants: merged },
+      update: { grants: merged },
+    });
+    console.log(`[galeria-034] policy OK: ${login} (${u.setorAcesso}) marketing=write`);
+  }
+
+  const comunicacao = await prisma.funcaoCasa.findUnique({ where: { slug: 'comunicacao' } });
+  if (!comunicacao) {
+    throw new Error('Função Comunicação não encontrada');
+  }
+
+  /** Pessoas seed: admin=1, supervisor=10, admin.integracoes=11, maedesanto=30, marketing=12–15 */
+  const pessoaIds = [1, 10, 11, 30, 12, 13, 14, 15];
+  for (const pessoaId of pessoaIds) {
+    const pessoa = await prisma.pessoa.findUnique({ where: { id: pessoaId }, select: { id: true } });
+    if (!pessoa) {
+      console.warn(`[galeria-034] pessoa ${pessoaId} ausente — skip responsável`);
+      continue;
+    }
+    await prisma.funcaoResponsavel.upsert({
+      where: {
+        funcaoId_pessoaId: { funcaoId: comunicacao.id, pessoaId },
+      },
+      create: {
+        funcaoId: comunicacao.id,
+        pessoaId,
+        papel: pessoaId === 30 ? 'Mãe de Santo' : pessoaId === 10 ? 'Supervisor' : pessoaId === 11 ? 'Admin' : pessoaId === 1 ? 'Diretoria' : 'Marketing',
+      },
+      update: {},
+    });
+  }
+  console.log('[galeria-034] Função Comunicação: responsáveis atualizados (mãe de santo, marketing, diretoria, supervisor, admin)');
 }
 
 async function seedEstoqueCasaCatalogo() {
@@ -679,6 +753,12 @@ if (hasFlag('--supervisor-only')) {
   // Idempotente — Feature 033
   seedFuncoesCasa()
     .then(() => console.log('Seed funções da casa (delegações) OK'))
+    .catch(console.error)
+    .finally(() => prisma.$disconnect());
+} else if (hasFlag('--galeria-policies-034')) {
+  // Idempotente — Spec 034: policies marketing + delegação Comunicação
+  seedGaleriaPoliciesEDelegacao()
+    .then(() => console.log('Seed galeria policies + Comunicação OK'))
     .catch(console.error)
     .finally(() => prisma.$disconnect());
 } else if (hasFlag('--portal-content')) {

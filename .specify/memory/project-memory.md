@@ -27,7 +27,16 @@
 | 2 | Spec 032 | Ingressos — só com decisão explícita |
 | 3 | Asaas | Sandbox/prod com chave + confirmação |
 | 4 | SSH allowlist :65025 | Opcional |
-| — | Galeria conteúdo | Operacional: publicar 1º vídeo YouTube via Marketing |
+
+## Policies galeria (034)
+
+```bash
+# Na VPS (idempotente): marketing write + função Comunicação
+./scripts/compose-prod.sh exec -T backend npx tsx prisma/seed.ts --galeria-policies-034
+```
+
+Logins cobertos: `admin`, `supervisor`, `admin.integracoes`, `maedesanto`, `marketing01`–`04`.
+
 
 ## Security — referência rápida
 

@@ -27,4 +27,10 @@ describe('snapshotGrantsForSetor', () => {
     expect(snap.marketing).toBe('write');
     expect(snap.estoque).toBeUndefined();
   });
+
+  it('ADMIN e DIRETORIA têm marketing write (galeria 034)', () => {
+    expect(defaultGrantsForSetor('ADMIN').marketing).toBe('write');
+    expect(defaultGrantsForSetor('DIRETORIA').marketing).toBe('write');
+    expect(defaultGrantsForSetor('SUPERVISOR').marketing).toBe('write');
+  });
 });

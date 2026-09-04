@@ -43,9 +43,11 @@ Implementação: `backend/src/policies/rbac.ts`
 ### Galeria (Spec 034)
 
 - CRUD: resource `marketing` (`/api/marketing/galeria`)  
+- Write: SUPERVISOR, ADMIN, DIRETORIA (incl. `maedesanto`), MARKETING  
 - Upload imagens: `marketing` **ou** `eventos` write (`authorizeAny`)  
 - Consumo interno `/api/galeria`: qualquer JWT autenticado  
 - Portal `/api/public/galeria`: só `PUBLICO` ao vivo  
+- Delegação: função **Comunicação** (`comunicacao`) — seed `--galeria-policies-034`  
 - ADR-012  
 
 ### Policies no cadastro (obrigatório operacional)

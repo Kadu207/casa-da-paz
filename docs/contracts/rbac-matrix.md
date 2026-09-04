@@ -39,7 +39,9 @@
 
 **MARKETING** publica eventos/conteúdo/galeria (`eventos`/`livraria`/`marketing` write; upload Cloudflare Images via `marketing` **ou** `eventos` write) mas **não** cadastra estoque (`estoque` só DIRETORIA/LIVRARIA/SUPERVISOR). Cadastro de livros: setor LIVRARIA.
 
-**Galeria (Spec 034):** CRUD em `/api/marketing/galeria` com resource `marketing`. Consumo interno `/api/galeria` e menu `/app/galeria` para **qualquer usuário autenticado**. Portal público `/public/galeria` só itens `PUBLICO` ao vivo.
+**Galeria (Spec 034):** CRUD em `/api/marketing/galeria` com resource `marketing`. Quem publica (write): **SUPERVISOR**, **ADMIN**, **DIRETORIA** (inclui login `maedesanto` — Mãe de Santo), **MARKETING**. Consumo interno `/api/galeria` e menu `/app/galeria` para qualquer JWT. Portal `/public/galeria` só `PUBLICO` ao vivo.
+
+**Delegação Comunicação:** função da casa `comunicacao` com responsáveis seed (mãe de santo, marketing01–04, diretoria/admin, supervisor). Refresh: `npx tsx prisma/seed.ts --galeria-policies-034`.
 
 **Estoque da Casa (`estoque_casa`):** almoxarifado primário (ADR-010). Write default: SUPERVISOR, ADMIN, DIRETORIA, TESOURARIA. \*MEDIUM: policy `write` para catálogo/movimentações; responsável de `GrupoLimpeza` ativo recebe **read** + checklist do próprio grupo (não write org-wide). Separado do estoque de venda da livraria.
 

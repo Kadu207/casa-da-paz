@@ -101,6 +101,9 @@ const matrix: Record<SetorAcesso, Partial<Record<Resource, PolicyGrant>>> = {
     manutencao: 'read',
     estoque_casa: 'write',
     delegacoes: 'write',
+    /** Galeria / marketing (Spec 034) — publicar fotos e vídeos */
+    marketing: 'write',
+    eventos: 'write',
   },
   DIRETORIA: {
     pessoas: 'write',
