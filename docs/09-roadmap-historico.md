@@ -16,6 +16,7 @@
 | Set/2026 | Auditoria F01–F10 remediada + smoke prod **GREEN** |
 | Set/2026 | **033 Delegações** (funções/tarefas/N8N) — ADR-011 |
 | Set/2026 | CSP mapa OSM no portal (“Onde nos encontrar”) |
+| Set/2026 | **034 Galeria de mídia** (YouTube + fotos, público/interno) — ADR-012 |
 
 ## 9.2. Estado atual
 
@@ -27,6 +28,7 @@ Ver [`.specify/memory/project-memory.md`](../.specify/memory/project-memory.md) 
 2. Ativar Asaas sandbox/produção **somente** com chave e confirmação  
 3. Controle de **ingressos/eventos** (032) — aguarda priorização  
 4. Next.js (016) — bloqueado por ADR-008 até aprovação  
+5. Operação: publicar conteúdo na galeria (canal YouTube + Marketing)  
 
 ## 9.4. Referência Lovable
 

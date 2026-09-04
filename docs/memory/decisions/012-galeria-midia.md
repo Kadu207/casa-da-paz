@@ -1,6 +1,6 @@
 # ADR-012 — Galeria de mídia (público vs interno)
 
-**Status:** Aceito | **Data:** 2026-09-04 | **Spec:** 034
+**Status:** Aceito e em produção | **Data:** 2026-09-04 | **Spec:** 034 | **Deploy:** `0638b6c`
 
 ## Contexto
 

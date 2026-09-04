@@ -15,8 +15,11 @@
 2. FE: `./scripts/build-frontend-on-vps.sh` **ou** build local + sync
 3. `cd infra`
 4. `CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh`
-5. Conferir UI: **Delegações** · Estoque · Financeiro → Patrocínios · Cadastros
-6. Seeds idempotentes (sem destroy):  
+5. `./scripts/compose-prod.sh exec -T backend npx prisma migrate deploy`
+6. Se nginx/CSP mudou: `./scripts/compose-prod.sh up -d --force-recreate frontend`
+7. Conferir UI: **Galeria** · Delegações · Estoque · Financeiro → Patrocínios · Cadastros  
+   APIs: `/health`, `/api/public/galeria`
+8. Seeds idempotentes (sem destroy):  
    `./scripts/compose-prod.sh exec backend npx tsx prisma/seed.ts --estoque-casa-only`  
    `./scripts/compose-prod.sh exec backend npx tsx prisma/seed.ts --funcoes-casa-only`  
    **Não** rodar seed completo destroy em produção.

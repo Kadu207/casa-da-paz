@@ -62,6 +62,7 @@ npm run dev
 - Patrocínios / padrinhos + mensalidade na lista de médiuns  
 - Estoque primário da casa (**031**)  
 - **Delegações / funções da casa (033)** — `/app/delegacoes`  
+- **Galeria de mídia (034)** — `/public/galeria` + `/app/galeria` (YouTube + fotos)  
 - Policies de acesso definidas **no cadastro** do usuário  
 - Asaas 021 opcional (dormant)  
 - Auditoria de segurança F01–F10 **GREEN**  

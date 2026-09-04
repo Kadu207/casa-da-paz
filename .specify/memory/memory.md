@@ -19,6 +19,7 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | [docs/memory/roadmap-cronograma.md](../../docs/memory/roadmap-cronograma.md) | Roadmap |
 | [docs/contracts/rbac-matrix.md](../../docs/contracts/rbac-matrix.md) | RBAC |
 | [docs/memory/playbooks/financeiro.md](../../docs/memory/playbooks/financeiro.md) | Ops tesouraria |
+| [docs/memory/playbooks/portal-publico.md](../../docs/memory/playbooks/portal-publico.md) | Portal + galeria |
 
 ## Agentes
 
@@ -27,27 +28,25 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | [agents.md](../../agents.md) | Construção + pós-operação |
 | [.cursor/skills/](../../.cursor/skills/) | Skills domínio + ops |
 
-## Specs tesouraria (sem Asaas)
+## Specs ativas (status)
 
 | Spec | Status |
 |------|--------|
-| 022-contas-a-pagar | ✅ Implementado |
-| 023-recorrencia-mensalidade | ✅ Implementado |
-| 024-dre-orcamento-centros | ✅ Implementado |
-| 025-conciliacao-ofx | ✅ Implementado |
-| Contribuintes (patrocínio/padrinho) | ✅ Implementado |
-| 020 policies no cadastro | ✅ Snapshot no POST usuários |
+| 022–025 tesouraria | ✅ Prod |
+| 026 contribuintes | ✅ Prod |
+| 020 policies no cadastro | ✅ Prod |
 | 021 Asaas | **Dormant** até chave |
-| 026 contribuintes | ✅ (spec dedicada) |
+| 027 materiais-estudo | ✅ Prod |
+| 030 security-hardening | ✅ Prod (+ CSP OSM/YouTube) |
 | 031 estoque-casa | ✅ Primário (ADR-010) |
-| 030 security-hardening | ✅ Fase 0–2 + CSP mapa OSM (2026-09-02) |
-| 033 delegacoes-casa | ✅ Prod (ADR-011) — N8N workflow importado |
-| 034 galeria-midia | 🚧 Repo pronto (ADR-012) — deploy pendente |
-| Auditoria F01–F10 | ✅ GREEN — [`docs/security-audit/ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
+| 033 delegacoes-casa | ✅ Prod (ADR-011) |
+| **034 galeria-midia** | ✅ Prod (ADR-012) — YouTube preferencial |
+| 032 ingressos | 📋 Stub |
+| Auditoria F01–F10 | ✅ GREEN |
 
 ## ADRs
 
-001–012 em `docs/memory/decisions/` — 002 (RBAC+policies), 009 Asaas opcional, **010 estoque primário**, **011 delegações**, **012 galeria mídia**.
+001–012 em `docs/memory/decisions/` — **012 galeria mídia** (público/interno + YouTube).
 
 ## Pendências vivas
 

@@ -49,7 +49,8 @@ flowchart LR
 | N8N | Alertas financeiros, agendamentos, **delegações (033)** |
 | Chatwoot | Atendimento WhatsApp (inbox Meta pendente polish) |
 | SMTP | E-mail via N8N (credencial `SMTP Casa da Paz` — configurar) |
-| Cloudflare Images | Upload portal (quando tokens presentes) |
+| Cloudflare Images | Upload de fotos (portal + galeria Marketing) |
+| YouTube | Embeds de vídeo na galeria (preferencial — ADR-012) |
 
 ## 2.3. Princípios (constitution)
 
@@ -61,3 +62,4 @@ flowchart LR
 6. Tesouraria **não depende** de Asaas
 7. Estoques separados: primário (casa) ≠ livraria/PDV ≠ ingressos futuros (ADR-010)
 8. Delegações (033) separadas do checklist de limpeza do estoque (ADR-011)
+9. Galeria (034): gate de descoberta na API; vídeos via YouTube embed (ADR-012)

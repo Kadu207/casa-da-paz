@@ -1,6 +1,6 @@
 # Cronograma — Casa da Paz
 
-**Atualizado:** 2026-09-02
+**Atualizado:** 2026-09-04
 
 ## Concluído
 
@@ -16,14 +16,16 @@
 | 022–025 tesouraria | AP, recorrência, DRE, OFX | ✅ Prod |
 | Contribuintes | Patrocínios / padrinhos | ✅ Prod |
 | 027 Materiais de estudo | Portal + Marketing | ✅ Prod |
-| 030 security | Hardening + CSP mapa OSM | ✅ Prod |
+| 030 security | Hardening + CSP OSM + YouTube/Vimeo | ✅ Prod |
 | **031 estoque casa** | Almoxarifado primário | ✅ Prod |
 | Auditoria F01–F10 | Remediação + smoke prod | ✅ **GREEN** |
 | **033 delegações** | Funções da casa + tarefas + N8N | ✅ Prod |
+| **034 galeria mídia** | Fotos CF + vídeos YouTube, público/interno | ✅ Prod |
 
 ## Sequência atual
 
 ```
+✅ 034 Galeria em produção
 ✅ 033 Delegações em produção
 ✅ Auditoria F01–F10 GREEN
     ↓
@@ -44,3 +46,4 @@
 | **2** | Spec 032 detalhada | Só quando priorizar ingressos |
 | **3** | Asaas sandbox | `asaas-dormant.md` gate |
 | **4** | SSH allowlist :65025 | Opcional |
+| Ops | Conteúdo galeria | Canal YouTube + 1º item via Marketing |

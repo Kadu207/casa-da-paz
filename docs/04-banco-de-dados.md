@@ -19,6 +19,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | Eventos | `Evento`, `Inscricao`, `Presenca` |
 | Estoque primário (031) | `ItemEstoqueCasa`, `MovimentacaoEstoqueCasa`, `GrupoLimpeza`, `ChecklistLimpeza`, `ChecklistLimpezaItem` |
 | Delegações (033) | `FuncaoCasa`, `FuncaoResponsavel`, `TarefaDelegacao` |
+| Galeria (034) | `MidiaPublicacao` (FOTO/VIDEO, PUBLICO/INTERNO, RASCUNHO/PUBLICADO) |
 | Livraria / ecommerce | `Produto`, `EstoqueMovimentacao`, `EcommercePedido` (venda — ADR-004) |
 | Portal | `AgendamentoPublico`, newsletter, consentimentos LGPD |
 | Ops | `Alerta` (inclui tipos `DELEGACAO_*`), auditoria, marketing |
@@ -43,6 +44,12 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 
 - `StatusTarefaDelegacao`: PENDENTE, CONCLUIDA, CANCELADA  
 
+### Galeria (034)
+
+- `TipoMidiaPublicacao`: FOTO, VIDEO  
+- `VisibilidadeMidia`: PUBLICO, INTERNO  
+- `StatusMidiaPublicacao`: RASCUNHO, PUBLICADO  
+
 ## 4.3. Regras de dados
 
 | Regra | Detalhe |
@@ -55,6 +62,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | Estoque mínimo (casa) | Derivado: `estoqueAtual <= estoqueMinimo` (não status persistido) |
 | Multi-estoque | Primário (`itens_estoque_casa`) ≠ livraria (`produtos`) — ADR-010 |
 | Delegações | Funções + tarefas checáveis; alertas `DELEGACAO_*` — ADR-011 |
+| Galeria | Ao vivo = PUBLICADO e (`publicadoEm` null ou ≤ now); público vs interno na API — ADR-012 |
 
 ## 4.4. Migrations recentes
 
@@ -66,6 +74,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | `20260820120000_estoque_casa_031` | Almoxarifado primário + grupos limpeza + checklist |
 | `20260901140000_usuario_deve_trocar_senha` | `Usuario.deveTrocarSenha` (F06) |
 | `20260902120000_delegacoes_casa_033` | Funções/tarefas + `Pessoa.email` |
+| `20260904120000_galeria_midia_034` | `midias_publicacao` + enums |
 
 ```bash
 cd backend

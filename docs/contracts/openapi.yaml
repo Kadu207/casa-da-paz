@@ -8,6 +8,7 @@ info:
     POST /auth/usuarios cria UsuarioPolicy (snapshot de grants) no ato do cadastro.
     Estoque primário (031): /estoque-casa/* — separado da livraria (ADR-010).
     Delegações (033): /delegacoes/* — funções, tarefas, sync-alertas (ADR-011).
+    Galeria (034): /public/galeria, /galeria, /marketing/galeria — YouTube preferencial (ADR-012).
 servers:
   - url: /api
 paths:

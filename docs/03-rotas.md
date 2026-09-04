@@ -69,6 +69,9 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | * | `/api/livraria` | PDV / produtos |
 | * | `/api/estoque-casa` | Estoque primário (itens, movimentações, grupos, checklists) |
 | * | `/api/delegacoes` | Funções, responsáveis, tarefas, toggle, sync-alertas, resumo |
+| * | `/api/marketing/galeria` | CRUD galeria (marketing) |
+| GET | `/api/galeria` | Consumo ERP (JWT — público + interno ao vivo) |
+| GET | `/api/public/galeria` | Galeria pública ao vivo |
 | * | `/api/public/*` | Portal anônimo |
 
 Contrato parcial: [`docs/contracts/openapi.yaml`](./contracts/openapi.yaml).

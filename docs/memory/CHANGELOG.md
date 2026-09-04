@@ -15,6 +15,7 @@
 - **Auditoria F01–F10:** Remediado/Validado 2026-09-02 — smoke prod PASS; ver `docs/security-audit/ACHADOS.md`
 
 ### Documentação
+- **Refresh 2026-09-04:** docs 00–09, README, roadmap, memória, playbook portal, OpenAPI/RBAC — Spec **034 Galeria** em produção
 - **Refresh 2026-09-02:** docs 00–09, README, roadmap, memória, ACHADOS F01–F10 GREEN, 033/delegações, CSP mapa OSM, smokes de auditoria
 - **Refresh 2026-08-06:** `docs/00–09`, README, roadmap, playbooks, constitution IX, specs 022–026 status, OpenAPI/RBAC alinhados à stack Express/Vite (Lovable movido para `docs/reference/lovable/`)
 - Cloudflare DNS + runbook firewall: smoke scripts e inventário secrets
