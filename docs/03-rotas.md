@@ -48,7 +48,7 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/app/estoque` | estoque_casa | Estoque primário da casa (insumos) |
 | `/app/ecommerce` | ecommerce | Pedidos |
 | `/app/marketing` | marketing | Marketing + materiais de estudo + galeria CRUD |
-| `/app/galeria` | (autenticado) | Consumo fotos/vídeos públicos e internos |
+| `/app/galeria` | (autenticado) | Consumo fotos/vídeos públicos e privados (+ filtro álbum) |
 | `/app/usuarios` | usuarios | Usuários + policies (SUPERVISOR) |
 | `/app/auditoria` | auditoria | Auditoria / export |
 
@@ -69,9 +69,11 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | * | `/api/livraria` | PDV / produtos |
 | * | `/api/estoque-casa` | Estoque primário (itens, movimentações, grupos, checklists) |
 | * | `/api/delegacoes` | Funções, responsáveis, tarefas, toggle, sync-alertas, resumo |
-| * | `/api/marketing/galeria` | CRUD galeria (marketing) |
-| GET | `/api/galeria` | Consumo ERP (JWT — público + interno ao vivo) |
+| * | `/api/marketing/galeria` | CRUD galeria + álbuns (marketing) |
+| GET | `/api/galeria` | Consumo ERP (JWT — público + privado ao vivo) |
+| GET | `/api/galeria/albuns` | Álbuns com itens ao vivo (JWT) |
 | GET | `/api/public/galeria` | Galeria pública ao vivo |
+| GET | `/api/public/galeria/albuns` | Álbuns com itens públicos ao vivo |
 | * | `/api/public/*` | Portal anônimo |
 
 Contrato parcial: [`docs/contracts/openapi.yaml`](./contracts/openapi.yaml).

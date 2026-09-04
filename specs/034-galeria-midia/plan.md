@@ -8,3 +8,5 @@
 6. CSP nginx YouTube/Vimeo
 7. OpenAPI + memória + validadores
 8. Deploy VPS sob confirmação
+9. `MidiaAlbum` + visibilidade `PRIVADO` (ex-INTERNO) + filtros UI
+10. Docs refresh PRIVADO/álbuns

@@ -40,13 +40,13 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 030 security-hardening | ✅ Prod (+ CSP OSM/YouTube) |
 | 031 estoque-casa | ✅ Primário (ADR-010) |
 | 033 delegacoes-casa | ✅ Prod (ADR-011) |
-| **034 galeria-midia** | ✅ Prod (ADR-012) — YouTube preferencial |
+| **034 galeria-midia** | ✅ Prod (ADR-012) — PUBLICO/PRIVADO + álbuns + YouTube |
 | 032 ingressos | 📋 Stub |
 | Auditoria F01–F10 | ✅ GREEN |
 
 ## ADRs
 
-001–012 em `docs/memory/decisions/` — **012 galeria mídia** (público/interno + YouTube).
+001–012 em `docs/memory/decisions/` — **012 galeria mídia** (PUBLICO/PRIVADO + álbuns + YouTube).
 
 ## Pendências vivas
 

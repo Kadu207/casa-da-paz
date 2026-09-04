@@ -16,11 +16,14 @@
 
 ## Galeria (034)
 
-1. MARKETING publica em ERP → Marketing → Galeria  
+1. MARKETING (ou Diretoria / Mãe de Santo / Supervisor / Admin) publica em ERP → **Marketing → Galeria**
 2. **Vídeo:** colar link YouTube (preferencial); prévia no formulário; thumb automática  
 3. **Foto:** upload Cloudflare Images  
-4. Visibilidade `PUBLICO` → aparece em `/public/galeria`; `INTERNO` → só `/app/galeria` (JWT)  
-5. `publicadoEm` opcional agenda o go-live  
+4. **Visibilidade:** `PUBLICO` → `/public/galeria`; `PRIVADO` → só `/app/galeria` (JWT)  
+5. **Álbum:** escolher ou criar (ex. *Batizado 2026*, *Festa dos Erês 2026*) — filtro na grade pública e no ERP  
+6. `publicadoEm` opcional agenda o go-live  
+
+APIs úteis: `GET /api/public/galeria`, `GET /api/public/galeria/albuns`, CRUD `/api/marketing/galeria` + `/api/marketing/galeria/albuns`.
 
 Canal YouTube da casa: hospeda o arquivo; o site só embute o player (CSP `youtube-nocookie`).
 

@@ -16,7 +16,7 @@
 | Set/2026 | Auditoria F01–F10 remediada + smoke prod **GREEN** |
 | Set/2026 | **033 Delegações** (funções/tarefas/N8N) — ADR-011 |
 | Set/2026 | CSP mapa OSM no portal (“Onde nos encontrar”) |
-| Set/2026 | **034 Galeria de mídia** (YouTube + fotos, público/interno) — ADR-012 |
+| Set/2026 | **034 Galeria de mídia** (YouTube + fotos, PUBLICO/PRIVADO + álbuns) — ADR-012 |
 
 ## 9.2. Estado atual
 

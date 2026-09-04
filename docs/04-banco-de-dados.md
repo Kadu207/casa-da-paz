@@ -63,7 +63,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | Estoque mínimo (casa) | Derivado: `estoqueAtual <= estoqueMinimo` (não status persistido) |
 | Multi-estoque | Primário (`itens_estoque_casa`) ≠ livraria (`produtos`) — ADR-010 |
 | Delegações | Funções + tarefas checáveis; alertas `DELEGACAO_*` — ADR-011 |
-| Galeria | Ao vivo = PUBLICADO e (`publicadoEm` null ou ≤ now); público vs interno na API — ADR-012 |
+| Galeria | Ao vivo = PUBLICADO e (`publicadoEm` null ou ≤ now); PUBLICO vs PRIVADO + álbum — ADR-012 |
 
 ## 4.4. Migrations recentes
 

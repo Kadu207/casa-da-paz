@@ -80,7 +80,8 @@ npx vitest run src/lib/video-url.test.ts src/lib/galeria-smoke.test.ts
 cd ..\frontend; npx tsc --noEmit
 ```
 
-Smoke prod galeria: `curl -s https://casadapaz.inovatitech.com.br/api/public/galeria`
+Smoke prod galeria: `curl -s https://casadapaz.inovatitech.com.br/api/public/galeria`  
+Álbuns públicos: `curl -s https://casadapaz.inovatitech.com.br/api/public/galeria/albuns`
 
 ## 8.6. Git dual
 

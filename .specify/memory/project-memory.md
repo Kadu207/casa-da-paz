@@ -6,17 +6,17 @@
 
 | Item | Status |
 |------|--------|
-| Fase | Pós-go-live estável: **034 Galeria** + 033 Delegações + 031 Estoque + 030 Security + auditoria F01–F10 GREEN |
+| Fase | Pós-go-live estável: **034 Galeria** (álbuns + PRIVADO) + 033 Delegações + 031 Estoque + 030 Security + auditoria F01–F10 GREEN |
 | Versão | 0.1.0-alpha |
-| Commit referência | Spec 034 `0638b6c` / docs refresh pós-034 |
+| Commit referência | Spec 034 álbuns/PRIVADO `32b9f22` + docs refresh |
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (Host `inovati`; **não** :22) |
 | Asaas (021) | **Dormant** — [`asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
 | Spec 032 ingressos | 📋 Stub — não implementar até priorizar |
 | Spec 033 delegações | ✅ Prod — migrate + seed funções + menu `/app/delegacoes` + N8N |
-| Spec 034 galeria | ✅ Prod — `/public/galeria`, `/app/galeria`, Marketing CRUD, YouTube embed, ADR-012 |
+| Spec 034 galeria | ✅ Prod — PUBLICO/PRIVADO, `MidiaAlbum`, YouTube, Marketing CRUD, ADR-012 |
 | Auditoria F01–F10 | ✅ **GREEN** — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
-| Mapa portal | ✅ CSP `frame-src` OSM |
+| Mapa portal | ✅ Google Maps embed + CSP (fallback estático) |
 | CSP mídia | ✅ YouTube / youtube-nocookie / Vimeo |
 
 ## Pendências operacionais (próxima onda)
@@ -27,6 +27,7 @@
 | 2 | Spec 032 | Ingressos — só com decisão explícita |
 | 3 | Asaas | Sandbox/prod com chave + confirmação |
 | 4 | SSH allowlist :65025 | Opcional |
+| Ops | Conteúdo galeria | Canal YouTube + 1º item via Marketing (álbum + Público/Privado) |
 
 ## Policies galeria (034)
 
@@ -36,7 +37,6 @@
 ```
 
 Logins cobertos: `admin`, `supervisor`, `admin.integracoes`, `maedesanto`, `marketing01`–`04`.
-
 
 ## Security — referência rápida
 
@@ -63,6 +63,7 @@ CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh
 ./scripts/compose-prod.sh up -d --force-recreate frontend   # se CSP/nginx mudou
 curl -s http://127.0.0.1:9080/health
 curl -s http://127.0.0.1:9080/api/public/galeria
+curl -s http://127.0.0.1:9080/api/public/galeria/albuns
 ```
 
 **Gate:** nunca `deploy.sh` sem confirmação explícita.

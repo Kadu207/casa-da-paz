@@ -45,6 +45,6 @@ Material legado do protótipo Lovable/Supabase (não é a stack de produção):
 
 **Stack canônica:** React/Vite/TS + Express/Prisma/PostgreSQL + Python IA + Chatwoot/N8N + Docker/Nginx/Hetzner/Cloudflare  
 
-**Última feature em prod:** Spec **034 Galeria** (YouTube + fotos) — ADR-012 · commit `0638b6c`  
+**Última feature em prod:** Spec **034 Galeria** (PUBLICO/PRIVADO + álbuns + YouTube) — ADR-012 · commit `32b9f22`  
 
 **Endereço físico:** Rua Valério Eugênio, 570 — Bairro Areal — Conselheiro Lafaiete - MG

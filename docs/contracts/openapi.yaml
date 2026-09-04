@@ -8,7 +8,7 @@ info:
     POST /auth/usuarios cria UsuarioPolicy (snapshot de grants) no ato do cadastro.
     Estoque primário (031): /estoque-casa/* — separado da livraria (ADR-010).
     Delegações (033): /delegacoes/* — funções, tarefas, sync-alertas (ADR-011).
-    Galeria (034): /public/galeria, /galeria, /marketing/galeria — YouTube preferencial (ADR-012).
+    Galeria (034): /public/galeria, /galeria, /marketing/galeria (+ albuns) — PUBLICO/PRIVADO + YouTube (ADR-012).
 servers:
   - url: /api
 paths:
@@ -224,7 +224,14 @@ paths:
       summary: CRUD listagem galeria (marketing)
     post:
       security: [{ bearerAuth: [] }]
-      summary: Criar foto/vídeo (marketing write)
+      summary: Criar foto/vídeo (PUBLICO|PRIVADO + albumId opcional)
+  /marketing/galeria/albuns:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Listar álbuns (marketing)
+    post:
+      security: [{ bearerAuth: [] }]
+      summary: Criar álbum (ex. Batizado 2026)
   /marketing/galeria/{id}:
     patch:
       security: [{ bearerAuth: [] }]
@@ -234,13 +241,20 @@ paths:
   /galeria:
     get:
       security: [{ bearerAuth: [] }]
-      summary: Público + interno ao vivo (JWT)
+      summary: PUBLICO + PRIVADO ao vivo (JWT); query albumId opcional
+  /galeria/albuns:
+    get:
+      security: [{ bearerAuth: [] }]
+      summary: Álbuns com itens ao vivo (JWT)
   /galeria/{slug}:
     get:
       security: [{ bearerAuth: [] }]
   /public/galeria:
     get:
-      summary: Galeria pública ao vivo
+      summary: Galeria pública ao vivo; query albumId opcional
+  /public/galeria/albuns:
+    get:
+      summary: Álbuns com itens PUBLICO ao vivo
   /public/galeria/{slug}:
     get:
       summary: Detalhe público

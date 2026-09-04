@@ -20,7 +20,7 @@
 | **031 estoque casa** | Almoxarifado primário | ✅ Prod |
 | Auditoria F01–F10 | Remediação + smoke prod | ✅ **GREEN** |
 | **033 delegações** | Funções da casa + tarefas + N8N | ✅ Prod |
-| **034 galeria mídia** | Fotos CF + vídeos YouTube, público/interno | ✅ Prod |
+| **034 galeria mídia** | Fotos CF + vídeos YouTube, PUBLICO/PRIVADO + álbuns | ✅ Prod |
 
 ## Sequência atual
 

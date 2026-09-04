@@ -3,8 +3,9 @@
 ## [Unreleased]
 
 ### Adicionado
+- **034 Galeria álbuns + PRIVADO:** model `MidiaAlbum`; visibilidade canônica `PUBLICO`/`PRIVADO` (alias `INTERNO`); filtro por álbum no portal/ERP; Marketing cria álbum (ex. Batizado 2026) — **deploy** `32b9f22` 2026-09-04
 - **034 Galeria policies:** ADMIN com `marketing` write; seed `--galeria-policies-034` (policies + função Comunicação: mãe de santo, marketing, diretoria, supervisor, admin)
-- **034 Galeria de mídia:** portal `/public/galeria`, ERP `/app/galeria`, CRUD Marketing, model `MidiaPublicacao` (PUBLICO/INTERNO + agendamento), vídeos **YouTube** (preferencial; Vimeo ok), thumb automática YouTube, prévia embed no admin, fotos Cloudflare Images, CSP embeds (ADR-012) — **deploy VPS** `0638b6c` 2026-09-04
+- **034 Galeria de mídia:** portal `/public/galeria`, ERP `/app/galeria`, CRUD Marketing, model `MidiaPublicacao` (PUBLICO/PRIVADO + agendamento + álbum), vídeos **YouTube** (preferencial; Vimeo ok), thumb automática YouTube, prévia embed no admin, fotos Cloudflare Images, CSP embeds (ADR-012) — **deploy VPS** `0638b6c` / álbuns `32b9f22` 2026-09-04
 - **033 Delegações / Funções da Casa:** menu `/app/delegacoes`, API `/api/delegacoes`, modelos `FuncaoCasa`/`TarefaDelegacao`, `Pessoa.email`, RBAC `delegacoes`, N8N `tarefa_delegacao` + `sync-alertas` (ADR-011) — **deploy VPS** `2975b46` (migrate + seed funções + rebuild BE/FE) 2026-09-02
 - **030 Security hardening:** Helmet/CSP API, magic bytes em uploads (media/OFX/Excel), rate-limit `/api`, smoke bypass `:9080`, `check-prod-secrets.sh`, Spec 030 (spec/plan/tasks), skill `agent-security-ops` checklist datado
 - **031 Estoque primário da Casa:** menu `/app/estoque`, API `/api/estoque-casa`, catálogo seedado (ritualística/limpeza), estoque mínimo/alertas, grupos de limpeza + checklist com baixas, RBAC `estoque_casa` (ADR-010) — separado da Livraria/PDV
@@ -16,13 +17,14 @@
 - **Auditoria F01–F10:** Remediado/Validado 2026-09-02 — smoke prod PASS; ver `docs/security-audit/ACHADOS.md`
 
 ### Documentação
+- **Refresh 2026-09-04 (álbuns/PRIVADO):** ADR-012, spec 034, playbook portal, OpenAPI/RBAC, docs 01–07/09, agents, memória — alinhado a `MidiaAlbum` + `PRIVADO`
 - **Refresh 2026-09-04:** docs 00–09, README, roadmap, memória, playbook portal, OpenAPI/RBAC — Spec **034 Galeria** em produção
 - **Refresh 2026-09-02:** docs 00–09, README, roadmap, memória, ACHADOS F01–F10 GREEN, 033/delegações, CSP mapa OSM, smokes de auditoria
 - **Refresh 2026-08-06:** `docs/00–09`, README, roadmap, playbooks, constitution IX, specs 022–026 status, OpenAPI/RBAC alinhados à stack Express/Vite (Lovable movido para `docs/reference/lovable/`)
 - Cloudflare DNS + runbook firewall: smoke scripts e inventário secrets
 
 ### Corrigido
-- **Mapa “Onde nos encontrar”:** CSP nginx `frame-src` para OpenStreetMap (bloqueio de iframe) — 2026-09-02
+- **Mapa “Onde nos encontrar”:** embed Google Maps + CSP (OSM bloqueado no browser) — 2026-09-04 `c3c1fa2`
 - **Auditoria F01–F10:** remediações P1/P2/P3 + smoke prod PASS — 2026-09-02
 
 ### Validado

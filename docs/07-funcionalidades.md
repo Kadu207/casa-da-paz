@@ -5,7 +5,7 @@
 - Home institucional, eventos, agendamento com protocolo, contato, termos LGPD  
 - Livraria / checkout (Asaas se `ASAAS_API_KEY`; senão fluxo sem PSP)  
 - **Materiais de estudo** (`/public/estudos`): ervas, banhos, defumação — edição via Marketing  
-- **Galeria** (`/public/galeria`): fotos e vídeos YouTube estilo grade; público vs interno (Spec 034)  
+- **Galeria** (`/public/galeria`): fotos e vídeos YouTube estilo grade; público vs privado + álbuns (Spec 034)  
 - Newsletter e consentimentos  
 
 ## 7.2. Cadastros (`/app/pessoas`)
@@ -42,13 +42,13 @@ Campo opcional **e-mail** (`Pessoa.email`) — usado em alertas de delegações.
 |--------|-----------|
 | Dashboard | KPIs por período; painel próprio para MEDIUM |
 | **Delegações** | Funções da casa (`/app/delegacoes`): responsáveis, tarefas com check, alertas e-mail/WhatsApp via N8N |
-| **Galeria** | Consumo interno (`/app/galeria`): itens públicos + internos ao vivo |
+| **Galeria** | Consumo ERP (`/app/galeria`): itens públicos + privados ao vivo; filtro por álbum |
 | Recepção | Check-in / presença |
 | Eventos | Gestão + inscrições |
 | **Estoque** | Almoxarifado **primário** (`/app/estoque`): itens, mínimo/alertas, grupos de limpeza, checklist, relatório |
 | Livraria | PDV e estoque de **venda** (produtos) |
 | Ecommerce | Pedidos |
-| Marketing | Conteúdo, materiais de estudo e **galeria** (fotos/vídeos YouTube) |
+| Marketing | Conteúdo, materiais de estudo e **galeria** (fotos/vídeos YouTube, Público/Privado, álbuns) |
 | Usuários | SUPERVISOR: criar com policies no ato |
 | Auditoria | Filtros + export CSV/PDF |
 
@@ -76,5 +76,5 @@ Campo opcional **e-mail** (`Pessoa.email`) — usado em alertas de delegações.
 | **031 Estoque primário da casa** | ✅ |
 | 032 Ingressos/eventos | 📋 Stub — não implementar ainda |
 | **033 Delegações / funções da casa** | ✅ |
-| **034 Galeria de mídia** | ✅ (YouTube preferencial; público/interno) |
+| **034 Galeria de mídia** | ✅ (YouTube; PUBLICO/PRIVADO + álbuns — ADR-012) |
 | Auditoria F01–F10 | ✅ GREEN |

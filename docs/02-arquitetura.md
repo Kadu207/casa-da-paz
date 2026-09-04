@@ -51,6 +51,7 @@ flowchart LR
 | SMTP | E-mail via N8N (credencial `SMTP Casa da Paz` — configurar) |
 | Cloudflare Images | Upload de fotos (portal + galeria Marketing) |
 | YouTube | Embeds de vídeo na galeria (preferencial — ADR-012) |
+| Álbuns de mídia | `MidiaAlbum` — referência temática (Batizado 2026, etc.) |
 
 ## 2.3. Princípios (constitution)
 

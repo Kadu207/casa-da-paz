@@ -45,8 +45,10 @@ Implementação: `backend/src/policies/rbac.ts`
 - CRUD: resource `marketing` (`/api/marketing/galeria`)  
 - Write: SUPERVISOR, ADMIN, DIRETORIA (incl. `maedesanto`), MARKETING  
 - Upload imagens: `marketing` **ou** `eventos` write (`authorizeAny`)  
-- Consumo interno `/api/galeria`: qualquer JWT autenticado  
+- Consumo ERP `/api/galeria`: qualquer JWT (PUBLICO + PRIVADO ao vivo)  
 - Portal `/api/public/galeria`: só `PUBLICO` ao vivo  
+- Álbuns: `MidiaAlbum`; filtros em public/ERP/marketing  
+- Visibilidade canônica: `PUBLICO` \| `PRIVADO` (alias API `INTERNO` → `PRIVADO`)  
 - Delegação: função **Comunicação** (`comunicacao`) — seed `--galeria-policies-034`  
 - ADR-012  
 
