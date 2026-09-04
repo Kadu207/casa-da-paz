@@ -1,6 +1,6 @@
 # Feature 034 — Galeria de mídia (fotos e vídeos)
 
-**Status:** ✅ Implementado no repo (deploy VPS pendente) | **Atualizado:** 2026-09-04
+**Status:** ✅ Produção (`0638b6c`) | **Atualizado:** 2026-09-04
 
 ## Objetivo
 

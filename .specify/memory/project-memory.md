@@ -14,7 +14,7 @@
 | Asaas (021) | **Dormant** — [`asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
 | Spec 032 ingressos | 📋 Stub — não implementar até priorizar |
 | Spec 033 delegações | ✅ Prod — migrate + seed funções + menu `/app/delegacoes` + N8N workflow importado |
-| Spec 034 galeria | 🚧 Implementado no repo — **deploy VPS pendente confirmação** |
+| Spec 034 galeria | ✅ Prod `0638b6c` — migrate + rebuild BE/FE + CSP YouTube |
 | Auditoria F01–F10 | ✅ **GREEN** Remediado/Validado — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
 | Mapa portal | ✅ CSP `frame-src` OSM — “Onde nos encontrar” OK |
 | Security 030 | ✅ Fase 0–2 + CSP mapa |
@@ -23,7 +23,7 @@
 
 | Prioridade | Item | Notas |
 |------------|------|-------|
-| 0 | Spec 034 Galeria | Deploy migrate + rebuild BE/FE + nginx CSP YouTube/Vimeo |
+| 0 | Spec 034 Galeria | ✅ Deployed — publicar 1º vídeo via Marketing |
 | 1 | Mensageria polish | SMTP N8N (`SMTP Casa da Paz`); inbox WhatsApp Meta; Chatwoot público **502** |
 | 2 | Spec 032 | Ingressos — só com decisão explícita |
 | 3 | Asaas | Sandbox/prod com chave + confirmação |

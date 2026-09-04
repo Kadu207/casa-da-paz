@@ -10,22 +10,22 @@
 - [x] CSP frame-src YouTube/Vimeo
 - [x] OpenAPI + memória + CHANGELOG
 - [x] Validadores V1/V2
-- [ ] Deploy VPS (gate humano)
+- [x] Deploy VPS (migrate + rebuild + CSP) — 2026-09-04 `0638b6c`
 
 ## Validação V1 (integração) — 2026-09-04
 
 | Check | OK | Ref |
 |-------|----|-----|
 | Rotas Express ↔ FE | ✅ | `galeria.ts` ↔ PublicGaleria / GaleriaPage / MarketingPage |
-| Prisma ↔ migration | ✅ | `20260904120000_galeria_midia_034` |
+| Prisma ↔ migration | ✅ | `20260904120000_galeria_midia_034` applied prod |
 | RBAC matrix ↔ policies | ✅ | `marketing` CRUD; `authorizeAny(['marketing','eventos'])` media |
-| CSP embeds | ✅ | nginx `frame-src` YouTube/Vimeo |
+| CSP embeds | ✅ | prod CSP inclui youtube-nocookie + vimeo |
 
 ## Validação V2 (qualidade) — 2026-09-04
 
 | Check | OK |
 |-------|----|
 | Constitution (RBAC backend, deploy gate) | ✅ |
-| Vitest video-url + FE/BE tsc | ✅ |
+| Vitest video-url + smoke + FE/BE tsc | ✅ |
 | Docs / ADR-012 / CHANGELOG | ✅ |
-| Deploy VPS | ⏸ Aguarda confirmação do usuário |
+| Deploy VPS | ✅ health + `GET /api/public/galeria` → `[]` |
