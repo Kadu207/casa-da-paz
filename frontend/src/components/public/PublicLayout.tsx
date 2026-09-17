@@ -92,6 +92,9 @@ export function PublicLayout({
               <Link to="/public/galeria" className="block hover:text-primary">
                 {t('nav.gallery')}
               </Link>
+              <Link to="/public/historia" className="block hover:text-primary">
+                {t('nav.history')}
+              </Link>
               <Link to="/public/contato" className="block hover:text-primary">
                 {t('nav.contact')}
               </Link>

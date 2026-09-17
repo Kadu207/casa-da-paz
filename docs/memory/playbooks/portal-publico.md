@@ -11,6 +11,7 @@
 | `/public/estudos` | Materiais de estudo (ervas/banhos) |
 | `/public/galeria` | **Galeria** fotos e vídeos públicos (Spec 034) |
 | `/public/galeria/:slug` | Detalhe / player YouTube embutido |
+| `/public/historia` | **Nossa história** (marcos 2015/2026 + texto completo editável) |
 | `/public/livraria` | Checkout |
 | `/public/termos` | LGPD |
 

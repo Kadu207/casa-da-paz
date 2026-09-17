@@ -35,6 +35,7 @@ import PublicEstudoDetalhe from './pages/public/PublicEstudoDetalhe';
 import PublicGaleria from './pages/public/PublicGaleria';
 import PublicGaleriaDetalhe from './pages/public/PublicGaleriaDetalhe';
 import PublicTermos from './pages/public/PublicTermos';
+import PublicHistoria from './pages/public/PublicHistoria';
 import EcommerceAdminPage from './pages/EcommerceAdminPage';
 import AuditoriaPage from './pages/AuditoriaPage';
 import AlertasPage from './pages/AlertasPage';
@@ -76,6 +77,7 @@ export default function App() {
       <Route path="/public/galeria" element={<PublicGaleria />} />
       <Route path="/public/galeria/:slug" element={<PublicGaleriaDetalhe />} />
       <Route path="/public/termos" element={<PublicTermos />} />
+      <Route path="/public/historia" element={<PublicHistoria />} />
       <Route path="/public/acompanhar/:protocolo" element={<PublicAcompanhar />} />
       {/* aliases Lovable → rotas canônicas */}
       <Route path="/" element={<Navigate to="/public" replace />} />

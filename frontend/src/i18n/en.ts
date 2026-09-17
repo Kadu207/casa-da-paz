@@ -9,6 +9,7 @@ export const en: Record<PortalTranslationKey, string> = {
   'nav.shop': 'Bookstore',
   'nav.studies': 'Herbs & baths',
   'nav.gallery': 'Gallery',
+  'nav.history': 'Our story',
   'site.documentTitle': 'Welcome to Casa da Paz',
   'home.title': 'Welcome to Casa da Paz',
   'home.subtitle':
@@ -22,6 +23,7 @@ export const en: Record<PortalTranslationKey, string> = {
   'home.cta.shop': 'Bookstore',
   'home.cta.studies': 'Herbs, baths & study',
   'home.cta.studiesOpen': 'Open study materials',
+  'home.cta.history': 'Our story',
   'home.studies.text':
     'Public content on sacred herbs, baths, smoke cleansing and tradition — curated by the communications team.',
   'home.shop.title': 'Casa da Paz Bookstore',
@@ -219,4 +221,25 @@ export const en: Record<PortalTranslationKey, string> = {
   'gallery.back': 'Gallery',
   'gallery.loading': 'Loading…',
   'gallery.noMedia': 'Media unavailable.',
+  'historia.eyebrow': 'Living memory',
+  'historia.title': 'Our story',
+  'historia.lead':
+    'Everything began on 26 September 2015. On 26 September 2026 we celebrate 11 years since the beginning and 10 years since Casa da Paz was registered.',
+  'historia.m1.year': '26 September 2015',
+  'historia.m1.title': 'The beginning',
+  'historia.m1.text':
+    'On this day the path of Casa da Paz began — a journey of faith, welcome and Umbanda tradition.',
+  'historia.m2.year': 'House registration',
+  'historia.m2.title': '10 years registered (in 2026)',
+  'historia.m2.text':
+    'Casa da Paz was formally registered; in 2026 we complete a decade of that institutional milestone.',
+  'historia.m3.year': '26 September 2026',
+  'historia.m3.title': '11 years since the start · 10 years registered',
+  'historia.m3.text':
+    'Together we celebrate the maturity of the house: eleven years from the first step and ten years since registration.',
+  'historia.bodyTitle': 'Full story',
+  'historia.bodyHint':
+    'Space reserved for the full narrative. The team can update this text at any time.',
+  'historia.body':
+    'The complete story of Casa da Paz will be published here — origins, people, giras, challenges and joys that built our community.\n\n(Coming soon.)',
 };

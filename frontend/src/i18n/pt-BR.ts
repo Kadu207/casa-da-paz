@@ -7,6 +7,7 @@ export const ptBR = {
   'nav.shop': 'Livraria',
   'nav.studies': 'Ervas & banhos',
   'nav.gallery': 'Galeria',
+  'nav.history': 'Nossa história',
   'site.documentTitle': 'Bem vindo a Casa da Paz',
   'home.title': 'Bem vindo a Casa da Paz',
   'home.subtitle':
@@ -20,6 +21,7 @@ export const ptBR = {
   'home.cta.shop': 'Livraria',
   'home.cta.studies': 'Ervas, banhos e estudos',
   'home.cta.studiesOpen': 'Abrir materiais de estudo',
+  'home.cta.history': 'Nossa história',
   'home.studies.text':
     'Conteúdo público sobre ervas sagradas, banhos, defumação e saberes da tradição — preparado pela equipe de comunicação.',
   'home.shop.title': 'Livraria Casa da Paz',
@@ -217,6 +219,27 @@ export const ptBR = {
   'gallery.back': 'Galeria',
   'gallery.loading': 'Carregando…',
   'gallery.noMedia': 'Mídia indisponível.',
+  'historia.eyebrow': 'Memória viva',
+  'historia.title': 'Nossa história',
+  'historia.lead':
+    'No dia 26 de setembro de 2015 começou tudo. Em 26 de setembro de 2026 celebramos 11 anos de início e 10 anos de registro da Casa da Paz.',
+  'historia.m1.year': '26 de setembro de 2015',
+  'historia.m1.title': 'O começo',
+  'historia.m1.text':
+    'Nesta data nasceu o caminho da Casa da Paz — o início de uma trajetória de fé, acolhimento e tradição umbandista.',
+  'historia.m2.year': 'Registro da Casa',
+  'historia.m2.title': '10 anos de registro (em 2026)',
+  'historia.m2.text':
+    'A Casa da Paz foi formalmente registrada; em 2026 completamos uma década desse marco institucional.',
+  'historia.m3.year': '26 de setembro de 2026',
+  'historia.m3.title': '11 anos de início · 10 anos de registro',
+  'historia.m3.text':
+    'Celebramos juntos a maturidade da casa: onze anos desde o primeiro passo e dez anos desde o registro.',
+  'historia.bodyTitle': 'História completa',
+  'historia.bodyHint':
+    'Espaço reservado para a narrativa completa. A equipe pode atualizar este texto a qualquer momento.',
+  'historia.body':
+    'Aqui será publicada a história completa da Casa da Paz — origens, pessoas, giras, desafios e alegrias que construíram nossa comunidade.\n\n(Em breve.)',
 } as const;
 
 export type PortalTranslationKey = keyof typeof ptBR;

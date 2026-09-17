@@ -6,6 +6,7 @@
 - Livraria / checkout (Asaas se `ASAAS_API_KEY`; senão fluxo sem PSP)  
 - **Materiais de estudo** (`/public/estudos`): ervas, banhos, defumação — edição via Marketing  
 - **Galeria** (`/public/galeria`): fotos e vídeos YouTube estilo grade; público vs privado + álbuns (Spec 034)  
+- **Nossa história** (`/public/historia`): marcos 26/09/2015 e 26/09/2026 + espaço para narrativa completa  
 - Newsletter e consentimentos  
 
 ## 7.2. Cadastros (`/app/pessoas`)

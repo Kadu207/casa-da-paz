@@ -18,6 +18,7 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/public/estudos/:slug` | Detalhe do material |
 | `/public/galeria` | Galeria pública de fotos e vídeos (Spec 034) |
 | `/public/galeria/:slug` | Detalhe da mídia pública |
+| `/public/historia` | Nossa história (marcos + narrativa completa) |
 | `/public/termos` | Termos / LGPD |
 
 ## 3.2. ERP (`/app`)
