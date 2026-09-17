@@ -81,7 +81,8 @@ cd ..\frontend; npx tsc --noEmit
 ```
 
 Smoke prod galeria: `curl -s https://casadapaz.inovatitech.com.br/api/public/galeria`  
-Álbuns públicos: `curl -s https://casadapaz.inovatitech.com.br/api/public/galeria/albuns`
+Álbuns públicos: `curl -s https://casadapaz.inovatitech.com.br/api/public/galeria/albuns`  
+Nossa história: `curl -s -o /dev/null -w '%{http_code}\n' https://casadapaz.inovatitech.com.br/public/historia`
 
 ## 8.6. Git dual
 

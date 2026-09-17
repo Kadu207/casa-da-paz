@@ -78,4 +78,5 @@ Campo opcional **e-mail** (`Pessoa.email`) — usado em alertas de delegações.
 | 032 Ingressos/eventos | 📋 Stub — não implementar ainda |
 | **033 Delegações / funções da casa** | ✅ |
 | **034 Galeria de mídia** | ✅ (YouTube; PUBLICO/PRIVADO + álbuns — ADR-012) |
+| Portal **Nossa história** | ✅ `/public/historia` (`b75f5c2`) |
 | Auditoria F01–F10 | ✅ GREEN |

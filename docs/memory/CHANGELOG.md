@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Adicionado
+- **Portal Nossa história:** botão na home + `/public/historia` (marcos 26/09/2015; 11 anos de início e 10 de registro em 26/09/2026; espaço `historia.body` em i18n) — **deploy VPS** `b75f5c2` 2026-09-17
 - **034 Galeria álbuns + PRIVADO:** model `MidiaAlbum`; visibilidade canônica `PUBLICO`/`PRIVADO` (alias `INTERNO`); filtro por álbum no portal/ERP; Marketing cria álbum (ex. Batizado 2026) — **deploy** `32b9f22` 2026-09-04
 - **034 Galeria policies:** ADMIN com `marketing` write; seed `--galeria-policies-034` (policies + função Comunicação: mãe de santo, marketing, diretoria, supervisor, admin)
 - **034 Galeria de mídia:** portal `/public/galeria`, ERP `/app/galeria`, CRUD Marketing, model `MidiaPublicacao` (PUBLICO/PRIVADO + agendamento + álbum), vídeos **YouTube** (preferencial; Vimeo ok), thumb automática YouTube, prévia embed no admin, fotos Cloudflare Images, CSP embeds (ADR-012) — **deploy VPS** `0638b6c` / álbuns `32b9f22` 2026-09-04
@@ -17,6 +18,7 @@
 - **Auditoria F01–F10:** Remediado/Validado 2026-09-02 — smoke prod PASS; ver `docs/security-audit/ACHADOS.md`
 
 ### Documentação
+- **Refresh 2026-09-17:** docs 00–03/07–09, README, roadmap, playbook portal, agents, memória — **Nossa história** em produção
 - **Refresh 2026-09-04 (álbuns/PRIVADO):** ADR-012, spec 034, playbook portal, OpenAPI/RBAC, docs 01–07/09, agents, memória — alinhado a `MidiaAlbum` + `PRIVADO`
 - **Refresh 2026-09-04:** docs 00–09, README, roadmap, memória, playbook portal, OpenAPI/RBAC — Spec **034 Galeria** em produção
 - **Refresh 2026-09-02:** docs 00–09, README, roadmap, memória, ACHADOS F01–F10 GREEN, 033/delegações, CSP mapa OSM, smokes de auditoria

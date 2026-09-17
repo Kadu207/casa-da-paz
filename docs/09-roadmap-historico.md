@@ -17,6 +17,7 @@
 | Set/2026 | **033 Delegações** (funções/tarefas/N8N) — ADR-011 |
 | Set/2026 | CSP mapa OSM no portal (“Onde nos encontrar”) |
 | Set/2026 | **034 Galeria de mídia** (YouTube + fotos, PUBLICO/PRIVADO + álbuns) — ADR-012 |
+| Set/2026 | Portal **Nossa história** (`/public/historia`) — marcos 2015/2026 · deploy `b75f5c2` |
 
 ## 9.2. Estado atual
 
@@ -29,6 +30,7 @@ Ver [`.specify/memory/project-memory.md`](../.specify/memory/project-memory.md) 
 3. Controle de **ingressos/eventos** (032) — aguarda priorização  
 4. Next.js (016) — bloqueado por ADR-008 até aprovação  
 5. Operação: publicar conteúdo na galeria (canal YouTube + Marketing)  
+6. Operação: completar narrativa em `historia.body` (i18n)  
 
 ## 9.4. Referência Lovable
 

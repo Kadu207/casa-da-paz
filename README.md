@@ -63,6 +63,7 @@ npm run dev
 - Estoque primário da casa (**031**)  
 - **Delegações / funções da casa (033)** — `/app/delegacoes`  
 - **Galeria de mídia (034)** — `/public/galeria` + `/app/galeria` (YouTube + fotos, PUBLICO/PRIVADO, álbuns)  
+- **Nossa história** — `/public/historia` (marcos 26/09/2015 · 11/10 anos em 2026; texto em i18n)  
 - Policies de acesso definidas **no cadastro** do usuário  
 - Asaas 021 opcional (dormant)  
 - Auditoria de segurança F01–F10 **GREEN**  

@@ -1,6 +1,6 @@
 # Cronograma — Casa da Paz
 
-**Atualizado:** 2026-09-04
+**Atualizado:** 2026-09-17
 
 ## Concluído
 
@@ -21,10 +21,12 @@
 | Auditoria F01–F10 | Remediação + smoke prod | ✅ **GREEN** |
 | **033 delegações** | Funções da casa + tarefas + N8N | ✅ Prod |
 | **034 galeria mídia** | Fotos CF + vídeos YouTube, PUBLICO/PRIVADO + álbuns | ✅ Prod |
+| **Portal Nossa história** | `/public/historia` — marcos 2015/2026 + espaço narrativa | ✅ Prod |
 
 ## Sequência atual
 
 ```
+✅ Nossa história em produção (b75f5c2)
 ✅ 034 Galeria em produção
 ✅ 033 Delegações em produção
 ✅ Auditoria F01–F10 GREEN
@@ -47,3 +49,4 @@
 | **3** | Asaas sandbox | `asaas-dormant.md` gate |
 | **4** | SSH allowlist :65025 | Opcional |
 | Ops | Conteúdo galeria | Canal YouTube + 1º item via Marketing |
+| Ops | Narrativa história | Completar `historia.body` (pt-BR / en) |

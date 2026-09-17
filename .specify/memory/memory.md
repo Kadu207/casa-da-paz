@@ -19,7 +19,7 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | [docs/memory/roadmap-cronograma.md](../../docs/memory/roadmap-cronograma.md) | Roadmap |
 | [docs/contracts/rbac-matrix.md](../../docs/contracts/rbac-matrix.md) | RBAC |
 | [docs/memory/playbooks/financeiro.md](../../docs/memory/playbooks/financeiro.md) | Ops tesouraria |
-| [docs/memory/playbooks/portal-publico.md](../../docs/memory/playbooks/portal-publico.md) | Portal + galeria |
+| [docs/memory/playbooks/portal-publico.md](../../docs/memory/playbooks/portal-publico.md) | Portal + galeria + história |
 
 ## Agentes
 
@@ -41,6 +41,7 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 031 estoque-casa | ✅ Primário (ADR-010) |
 | 033 delegacoes-casa | ✅ Prod (ADR-011) |
 | **034 galeria-midia** | ✅ Prod (ADR-012) — PUBLICO/PRIVADO + álbuns + YouTube |
+| Portal Nossa história | ✅ Prod — `/public/historia` (`b75f5c2`) |
 | 032 ingressos | 📋 Stub |
 | Auditoria F01–F10 | ✅ GREEN |
 

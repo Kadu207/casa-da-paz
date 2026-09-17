@@ -11,9 +11,19 @@
 | `/public/estudos` | Materiais de estudo (ervas/banhos) |
 | `/public/galeria` | **Galeria** fotos e vídeos públicos (Spec 034) |
 | `/public/galeria/:slug` | Detalhe / player YouTube embutido |
-| `/public/historia` | **Nossa história** (marcos 2015/2026 + texto completo editável) |
+| `/public/historia` | **Nossa história** (marcos 2015/2026 + narrativa completa) |
 | `/public/livraria` | Checkout |
 | `/public/termos` | LGPD |
+
+## Nossa história
+
+1. Botão **Nossa história** na home e link no rodapé → `/public/historia`
+2. Marcos fixos na UI: início **26/09/2015**; em **26/09/2026** — 11 anos de início e 10 anos de registro
+3. **Narrativa completa:** editar chave i18n `historia.body` em:
+   - `frontend/src/i18n/pt-BR.ts`
+   - `frontend/src/i18n/en.ts`
+4. Após editar o texto: build FE + deploy (ou `build-frontend-on-vps.sh` + restart frontend)
+5. Componente: `frontend/src/pages/public/PublicHistoria.tsx`
 
 ## Galeria (034)
 
@@ -38,5 +48,6 @@ Canal YouTube da casa: hospeda o arquivo; o site só embute o player (CSP `youtu
 ## Manutenção
 
 - Textos institucionais: `PublicHome.tsx`  
+- História completa: i18n `historia.*`  
 - Token Chatwoot: `VITE_CHATWOOT_WEBSITE_TOKEN` no frontend  
-- ADR: [`012-galeria-midia.md`](../decisions/012-galeria-midia.md)  
+- ADR galeria: [`012-galeria-midia.md`](../decisions/012-galeria-midia.md)  

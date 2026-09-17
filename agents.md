@@ -45,6 +45,7 @@ Usuário → agent-orquestrador → agente-domínio → validador-integracao →
 | 032 | Ingressos/eventos (secundário) | 📋 Planejado — não implementar ainda |
 | 033 | Delegações / funções da casa | **Não depende** (N8N para alertas) |
 | 034 | Galeria fotos/vídeos (PUBLICO/PRIVADO + álbuns) | **Não depende** |
+| — | Portal Nossa história (`/public/historia`) | **Não depende** |
 
 Docs: [`docs/00-index.md`](docs/00-index.md)
 

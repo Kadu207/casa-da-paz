@@ -17,8 +17,8 @@
 4. `CASADAPAZ_DEPLOY_CONFIRMED=yes ./scripts/deploy.sh`
 5. `./scripts/compose-prod.sh exec -T backend npx prisma migrate deploy`
 6. Se nginx/CSP mudou: `./scripts/compose-prod.sh up -d --force-recreate frontend`
-7. Conferir UI: **Galeria** (Público/Privado + álbuns) · Delegações · Estoque · Financeiro → Patrocínios · Cadastros  
-   APIs: `/health`, `/api/public/galeria`, `/api/public/galeria/albuns`
+7. Conferir UI: **Nossa história** · **Galeria** (Público/Privado + álbuns) · Delegações · Estoque · Financeiro → Patrocínios · Cadastros  
+   APIs/páginas: `/health`, `/public/historia`, `/api/public/galeria`, `/api/public/galeria/albuns`
 8. Seeds idempotentes (sem destroy):  
    `./scripts/compose-prod.sh exec backend npx tsx prisma/seed.ts --estoque-casa-only`  
    `./scripts/compose-prod.sh exec backend npx tsx prisma/seed.ts --funcoes-casa-only`  

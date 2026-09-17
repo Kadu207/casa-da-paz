@@ -99,10 +99,12 @@ Isolamento MEDIUM: `WHERE pessoa_id = :currentUserPessoaId` em todas as queries 
 **URL:** `https://casadapaz.inovatitech.com.br/public`
 
 ### Páginas
-1. **Home** — missão, contato, link Instagram
+1. **Home** — missão, contato, link Instagram, CTAs (incl. **Nossa história**)
 2. **Eventos** — giras e oficinas abertas (somente leitura)
 3. **Agendar consulta** — formulário: nome, telefone, data preferida, observação
 4. **Contato** — botão WhatsApp (Chatwoot widget ou link wa.me)
+5. **Estudos / Galeria / Livraria / Termos** — entregues além do MVP original
+6. **Nossa história** (`/public/historia`) — marcos 26/09/2015 e aniversário 2026; narrativa completa via i18n
 
 ### Fluxo agendamento
 1. Consulentes preenchem formulário público

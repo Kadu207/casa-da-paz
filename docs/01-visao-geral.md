@@ -10,8 +10,9 @@ O **Casa da Paz Management System Cloud** apoia a gestão do terreiro e a presen
 - **Estoque primário da casa** (insumos ritualísticos e de funcionamento — ADR-010)
 - **Delegações / funções da casa** (tarefas, responsáveis, alertas N8N — ADR-011)
 - **Galeria de mídia** (fotos + vídeos YouTube, PUBLICO/PRIVADO + álbuns — ADR-012)
+- **Nossa história** no portal (`/public/historia` — marcos 2015/2026 + narrativa editável)
 - Livraria (PDV/estoque de venda) e ecommerce
-- Portal público (eventos, agendamento, livraria, estudos, **galeria**, LGPD, mapa OSM)
+- Portal público (eventos, agendamento, livraria, estudos, galeria, **história**, LGPD, mapa)
 - Marketing institucional (papel MARKETING) — estudos + galeria
 - Cobranças Asaas **opcionais** (dormant até `ASAAS_API_KEY` — ADR-009)
 - Alertas e automações via N8N / Chatwoot
