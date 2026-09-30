@@ -1,3 +1,5 @@
+import { isNetworkError, isRetryableHttpStatus, withRetry } from '../../lib/with-retry.js';
+
 export type AsaasEnv = 'sandbox' | 'production';
 
 export function getAsaasConfig() {
@@ -48,32 +50,52 @@ export async function asaasFetch<T>(
     throw new AsaasApiError('ASAAS_API_KEY não configurada', 503);
   }
 
-  const res = await fetch(`${cfg.baseUrl}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      access_token: cfg.apiKey,
-      ...(init.headers ?? {}),
+  const method = (init.method ?? 'GET').toUpperCase();
+  const mutating = method !== 'GET' && method !== 'HEAD' && method !== 'DELETE';
+
+  return withRetry(
+    async () => {
+      const res = await fetch(`${cfg.baseUrl}${path}`, {
+        ...init,
+        headers: {
+          'Content-Type': 'application/json',
+          access_token: cfg.apiKey,
+          ...(init.headers ?? {}),
+        },
+      });
+
+      const text = await res.text();
+      let body: unknown = null;
+      if (text) {
+        try {
+          body = JSON.parse(text);
+        } catch {
+          body = text;
+        }
+      }
+
+      if (!res.ok) {
+        const msg =
+          typeof body === 'object' && body && 'errors' in body
+            ? JSON.stringify((body as { errors: unknown }).errors)
+            : `Asaas HTTP ${res.status}`;
+        throw new AsaasApiError(msg, res.status, body);
+      }
+
+      return body as T;
     },
-  });
-
-  const text = await res.text();
-  let body: unknown = null;
-  if (text) {
-    try {
-      body = JSON.parse(text);
-    } catch {
-      body = text;
+    {
+      attempts: 3,
+      baseDelayMs: 250,
+      retryOn: (err) => {
+        if (err instanceof AsaasApiError) {
+          return isRetryableHttpStatus(err.status);
+        }
+        if (isNetworkError(err)) {
+          return !mutating;
+        }
+        return false;
+      },
     }
-  }
-
-  if (!res.ok) {
-    const msg =
-      typeof body === 'object' && body && 'errors' in body
-        ? JSON.stringify((body as { errors: unknown }).errors)
-        : `Asaas HTTP ${res.status}`;
-    throw new AsaasApiError(msg, res.status, body);
-  }
-
-  return body as T;
+  );
 }

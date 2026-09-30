@@ -11,17 +11,22 @@ export async function resolverPessoaId(
     return input.pessoaId;
   }
 
+  const digits = normalizarTelefone(input.telefone);
+  const suffix = digits.length >= 9 ? digits.slice(-9) : digits;
   const candidatos = await prisma.pessoa.findMany({
-    where: { telefone: { not: null } },
+    where: {
+      OR: [{ telefoneDigitos: digits }, { telefoneDigitos: { endsWith: suffix } }],
+    },
+    take: 40,
   });
   const match = candidatos.find((p) => p.telefone && telefonesEquivalentes(input.telefone, p.telefone));
   if (match) return match.id;
 
-  const digits = normalizarTelefone(input.telefone);
   const pessoa = await prisma.pessoa.create({
     data: {
       nomeCompleto: input.nome.trim(),
       telefone: digits || input.telefone,
+      telefoneDigitos: digits || null,
       tipoPerfil: 'CONSULENTE',
       maiorDeIdade: true,
     },

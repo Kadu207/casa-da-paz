@@ -1,6 +1,6 @@
 ﻿# Memória Viva — Casa da Paz
 
-**Última atualização:** 2026-09-17
+**Última atualização:** 2026-09-29
 
 ## Estado do projeto
 
@@ -8,7 +8,7 @@
 |------|--------|
 | Fase | Pós-go-live estável: **Nossa história** + **034 Galeria** + 033 Delegações + 031 Estoque + 030 Security + F01–F10 GREEN |
 | Versão | 0.1.0-alpha |
-| Commit referência | Portal história `b75f5c2` (+ docs refresh) |
+| Commit referência | FTS/retry/idempotência (após logo `6e0deef`) |
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (Host `inovati`; **não** :22) |
 | Asaas (021) | **Dormant** — [`asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |

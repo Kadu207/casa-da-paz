@@ -1,15 +1,14 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { detectarDuplicata, normalizarTelefone } from '../lib/deduplicacao.js';
+import { ftsSearchIds } from '../lib/fts.js';
 import {
   normalizarResponsaveis,
   pessoaInputSchema,
   validarResponsaveis,
 } from '../lib/pessoa-responsaveis.js';
-import { prismaContainsExact, prismaContainsInsensitive } from '../lib/safe-search.js';
 
 const router = Router();
 
@@ -21,22 +20,42 @@ const pessoaInclude = {
 } satisfies Prisma.PessoaInclude;
 
 async function findTelefoneDuplicado(telefone: string, excludeId?: number) {
+  const digits = normalizarTelefone(telefone);
+  if (digits.length < 8) return null;
+  const suffix = digits.length >= 9 ? digits.slice(-9) : digits;
   const candidatos = await prisma.pessoa.findMany({
     where: {
-      telefone: { not: null },
       ...(excludeId ? { id: { not: excludeId } } : {}),
+      OR: [{ telefoneDigitos: digits }, { telefoneDigitos: { endsWith: suffix } }],
     },
+    take: 25,
   });
-  return candidatos.find((p) => p.telefone && detectarDuplicata({ nomeCompleto: '', telefone }, p) === 'telefone') ?? null;
+  return (
+    candidatos.find((p) => p.telefone && detectarDuplicata({ nomeCompleto: '', telefone }, p) === 'telefone') ??
+    null
+  );
 }
 
-async function findDuplicatasSugeridas(
-  params: { nome?: string; telefone?: string; excludeId?: number }
-) {
+async function findDuplicatasSugeridas(params: {
+  nome?: string;
+  telefone?: string;
+  excludeId?: number;
+}) {
   const { nome, telefone, excludeId } = params;
+  const ids = new Set<number>();
+  if (nome?.trim()) {
+    for (const id of await ftsSearchIds('pessoas', nome, 80)) ids.add(id);
+  }
+  if (telefone) {
+    const dup = await findTelefoneDuplicado(telefone, excludeId);
+    if (dup) ids.add(dup.id);
+  }
+  if (ids.size === 0) return [];
+  const idList = excludeId ? [...ids].filter((id) => id !== excludeId) : [...ids];
+  if (idList.length === 0) return [];
+
   const pessoas = await prisma.pessoa.findMany({
-    where: excludeId ? { id: { not: excludeId } } : undefined,
-    orderBy: { nomeCompleto: 'asc' },
+    where: { id: { in: idList } },
   });
 
   const candidato = {
@@ -72,22 +91,19 @@ router.get('/', authenticate, authorize('pessoas', 'read'), async (req, res) => 
   const q = req.query.q as string | undefined;
   const telefone = req.query.telefone as string | undefined;
   const where: Prisma.PessoaWhereInput = {};
+  let rankedIds: number[] | null = null;
 
   if (q) {
-    const nome = prismaContainsInsensitive(q);
-    const fone = prismaContainsExact(q);
-    if (!nome && !fone) {
+    rankedIds = await ftsSearchIds('pessoas', q);
+    if (rankedIds.length === 0) {
       res.json([]);
       return;
     }
-    where.OR = [
-      ...(nome ? [{ nomeCompleto: nome }] : []),
-      ...(fone ? [{ telefone: fone }] : []),
-    ];
+    where.id = { in: rankedIds };
   } else if (telefone) {
     const digits = normalizarTelefone(telefone);
     if (digits.length >= 4) {
-      where.telefone = { contains: digits.slice(-4) };
+      where.telefoneDigitos = { endsWith: digits.slice(-4) };
     }
   }
 
@@ -96,6 +112,12 @@ router.get('/', authenticate, authorize('pessoas', 'read'), async (req, res) => 
     orderBy: { nomeCompleto: 'asc' },
     include: pessoaInclude,
   });
+
+  if (rankedIds) {
+    const byId = new Map(pessoas.map((p) => [p.id, p]));
+    res.json(rankedIds.map((id) => byId.get(id)).filter((p): p is NonNullable<typeof p> => Boolean(p)));
+    return;
+  }
 
   if (telefone && !q) {
     const filtradas = pessoas.filter(
@@ -160,9 +182,30 @@ router.post('/', authenticate, authorize('pessoas', 'write'), async (req, res) =
     }
   }
 
-  const { responsaveis: _r, ...dados } = parsed.data;
+  if (!parsed.data.forceDuplicata) {
+    const dups = await findDuplicatasSugeridas({
+      nome: parsed.data.nomeCompleto,
+      telefone: parsed.data.telefone,
+    });
+    const nomeDup = dups.find((d) => d.motivo === 'nome');
+    if (nomeDup) {
+      res.status(409).json({
+        error: 'Possível cadastro duplicado (nome)',
+        pessoaId: nomeDup.id,
+        motivo: 'nome',
+      });
+      return;
+    }
+  }
+
+  const { responsaveis: _r, forceDuplicata: _f, ...dados } = parsed.data;
   const pessoa = await prisma.$transaction(async (tx) => {
-    const criada = await tx.pessoa.create({ data: dados });
+    const criada = await tx.pessoa.create({
+      data: {
+        ...dados,
+        telefoneDigitos: dados.telefone ? normalizarTelefone(dados.telefone) : null,
+      },
+    });
     if (responsaveis.length > 0) {
       await tx.pessoaResponsavel.createMany({
         data: responsaveis.map((r) => ({ pessoaId: criada.id, ...r })),
@@ -214,12 +257,34 @@ router.put('/:id', authenticate, authorize('pessoas', 'write'), async (req, res)
     }
   }
 
-  const { responsaveis: _r, ...dados } = parsed.data;
+  if (!parsed.data.forceDuplicata && (parsed.data.nomeCompleto || parsed.data.telefone)) {
+    const dups = await findDuplicatasSugeridas({
+      nome: parsed.data.nomeCompleto ?? atual.nomeCompleto,
+      telefone: parsed.data.telefone ?? atual.telefone ?? undefined,
+      excludeId: id,
+    });
+    const nomeDup = dups.find((d) => d.motivo === 'nome');
+    if (nomeDup) {
+      res.status(409).json({
+        error: 'Possível cadastro duplicado (nome)',
+        pessoaId: nomeDup.id,
+        motivo: 'nome',
+      });
+      return;
+    }
+  }
+
+  const { responsaveis: _r, forceDuplicata: _f, ...dados } = parsed.data;
 
   const pessoa = await prisma.$transaction(async (tx) => {
     const atualizada = await tx.pessoa.update({
       where: { id },
-      data: dados,
+      data: {
+        ...dados,
+        ...(dados.telefone !== undefined
+          ? { telefoneDigitos: dados.telefone ? normalizarTelefone(dados.telefone) : null }
+          : {}),
+      },
     });
     if (responsaveis !== undefined) {
       await syncResponsaveis(atualizada.id, tipoPerfil, maiorDeIdade, responsaveis);

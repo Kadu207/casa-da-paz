@@ -21,6 +21,7 @@ async function ensureUsuarioWithPolicy(input: SeedUserInput) {
     update: {
       nomeCompleto: input.nomeCompleto,
       telefone: input.telefone,
+      telefoneDigitos: input.telefone.replace(/\D/g, ''),
       tipoPerfil: input.tipoPerfil,
       maiorDeIdade: true,
     },
@@ -28,6 +29,7 @@ async function ensureUsuarioWithPolicy(input: SeedUserInput) {
       id: input.pessoaId,
       nomeCompleto: input.nomeCompleto,
       telefone: input.telefone,
+      telefoneDigitos: input.telefone.replace(/\D/g, ''),
       tipoPerfil: input.tipoPerfil,
       maiorDeIdade: true,
     },
@@ -418,6 +420,7 @@ async function main() {
       id: 2,
       nomeCompleto: 'Maria Silva Consulente',
       telefone: '31988887777',
+      telefoneDigitos: '31988887777',
       tipoPerfil: 'CONSULENTE',
       maiorDeIdade: true,
     },

@@ -5,7 +5,7 @@ describe('buildAuditoriaWhere', () => {
   it('filtra por setor e rota', () => {
     const w = buildAuditoriaWhere({ setor: 'DIRETORIA', rota: 'financeiro' });
     expect(w.setor).toBe('DIRETORIA');
-    expect(w.rota).toEqual({ contains: 'financeiro', mode: 'insensitive' });
+    expect(w.rota).toBeUndefined();
   });
 
   it('filtra periodo de datas', () => {

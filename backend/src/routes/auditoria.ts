@@ -8,7 +8,7 @@ import { registrarAuditoria } from '../lib/auditoria.js';
 import {
   auditoriaExportFilename,
   buildAuditoriaCsv,
-  buildAuditoriaWhere,
+  resolveAuditoriaWhere,
 } from '../lib/auditoria-export.js';
 
 const router = Router();
@@ -32,7 +32,8 @@ async function loadExportLogs(
   filters: z.infer<typeof querySchema>
 ): Promise<{ locale: AuditLocale; logs: Awaited<ReturnType<typeof prisma.adminAuditLog.findMany>> }> {
   const locale = (filters.locale ?? 'pt-BR') as AuditLocale;
-  const where = buildAuditoriaWhere(filters);
+  const where = await resolveAuditoriaWhere(filters);
+  if (!where) return { locale, logs: [] };
   const logs = await prisma.adminAuditLog.findMany({
     where,
     orderBy: { [filters.sort]: filters.order },
@@ -50,8 +51,13 @@ router.get('/', authenticate, requireSupervisor, async (req, res) => {
 
   const { page, limit, sort, order } = parsed.data;
   const locale = (parsed.data.locale ?? 'pt-BR') as AuditLocale;
-  const where = buildAuditoriaWhere(parsed.data);
+  const where = await resolveAuditoriaWhere(parsed.data);
   const skip = (page - 1) * limit;
+
+  if (!where) {
+    res.json({ page, limit, total: 0, items: [] });
+    return;
+  }
 
   const [total, logs] = await Promise.all([
     prisma.adminAuditLog.count({ where }),

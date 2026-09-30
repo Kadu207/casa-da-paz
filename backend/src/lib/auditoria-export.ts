@@ -1,7 +1,7 @@
 import type { Prisma } from '@prisma/client';
 import { enriquecerLogAuditoria, type AuditLocale } from './audit-i18n.js';
 import type { AdminAuditLog } from '@prisma/client';
-import { prismaContainsExact, prismaContainsInsensitive } from './safe-search.js';
+import { ftsSearchIds } from './fts.js';
 
 export interface AuditoriaQueryFilters {
   setor?: string;
@@ -14,32 +14,30 @@ export interface AuditoriaQueryFilters {
 export function buildAuditoriaWhere(q: AuditoriaQueryFilters): Prisma.AdminAuditLogWhereInput {
   const where: Prisma.AdminAuditLogWhereInput = {};
   if (q.setor) where.setor = q.setor;
-  if (q.rota) {
-    const rota = prismaContainsInsensitive(q.rota);
-    if (rota) where.rota = rota;
-  }
   if (q.de || q.ate) {
     where.createdAt = {};
     if (q.de) where.createdAt.gte = new Date(q.de + 'T00:00:00');
     if (q.ate) where.createdAt.lte = new Date(q.ate + 'T23:59:59');
   }
-  if (q.q) {
-    const ins = prismaContainsInsensitive(q.q);
-    const exact = prismaContainsExact(q.q);
-    const or: Prisma.AdminAuditLogWhereInput[] = [];
-    if (ins) {
-      or.push(
-        { motivo: ins },
-        { rota: ins },
-        { login: ins },
-        { recurso: ins },
-        { acao: ins }
-      );
-    }
-    if (exact) or.push({ ip: exact });
-    if (or.length) where.OR = or;
-  }
   return where;
+}
+
+/** `null` = nenhum hit FTS (lista vazia). */
+export async function resolveAuditoriaWhere(
+  q: AuditoriaQueryFilters
+): Promise<Prisma.AdminAuditLogWhereInput | null> {
+  const where = buildAuditoriaWhere(q);
+  const needles = [q.rota, q.q].filter((n): n is string => Boolean(n?.trim()));
+  if (needles.length === 0) return where;
+
+  let ids: number[] | null = null;
+  for (const needle of needles) {
+    const found = await ftsSearchIds('admin_audit_log', needle);
+    if (found.length === 0) return null;
+    ids = ids === null ? found : ids.filter((id) => found.includes(id));
+    if (ids.length === 0) return null;
+  }
+  return { AND: [where, { id: { in: ids ?? [] } }] };
 }
 
 export function buildAuditoriaCsv(logs: AdminAuditLog[], locale: AuditLocale): string {

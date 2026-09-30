@@ -3,6 +3,8 @@ import multer from 'multer';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { prisma } from '../lib/prisma.js';
 import { isAllowedExcelBuffer, isAllowedExcelUpload } from '../lib/upload-filters.js';
+import { isNetworkError, isRetryableHttpStatus, withRetry } from '../lib/with-retry.js';
+import { normalizarTelefone } from '../lib/deduplicacao.js';
 
 const router = Router();
 const upload = multer({
@@ -25,10 +27,22 @@ router.post('/excel', authenticate, authorize('import', 'write'), upload.single(
   }
 
   try {
-    const form = new FormData();
-    form.append('file', new Blob([new Uint8Array(req.file.buffer)]), req.file.originalname);
-
-    const parseRes = await fetch(`${AI_URL}/parse-excel`, { method: 'POST', body: form });
+    const parseRes = await withRetry(
+      async () => {
+        const retryForm = new FormData();
+        retryForm.append('file', new Blob([new Uint8Array(req.file!.buffer)]), req.file!.originalname);
+        const res = await fetch(`${AI_URL}/parse-excel`, { method: 'POST', body: retryForm });
+        if (!res.ok && isRetryableHttpStatus(res.status)) {
+          throw new Error(`parse-excel HTTP ${res.status}`);
+        }
+        return res;
+      },
+      {
+        attempts: 3,
+        baseDelayMs: 250,
+        retryOn: (err) => isNetworkError(err) || /parse-excel HTTP/.test(String(err)),
+      }
+    );
     if (!parseRes.ok) {
       const err = await parseRes.json().catch(() => ({}));
       res.status(502).json({ error: 'Falha no parse-excel', detail: err });
@@ -59,7 +73,11 @@ router.post('/excel', authenticate, authorize('import', 'write'), upload.single(
         const nome = linha.nome ?? linha.nome_completo;
         const telefone = linha.telefone ? String(linha.telefone) : undefined;
         if (nome && telefone) {
-          const existente = await tx.pessoa.findFirst({ where: { telefone } });
+          const existente = await tx.pessoa.findFirst({
+            where: telefone
+              ? { telefoneDigitos: normalizarTelefone(telefone) }
+              : { telefone },
+          });
           if (existente) {
             pessoaId = existente.id;
           } else {
@@ -67,6 +85,7 @@ router.post('/excel', authenticate, authorize('import', 'write'), upload.single(
               data: {
                 nomeCompleto: String(nome),
                 telefone,
+                telefoneDigitos: telefone ? normalizarTelefone(telefone) : null,
                 tipoPerfil: 'CONSULENTE',
                 maiorDeIdade: true,
               },

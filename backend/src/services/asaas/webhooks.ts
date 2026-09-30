@@ -1,5 +1,6 @@
 import type { AsaasBillingType, AsaasCobrancaStatus, Prisma } from '@prisma/client';
 import { prisma } from '../../lib/prisma.js';
+import { isPrismaUniqueViolation } from '../../lib/prisma-errors.js';
 import { timingSafeEqualString } from '../../lib/runtime-env.js';
 import { getAsaasConfig } from './client.js';
 import type { AsaasPayment } from './payments.js';
@@ -64,33 +65,35 @@ async function ensureContaAsaas(tx: Prisma.TransactionClient) {
   return conta;
 }
 
+export function asaasWebhookEventId(payload: AsaasWebhookPayload): string {
+  if (payload.id?.trim()) return payload.id.trim();
+  const pay = payload.payment;
+  return `${payload.event}:${pay?.id ?? 'none'}:${pay?.status ?? 'nostatus'}`;
+}
+
 export async function processAsaasWebhook(payload: AsaasWebhookPayload): Promise<{
   ok: boolean;
   duplicate?: boolean;
   paymentId?: string;
 }> {
-  const eventId = payload.id ?? `${payload.event}:${payload.payment?.id ?? 'none'}:${Date.now()}`;
-  const existing = await prisma.asaasWebhookEvent.findUnique({ where: { eventId } });
-  if (existing) {
-    return { ok: true, duplicate: true };
-  }
-
-  await prisma.asaasWebhookEvent.create({
-    data: {
-      eventId,
-      eventType: payload.event,
-      payload: payload as unknown as Prisma.InputJsonValue,
-    },
-  });
-
+  const eventId = asaasWebhookEventId(payload);
   const payment = payload.payment;
-  if (!payment?.id) {
-    return { ok: true };
-  }
 
-  const status = mapAsaasPaymentStatus(payment.status);
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.asaasWebhookEvent.create({
+        data: {
+          eventId,
+          eventType: payload.event,
+          payload: payload as unknown as Prisma.InputJsonValue,
+        },
+      });
 
-  await prisma.$transaction(async (tx) => {
+      if (!payment?.id) {
+        return;
+      }
+
+      const status = mapAsaasPaymentStatus(payment.status);
     const cobranca = await tx.asaasCobranca.findUnique({
       where: { asaasPaymentId: payment.id },
     });
@@ -212,7 +215,13 @@ export async function processAsaasWebhook(payload: AsaasWebhookPayload): Promise
         },
       });
     }
-  });
+    });
+  } catch (err) {
+    if (isPrismaUniqueViolation(err)) {
+      return { ok: true, duplicate: true };
+    }
+    throw err;
+  }
 
-  return { ok: true, paymentId: payment.id };
+  return { ok: true, paymentId: payment?.id };
 }

@@ -25,6 +25,7 @@ export const pessoaInputSchema = z.object({
   maiorDeIdade: z.boolean().default(true),
   tipoPerfil: z.enum(TIPOS_PERFIL),
   responsaveis: z.array(responsavelSchema).optional(),
+  forceDuplicata: z.boolean().optional(),
 });
 
 export function perfilExigeResponsavel(tipoPerfil: TipoPerfilPessoa, maiorDeIdade: boolean): boolean {

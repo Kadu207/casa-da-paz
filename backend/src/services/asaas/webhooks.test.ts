@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { mapAsaasPaymentStatus, mapBillingType, validateAsaasWebhookToken } from './webhooks.js';
+import { mapAsaasPaymentStatus, mapBillingType, validateAsaasWebhookToken, asaasWebhookEventId } from './webhooks.js';
 
 describe('asaas webhook mappers', () => {
   const prevToken = process.env.ASAAS_WEBHOOK_TOKEN;
@@ -42,5 +42,15 @@ describe('asaas webhook mappers', () => {
     process.env.CASADAPAZ_ENV = 'production';
     process.env.ASAAS_WEBHOOK_TOKEN = 'asaas-dev-webhook-token';
     expect(validateAsaasWebhookToken('asaas-dev-webhook-token')).toBe(false);
+  });
+
+  it('asaasWebhookEventId é estável (sem Date.now)', () => {
+    expect(
+      asaasWebhookEventId({
+        event: 'PAYMENT_RECEIVED',
+        payment: { id: 'pay_1', status: 'RECEIVED' } as never,
+      })
+    ).toBe('PAYMENT_RECEIVED:pay_1:RECEIVED');
+    expect(asaasWebhookEventId({ id: 'evt_9', event: 'PAYMENT_RECEIVED' })).toBe('evt_9');
   });
 });

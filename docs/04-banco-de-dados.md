@@ -64,6 +64,9 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | Multi-estoque | Primário (`itens_estoque_casa`) ≠ livraria (`produtos`) — ADR-010 |
 | Delegações | Funções + tarefas checáveis; alertas `DELEGACAO_*` — ADR-011 |
 | Galeria | Ao vivo = PUBLICADO e (`publicadoEm` null ou ≤ now); PUBLICO vs PRIVADO + álbum — ADR-012 |
+| FTS | `pessoas.busca` e `admin_audit_log.busca` (GIN + `websearch_to_tsquery` portuguese) |
+| Dedup telefone | `pessoas.telefone_digitos` indexado |
+| Webhook Asaas | Insert `eventId` estável na mesma transação do ledger (corrida → P2002 = duplicate) |
 
 ## 4.4. Migrations recentes
 
@@ -76,7 +79,7 @@ SGBD: **PostgreSQL 16**. Autorização de aplicação via JWT/RBAC (não RLS Sup
 | `20260901140000_usuario_deve_trocar_senha` | `Usuario.deveTrocarSenha` (F06) |
 | `20260902120000_delegacoes_casa_033` | Funções/tarefas + `Pessoa.email` |
 | `20260904120000_galeria_midia_034` | `midias_publicacao` + enums |
-| `20260904160000_galeria_albuns_privado_034` | Álbuns + `PRIVADO` (ex-INTERNO) |
+| `20260930010000_fts_idempotency_retry` | FTS GIN pessoas/auditoria + `telefone_digitos` |
 
 ```bash
 cd backend

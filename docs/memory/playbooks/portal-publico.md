@@ -50,6 +50,6 @@ Canal YouTube da casa: hospeda o arquivo; o site só embute o player (CSP `youtu
 - Textos institucionais: `PublicHome.tsx`  
 - História completa: i18n `historia.*`  
 - **Logo oficial:** `frontend/public/portal/logo.png` (1024) + `logo-4k.webp` / `logo-4k.jpg` (3840×3840) na home; favicon em `frontend/public/favicon.ico`  
-- Busca texto (pessoas/auditoria): `contains` Prisma parametrizado + `sanitizeLikeContains` (sem `%`/`_` do usuário)  
+- Busca pessoas/auditoria: **FTS** (`websearch_to_tsquery` portuguese + GIN), não ILIKE aberto  
 - Token Chatwoot: `VITE_CHATWOOT_WEBSITE_TOKEN` no frontend  
 - ADR galeria: [`012-galeria-midia.md`](../decisions/012-galeria-midia.md)  

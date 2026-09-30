@@ -1,4 +1,5 @@
 import { resolveSecret } from './runtime-env.js';
+import { isNetworkError, isRetryableHttpStatus, withRetry } from './with-retry.js';
 
 export type N8nWorkflow =
   | 'novo_agendamento'
@@ -36,16 +37,31 @@ export async function dispararN8n(
   }
 
   const path = WEBHOOK_PATHS[workflow];
+  const url = `${baseUrl.replace(/\/$/, '')}${path}`;
+  const body = JSON.stringify({ workflow, ...payload });
 
   try {
-    const res = await fetch(`${baseUrl.replace(/\/$/, '')}${path}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Webhook-Secret': secret,
+    const res = await withRetry(
+      async () => {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Webhook-Secret': secret,
+          },
+          body,
+        });
+        if (!response.ok && isRetryableHttpStatus(response.status)) {
+          throw new Error(`N8N HTTP ${response.status}`);
+        }
+        return response;
       },
-      body: JSON.stringify({ workflow, ...payload }),
-    });
+      {
+        attempts: 3,
+        baseDelayMs: 250,
+        retryOn: (err) => isNetworkError(err) || /N8N HTTP (429|5\d\d)/.test(String(err)),
+      }
+    );
     if (!res.ok) {
       return { enviado: false, motivo: `N8N respondeu ${res.status}` };
     }

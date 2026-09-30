@@ -240,6 +240,7 @@ model Pessoa {
   id            Int       @id @default(autoincrement())
   nomeCompleto  String    @map("nome_completo") @db.VarChar(150)
   telefone      String?   @db.VarChar(20)
+  telefoneDigitos String?  @map("telefone_digitos") @db.VarChar(20)
   email         String?   @db.VarChar(150)
   maiorDeIdade  Boolean   @default(true) @map("maior_de_idade")
   tipoPerfil    TipoPerfil @map("tipo_perfil")
@@ -256,6 +257,7 @@ model Pessoa {
   funcoesResponsavel FuncaoResponsavel[]
   tarefasDelegacao   TarefaDelegacao[]
 
+  @@index([telefoneDigitos])
   @@map("pessoas")
 }
 

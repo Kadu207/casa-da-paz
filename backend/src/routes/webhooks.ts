@@ -99,15 +99,15 @@ router.post('/pix', async (req, res) => {
     res.status(404).json({ error: 'Transação não encontrada' });
     return;
   }
-  if (atual.status === 'CONCLUIDO') {
+  const updated = await prisma.financeiroTransacao.updateMany({
+    where: { id: body.data.transacaoId, status: { not: 'CONCLUIDO' } },
+    data: { status: 'CONCLUIDO' },
+  });
+  if (updated.count === 0) {
     res.json({ ok: true, transacaoId: atual.id, status: atual.status, duplicate: true });
     return;
   }
-  const t = await prisma.financeiroTransacao.update({
-    where: { id: body.data.transacaoId },
-    data: { status: 'CONCLUIDO' },
-  });
-  res.json({ ok: true, transacaoId: t.id, status: t.status });
+  res.json({ ok: true, transacaoId: atual.id, status: 'CONCLUIDO' });
 });
 
 router.post('/n8n/trigger', authenticate, authorize('integracoes', 'write'), async (req, res) => {
