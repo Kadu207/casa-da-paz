@@ -83,7 +83,10 @@ export default function AppLayout() {
   return (
     <div className="app-shell flex flex-col md:flex-row">
       <header className="md:hidden relative z-[60] shrink-0 flex items-center justify-between gap-3 px-4 py-3 bg-[var(--color-surface)] border-b border-white/10">
-        <span className="text-[var(--color-accent)] font-serif text-lg">{t('home.title')}</span>
+        <span className="flex items-center gap-2 min-w-0">
+          <img src={portalAssets.logo} alt="" width={32} height={32} className="h-8 w-8 object-contain shrink-0" />
+          <span className="text-[var(--color-accent)] font-serif text-lg truncate">{t('home.title')}</span>
+        </span>
         <div className="flex items-center gap-1">
           <LanguageSwitcher className="text-xs text-white/70 hover:text-[var(--color-accent)] px-2 min-h-11" />
           <button
@@ -117,7 +120,10 @@ export default function AppLayout() {
         }`}
       >
         <div className="hidden md:flex items-center justify-between gap-2 mb-3">
-          <h1 className="text-[var(--color-accent)] font-serif text-lg">{t('home.title')}</h1>
+          <h1 className="flex items-center gap-2 min-w-0 text-[var(--color-accent)] font-serif text-lg">
+            <img src={portalAssets.logo} alt="" width={36} height={36} className="h-9 w-9 object-contain shrink-0" />
+            <span className="truncate">{t('home.title')}</span>
+          </h1>
           <LanguageSwitcher className="text-xs text-white/70 hover:text-[var(--color-accent)] px-1" />
         </div>
         <nav className="flex flex-col gap-1 overflow-y-auto min-h-0 flex-1">

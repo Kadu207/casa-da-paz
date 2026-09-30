@@ -34,9 +34,9 @@ export function SolidScreenLayout({
           <img
             src={portalAssets.logo}
             alt=""
-            width={72}
-            height={72}
-            className="h-16 w-16 rounded-full ring-2 ring-[var(--color-accent)]/40 object-cover mb-4 hidden md:block"
+            width={96}
+            height={96}
+            className="h-20 w-20 object-contain mb-4 hidden md:block drop-shadow-lg"
           />
           <p className="font-serif text-2xl sm:text-3xl text-[var(--color-accent)]">{t('erp.layout.tagline')}</p>
           <p className="mt-2 text-sm sm:text-base text-white/75 max-w-sm leading-relaxed">{t('erp.layout.hero')}</p>

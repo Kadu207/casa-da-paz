@@ -15,10 +15,14 @@ function lovable(path: string, localFile: string): string {
 }
 
 export const portalAssets = {
-  logo: lovable(
-    '/__l5e/assets-v1/eeccef43-b889-4135-8b5f-c4ced7b4480f/casa-da-paz-logo.png',
-    'logo.png'
-  ),
+  /** Emblema oficial (sempre local — não usa CDN Lovable) */
+  logo: '/portal/logo.png',
+  /** Emblema oficial 4K (3840×3840) — home e displays de alta densidade */
+  logo4k: '/portal/logo-4k.webp',
+  logo4kJpg: '/portal/logo-4k.jpg',
+  logoWebp: '/portal/logo.webp',
+  logo192: '/portal/logo-192.png',
+  logo512: '/portal/logo-512.png',
   hero: lovable(
     '/__l5e/assets-v1/7a3cccb7-7e32-4ecb-b542-70930763ac21/hero-afroindigena.jpg',
     'hero.jpg'
