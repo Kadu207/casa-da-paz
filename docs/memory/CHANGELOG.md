@@ -5,6 +5,7 @@
 ### Adicionado
 - **Retry + FTS + idempotência:** backoff N8N/Asaas/CF/Excel; `websearch_to_tsquery` em pessoas e auditoria (GIN); webhook Asaas insert-first sem `Date.now`; PIX `updateMany` condicional; dedup telefone indexado + 409 por nome — **deploy VPS** `4416502` 2026-09-29
 - **Cadastro homônimo:** UI envia `forceDuplicata` no POST/PUT após confirmação; telefone duplicado permanece bloqueado. Seed completo destroy **não** rodado em produção — **deploy VPS** `1d99adf` 2026-09-29
+- **Logo home:** emblema menor (~160–200px), PNG/WebP com fundo transparente e brilho dourado no navy — **deploy VPS** `5fb17d6` 2026-09-29
 - **Logo oficial Casa da Paz:** emblema no portal, ERP, login, favicon/PWA; home com arquivo 4K (3840×3840 WebP/JPEG)
 - **Portal Nossa história:** botão na home + `/public/historia` (marcos 26/09/2015; 11 anos de início e 10 de registro em 26/09/2026; espaço `historia.body` em i18n) — **deploy VPS** `b75f5c2` 2026-09-17
 - **034 Galeria álbuns + PRIVADO:** model `MidiaAlbum`; visibilidade canônica `PUBLICO`/`PRIVADO` (alias `INTERNO`); filtro por álbum no portal/ERP; Marketing cria álbum (ex. Batizado 2026) — **deploy** `32b9f22` 2026-09-04
