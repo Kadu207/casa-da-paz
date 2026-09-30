@@ -9,6 +9,7 @@ import {
   pessoaInputSchema,
   validarResponsaveis,
 } from '../lib/pessoa-responsaveis.js';
+import { prismaContainsExact, prismaContainsInsensitive } from '../lib/safe-search.js';
 
 const router = Router();
 
@@ -73,9 +74,15 @@ router.get('/', authenticate, authorize('pessoas', 'read'), async (req, res) => 
   const where: Prisma.PessoaWhereInput = {};
 
   if (q) {
+    const nome = prismaContainsInsensitive(q);
+    const fone = prismaContainsExact(q);
+    if (!nome && !fone) {
+      res.json([]);
+      return;
+    }
     where.OR = [
-      { nomeCompleto: { contains: q, mode: 'insensitive' } },
-      { telefone: { contains: q } },
+      ...(nome ? [{ nomeCompleto: nome }] : []),
+      ...(fone ? [{ telefone: fone }] : []),
     ];
   } else if (telefone) {
     const digits = normalizarTelefone(telefone);

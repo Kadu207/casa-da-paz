@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 ### Adicionado
+- **Logo oficial Casa da Paz:** emblema no portal, ERP, login, favicon/PWA; home com arquivo 4K (3840×3840 WebP/JPEG)
+- **Busca ILIKE:** `sanitizeLikeContains` em pessoas e auditoria (remove `%` `_` do input; Prisma continua parametrizado)
 - **Portal Nossa história:** botão na home + `/public/historia` (marcos 26/09/2015; 11 anos de início e 10 de registro em 26/09/2026; espaço `historia.body` em i18n) — **deploy VPS** `b75f5c2` 2026-09-17
 - **034 Galeria álbuns + PRIVADO:** model `MidiaAlbum`; visibilidade canônica `PUBLICO`/`PRIVADO` (alias `INTERNO`); filtro por álbum no portal/ERP; Marketing cria álbum (ex. Batizado 2026) — **deploy** `32b9f22` 2026-09-04
 - **034 Galeria policies:** ADMIN com `marketing` write; seed `--galeria-policies-034` (policies + função Comunicação: mãe de santo, marketing, diretoria, supervisor, admin)
