@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { perfilExigeResponsavel, validarResponsaveis } from './pessoa-responsaveis.js';
+import { perfilExigeResponsavel, pessoaInputSchema, validarResponsaveis } from './pessoa-responsaveis.js';
 
 describe('pessoa-responsaveis', () => {
   it('exige responsável para consulente/médium menor', () => {
@@ -14,5 +14,14 @@ describe('pessoa-responsaveis', () => {
     expect(
       validarResponsaveis('MEDIUM', false, [{ nomeCompleto: 'Maria Silva', telefone: '31999990000' }])
     ).toBeNull();
+  });
+
+  it('aceita forceDuplicata opcional no POST de homônimo', () => {
+    const parsed = pessoaInputSchema.parse({
+      nomeCompleto: 'Maria Silva',
+      tipoPerfil: 'CONSULENTE',
+      forceDuplicata: true,
+    });
+    expect(parsed.forceDuplicata).toBe(true);
   });
 });

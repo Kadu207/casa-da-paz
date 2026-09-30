@@ -14,7 +14,8 @@
 Listas por função: Presidente, Diretoria, Tesouraria, Conselheiro, **Médium**, Consulente, Suporte TI.  
 Menores: `PessoaResponsavel`.  
 Campo opcional **e-mail** (`Pessoa.email`) — usado em alertas de delegações.  
-**Médiuns:** coluna Mensalidade (edição por quem tem `recorrencia` write).
+**Médiuns:** coluna Mensalidade (edição por quem tem `recorrencia` write).  
+**Duplicatas:** telefone igual → 409 sem override. Homônimo de nome (Levenshtein) → 409 até o operador marcar *homônimo real* e o POST/PUT ir com `forceDuplicata: true`.
 
 ## 7.3. Tesouraria (`/app/financeiro`)
 

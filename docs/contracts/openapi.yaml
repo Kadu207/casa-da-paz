@@ -46,7 +46,7 @@ paths:
       summary: Listar pessoas
     post:
       security: [{ bearerAuth: [] }]
-      summary: Criar pessoa
+      summary: Criar pessoa. Homônimo de nome exige forceDuplicata; telefone duplicado permanece 409.
   /financeiro:
     get:
       security: [{ bearerAuth: [] }]

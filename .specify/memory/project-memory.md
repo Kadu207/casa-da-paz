@@ -17,6 +17,7 @@
 | Spec 034 galeria | ✅ Prod — PUBLICO/PRIVADO, `MidiaAlbum`, YouTube, Marketing CRUD, ADR-012 |
 | Portal história | ✅ Prod — `/public/historia` (marcos 26/09/2015 · 11 anos / 10 anos registro em 2026) |
 | Logo oficial | Emblema no portal/ERP/favicon; home 4K (`logo-4k.webp`) |
+| Seed prod | Só flags idempotentes (`--estoque-casa-only`, `--funcoes-casa-only`, `--galeria-policies-034`). **Seed completo (destroy) não foi rodado** — exige `CONFIRM_SEED_DESTROY=yes` + backup |
 | Auditoria F01–F10 | ✅ **GREEN** — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
 | Mapa portal | ✅ Google Maps embed + CSP (fallback estático) |
 | CSP mídia | ✅ YouTube / youtube-nocookie / Vimeo |

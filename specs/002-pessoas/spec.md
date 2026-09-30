@@ -8,5 +8,6 @@
 - [x] CRUD `/api/pessoas` com RBAC (write: DIRETORIA, RECEPCAO)
 - [x] Busca por `q` (nome/telefone) e filtro telefone normalizado
 - [x] Endpoint `GET /api/pessoas/sugerir-duplicatas`
-- [x] Bloqueio 409 em telefone duplicado
+- [x] Bloqueio 409 em telefone duplicado (sem override)
+- [x] Homônimo real: UI confirma e POST/PUT envia `forceDuplicata: true`
 - [x] UI PessoasPage com aviso fuzzy e modo leitura para FINANCEIRO/LIVRARIA/SUPORTE

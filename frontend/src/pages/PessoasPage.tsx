@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { api } from '../lib/api';
+import { ApiError, api } from '../lib/api';
 import { hasPermission, useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n/I18nContext';
 import { labelEnum } from '../i18n/helpers';
@@ -41,6 +41,8 @@ export default function PessoasPage() {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState<number | null>(null);
   const [duplicatas, setDuplicatas] = useState<DuplicataSugerida[]>([]);
+  const [confirmarHomonimo, setConfirmarHomonimo] = useState(false);
+  const [exigirHomonimo, setExigirHomonimo] = useState(false);
   const [erro, setErro] = useState('');
   const [salvando, setSalvando] = useState(false);
   const [mostrarForm, setMostrarForm] = useState(false);
@@ -97,6 +99,9 @@ export default function PessoasPage() {
     try {
       const sugestoes = await api<DuplicataSugerida[]>(`/pessoas/sugerir-duplicatas?${params}`);
       setDuplicatas(sugestoes);
+      if (!sugestoes.some((d) => d.motivo === 'nome')) {
+        setConfirmarHomonimo(false);
+      }
     } catch {
       setDuplicatas([]);
     }
@@ -124,6 +129,8 @@ export default function PessoasPage() {
     setEditId(null);
     setForm({ ...emptyForm, tipoPerfil: perfil, responsaveis: [] });
     setDuplicatas([]);
+    setConfirmarHomonimo(false);
+    setExigirHomonimo(false);
     setErro('');
     setMostrarForm(true);
   };
@@ -143,6 +150,8 @@ export default function PessoasPage() {
         })) ?? [],
     });
     setDuplicatas([]);
+    setConfirmarHomonimo(false);
+    setExigirHomonimo(false);
     setErro('');
     setMostrarForm(true);
   };
@@ -150,6 +159,17 @@ export default function PessoasPage() {
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro('');
+    const dupTelefone = duplicatas.some((d) => d.motivo === 'telefone');
+    const dupNome = duplicatas.some((d) => d.motivo === 'nome') || exigirHomonimo;
+    if (dupTelefone) {
+      setErro(t('erp.pessoas.duplicatePhone'));
+      return;
+    }
+    if (dupNome && !confirmarHomonimo) {
+      setErro(t('erp.pessoas.homonymConfirmRequired'));
+      setExigirHomonimo(true);
+      return;
+    }
     setSalvando(true);
     const payload = {
       nomeCompleto: form.nomeCompleto.trim(),
@@ -165,6 +185,7 @@ export default function PessoasPage() {
               telefone: r.telefone.trim() || undefined,
             }))
         : [],
+      ...(confirmarHomonimo ? { forceDuplicata: true } : {}),
     };
     try {
       if (editId) {
@@ -173,8 +194,19 @@ export default function PessoasPage() {
         await api('/pessoas', { method: 'POST', body: JSON.stringify(payload) });
       }
       setMostrarForm(false);
+      setConfirmarHomonimo(false);
+      setExigirHomonimo(false);
       await carregar();
     } catch (err) {
+      if (err instanceof ApiError && err.status === 409 && err.motivo === 'nome') {
+        setExigirHomonimo(true);
+        setErro(t('erp.pessoas.homonymConfirmRequired'));
+        return;
+      }
+      if (err instanceof ApiError && err.status === 409 && err.motivo === 'telefone') {
+        setErro(t('erp.pessoas.duplicatePhone'));
+        return;
+      }
       setErro(err instanceof Error ? err.message : t('erp.pessoas.saveError'));
     } finally {
       setSalvando(false);
@@ -244,17 +276,35 @@ export default function PessoasPage() {
             {editId ? t('erp.pessoas.edit') : t('erp.pessoas.new')}
           </h3>
           {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
-          {duplicatas.length > 0 && (
+          {(duplicatas.length > 0 || exigirHomonimo) && (
             <div className="bg-amber-900/30 border border-amber-600/50 rounded p-3 text-sm">
-              <p className="font-medium text-amber-200 mb-2">{t('erp.pessoas.duplicates')}</p>
-              <ul className="space-y-1">
-                {duplicatas.map((d) => (
-                  <li key={d.id} className="text-white/80">
-                    {d.nomeCompleto} {d.telefone && `— ${d.telefone}`}{' '}
-                    <span className="text-amber-300/80">({labelEnum(t, 'duplicata', d.motivo)})</span>
-                  </li>
-                ))}
-              </ul>
+              {duplicatas.length > 0 && (
+                <>
+                  <p className="font-medium text-amber-200 mb-2">{t('erp.pessoas.duplicates')}</p>
+                  <ul className="space-y-1">
+                    {duplicatas.map((d) => (
+                      <li key={d.id} className="text-white/80">
+                        {d.nomeCompleto} {d.telefone && `— ${d.telefone}`}{' '}
+                        <span className="text-amber-300/80">({labelEnum(t, 'duplicata', d.motivo)})</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {(duplicatas.some((d) => d.motivo === 'nome') || exigirHomonimo) && (
+                <label className="flex items-start gap-2 mt-3 text-sm text-amber-100/90">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5"
+                    checked={confirmarHomonimo}
+                    onChange={(e) => {
+                      setConfirmarHomonimo(e.target.checked);
+                      setErro('');
+                    }}
+                  />
+                  {t('erp.pessoas.homonymConfirm')}
+                </label>
+              )}
             </div>
           )}
           <input

@@ -775,6 +775,7 @@ if (hasFlag('--supervisor-only')) {
     .catch(console.error)
     .finally(() => prisma.$disconnect());
 } else {
+  // Produção: não executar este ramo. Deploy 2026-09-29 não rodou seed destroy.
   assertSeedGate('destroy');
   main()
     .catch(console.error)

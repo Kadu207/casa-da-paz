@@ -23,7 +23,7 @@
    `./scripts/compose-prod.sh exec backend npx tsx prisma/seed.ts --estoque-casa-only`  
    `./scripts/compose-prod.sh exec backend npx tsx prisma/seed.ts --funcoes-casa-only`  
    `./scripts/compose-prod.sh exec -T backend npx tsx prisma/seed.ts --galeria-policies-034`  
-   **Não** rodar seed completo destroy em produção.
+   **Não** rodar seed completo destroy em produção. Deploy FTS `4416502` (2026-09-29): **não** foi executado `npx tsx prisma/seed.ts` sem flag (apagaria financeiro/produtos).
 
 ## Pós-deploy útil
 - Auditoria: `.\scripts\smoke-audit-f01-f10-prod.ps1`
