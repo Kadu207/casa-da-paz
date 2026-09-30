@@ -37,7 +37,7 @@ export function PublicLayout({
               alt=""
               width={40}
               height={40}
-              className="h-10 w-10 shrink-0 object-contain"
+              className="h-10 w-10 shrink-0 object-contain opacity-90"
             />
             <span className="font-serif text-lg text-primary truncate">{t('home.title')}</span>
           </Link>
@@ -70,7 +70,7 @@ export function PublicLayout({
                 alt=""
                 width={72}
                 height={72}
-                className="h-16 w-16 object-contain mb-2"
+                className="h-16 w-16 object-contain mb-2 opacity-90"
               />
               <p className="font-serif text-primary text-base">{t('home.title')}</p>
               <p className="mt-1 text-foreground/75">

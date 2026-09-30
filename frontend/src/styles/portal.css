@@ -91,6 +91,31 @@
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 25%, transparent);
 }
 
+/* Emblema da home: compacto, fundo transparente, brilho dourado no navy */
+.portal-home-mark {
+  display: block;
+  width: min(38vw, 9.75rem);
+  height: auto;
+  margin-inline: auto;
+  opacity: 0.92;
+  filter:
+    drop-shadow(0 1px 2px oklch(0.205 0.04 265 / 0.45))
+    drop-shadow(0 6px 18px oklch(0.78 0.13 86 / 0.28));
+}
+
+@media (min-width: 640px) {
+  .portal-home-mark {
+    width: 11.25rem;
+    opacity: 0.94;
+  }
+}
+
+@media (min-width: 768px) {
+  .portal-home-mark {
+    width: 12.5rem;
+  }
+}
+
 .turnstile-widget-host iframe {
   display: block;
   min-height: 65px;

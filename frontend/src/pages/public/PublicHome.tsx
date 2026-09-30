@@ -67,27 +67,21 @@ export default function PublicHome() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/35 via-background/55 to-background" />
         </div>
-        <div className="relative max-w-6xl mx-auto px-4 pt-10 pb-16 sm:pt-14 sm:pb-20 text-center">
+        <div className="relative max-w-6xl mx-auto px-4 pt-8 pb-12 sm:pt-10 sm:pb-16 text-center">
           <picture>
-            <source
-              type="image/webp"
-              srcSet={`${portalAssets.logoWebp} 1024w, ${portalAssets.logo4k} 3840w`}
-              sizes="(min-width: 1280px) 48rem, 92vw"
-            />
+            <source type="image/webp" srcSet={portalAssets.logoWebp} />
             <img
-              src={portalAssets.logo4kJpg}
-              srcSet={`${portalAssets.logo} 1024w, ${portalAssets.logo4kJpg} 3840w`}
-              sizes="(min-width: 1280px) 48rem, 92vw"
+              src={portalAssets.logo}
               alt={t('home.logoAlt')}
-              width={3840}
-              height={3840}
+              width={1024}
+              height={1024}
               loading="eager"
               fetchPriority="high"
               decoding="async"
-              className="mx-auto w-[min(92vw,48rem)] h-auto drop-shadow-2xl"
+              className="portal-home-mark"
             />
           </picture>
-          <h1 className="mt-6 font-serif text-4xl sm:text-5xl text-primary">{t('home.title')}</h1>
+          <h1 className="mt-5 font-serif text-4xl sm:text-5xl text-primary">{t('home.title')}</h1>
           <p className="mt-6 text-base sm:text-lg text-foreground/85 max-w-xl mx-auto leading-relaxed">
             {t('home.subtitle')}
           </p>
