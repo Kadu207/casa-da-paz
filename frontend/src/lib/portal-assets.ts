@@ -15,7 +15,7 @@ function lovable(path: string, localFile: string): string {
 }
 
 /** Bust de cache quando o arquivo do emblema muda (Cloudflare guarda /portal/ por 24h). */
-const LOGO_VERSION = '20261021b';
+const LOGO_VERSION = '20261021c';
 
 function logoAsset(file: string): string {
   return `/portal/${file}?v=${LOGO_VERSION}`;

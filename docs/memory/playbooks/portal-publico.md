@@ -24,7 +24,7 @@
 3. `/public/estudos` continua com os materiais editáveis pelo Marketing e aponta para a enciclopédia.
 4. Para trocar uma foto: `python scripts/fetch-ervas-fotos.py <slug>`. O extrator do `.docx` (`scripts/extract-enciclopedia-ervas.py`) recria só o texto e as ilustrações esquemáticas; não usar isso por cima das fotos já creditadas.
 5. A jurema-branca usa fotografia de *Piptadenia retusa*: o GBIF trata *Piptadenia stipulacea* como sinônimo, e a ficha traz essa nota.
-6. As fotos não entram no precache do PWA (`globIgnores` em `frontend/vite.config.ts`). A URL do emblema leva `?v=20261021b` para não reaproveitar o arquivo antigo no cache da Cloudflare. O fundo branco de fora do selo sai; os buracos das letras também ficam transparentes, sem a auréola branca. O triângulo, o aro e as estrelas continuam brancos.
+6. As fotos não entram no precache do PWA (`globIgnores` em `frontend/vite.config.ts`). A URL do emblema leva `?v=20261021c` para não reaproveitar o arquivo antigo no cache da Cloudflare. O desenho é o PNG oficial (`0ece8eb`); só o papel branco de fora do aro sai. O triângulo, o aro e as estrelas continuam brancos.
 
 ## Nossa história
 
