@@ -17,7 +17,7 @@
 | Spec 034 galeria | ✅ Prod — PUBLICO/PRIVADO, `MidiaAlbum`, YouTube, Marketing CRUD, ADR-012 |
 | Portal história | ✅ Prod — `/public/historia` (marcos 26/09/2015 · 11 anos / 10 anos registro em 2026) |
 | Enciclopédia de ervas | ✅ Prod — `/public/ervas`, 100 fotos creditadas — **deploy VPS** `ce143fb` 2026-10-21 |
-| Logo oficial | ✅ Código — emblema oficial (`0ece8eb`), só o papel branco de fora do aro removido (`?v=20261021c`) |
+| Logo oficial | ✅ Prod `abfc071` — emblema oficial, só o papel branco de fora do aro removido (`?v=20261021c`) |
 | Seed prod | Só flags idempotentes (`--estoque-casa-only`, `--funcoes-casa-only`, `--galeria-policies-034`). **Seed completo (destroy) não foi rodado** — exige `CONFIRM_SEED_DESTROY=yes` + backup |
 | Auditoria F01–F10 | ✅ **GREEN** — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
 | Mapa portal | ✅ Google Maps embed + CSP (fallback estático) |
