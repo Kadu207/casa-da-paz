@@ -8,7 +8,7 @@
 |------|--------|
 | Fase | Pós-go-live estável: **Nossa história** + **034 Galeria** + 033 Delegações + 031 Estoque + 030 Security + F01–F10 GREEN |
 | Versão | 0.1.0-alpha |
-| Commit referência | `5fb17d6` logo home compacta + transparente — **deploy VPS** 2026-09-29 |
+| Commit referência | `ce143fb` enciclopédia de ervas com fotos — **deploy VPS** 2026-10-21 |
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (Host `inovati`; **não** :22) |
 | Asaas (021) | **Dormant** — [`asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
@@ -16,7 +16,7 @@
 | Spec 033 delegações | ✅ Prod — migrate + seed funções + menu `/app/delegacoes` + N8N |
 | Spec 034 galeria | ✅ Prod — PUBLICO/PRIVADO, `MidiaAlbum`, YouTube, Marketing CRUD, ADR-012 |
 | Portal história | ✅ Prod — `/public/historia` (marcos 26/09/2015 · 11 anos / 10 anos registro em 2026) |
-| Enciclopédia de ervas | ✅ Código — `/public/ervas`, 100 fotos creditadas. Deploy logo após o push |
+| Enciclopédia de ervas | ✅ Prod — `/public/ervas`, 100 fotos creditadas — **deploy VPS** `ce143fb` 2026-10-21 |
 | Logo oficial | Emblema no portal/ERP/favicon; home 4K (`logo-4k.webp`) |
 | Seed prod | Só flags idempotentes (`--estoque-casa-only`, `--funcoes-casa-only`, `--galeria-policies-034`). **Seed completo (destroy) não foi rodado** — exige `CONFIRM_SEED_DESTROY=yes` + backup |
 | Auditoria F01–F10 | ✅ **GREEN** — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
