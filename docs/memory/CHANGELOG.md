@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Adicionado
-- **Logo:** o emblema oficial voltou no lugar do recorte anterior, que tinha deixado as letras serrilhadas. Só o papel branco de fora do aro sai; triângulo, aro e estrelas continuam brancos — **deploy VPS** `abfc071` 2026-10-21 (`logo.webp?v=20261021c`)
+- **Logo:** o site passou a usar o arquivo enviado pela casa (`logo-oficial.jpg`), com o fundo branco. O recorte transparente saiu (`logo.webp?v=20261021d`).
 - **Enciclopédia de ervas — fotos:** 100 fotografias de referência (licença livre, autoria na ficha) em `/public/ervas`; ilustrações esquemáticas saíram do catálogo — **deploy VPS** `ce143fb` 2026-10-21
 - **Enciclopédia de ervas:** portal `/public/ervas` com 100 fichas, fundamentos, banhos suaves e filtros; home (botão e galeria) e rodapé apontam para ela. Materiais do Marketing seguem em `/public/estudos`.
 - **Retry + FTS + idempotência:** backoff N8N/Asaas/CF/Excel; `websearch_to_tsquery` em pessoas e auditoria (GIN); webhook Asaas insert-first sem `Date.now`; PIX `updateMany` condicional; dedup telefone indexado + 409 por nome — **deploy VPS** `4416502` 2026-09-29

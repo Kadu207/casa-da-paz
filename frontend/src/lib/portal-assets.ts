@@ -15,16 +15,16 @@ function lovable(path: string, localFile: string): string {
 }
 
 /** Bust de cache quando o arquivo do emblema muda (Cloudflare guarda /portal/ por 24h). */
-const LOGO_VERSION = '20261021c';
+const LOGO_VERSION = '20261021d';
 
 function logoAsset(file: string): string {
   return `/portal/${file}?v=${LOGO_VERSION}`;
 }
 
 export const portalAssets = {
-  /** Emblema oficial transparente (sempre local — não usa CDN Lovable) */
+  /** Emblema oficial enviado pela casa (logo-oficial.jpg), com o fundo branco do arquivo */
   logo: logoAsset('logo.png'),
-  /** Emblema oficial 4K (3840×3840) — arquivo de arquivo; a home usa o WebP transparente */
+  /** Cópia 4K antiga. A home usa o arquivo enviado, não este. */
   logo4k: logoAsset('logo-4k.webp'),
   logo4kJpg: logoAsset('logo-4k.jpg'),
   logoWebp: logoAsset('logo.webp'),

@@ -24,7 +24,7 @@
 3. `/public/estudos` continua com os materiais editáveis pelo Marketing e aponta para a enciclopédia.
 4. Para trocar uma foto: `python scripts/fetch-ervas-fotos.py <slug>`. O extrator do `.docx` (`scripts/extract-enciclopedia-ervas.py`) recria só o texto e as ilustrações esquemáticas; não usar isso por cima das fotos já creditadas.
 5. A jurema-branca usa fotografia de *Piptadenia retusa*: o GBIF trata *Piptadenia stipulacea* como sinônimo, e a ficha traz essa nota.
-6. As fotos não entram no precache do PWA (`globIgnores` em `frontend/vite.config.ts`). A URL do emblema leva `?v=20261021c` para não reaproveitar o arquivo antigo no cache da Cloudflare. O desenho é o PNG oficial (`0ece8eb`); só o papel branco de fora do aro sai. O triângulo, o aro e as estrelas continuam brancos.
+6. As fotos não entram no precache do PWA (`globIgnores` em `frontend/vite.config.ts`). A URL do emblema leva `?v=20261021d` para não reaproveitar o recorte antigo no cache da Cloudflare. O arquivo é o que a casa enviou (`frontend/public/portal/logo-oficial.jpg`), com o fundo branco.
 
 ## Nossa história
 
@@ -60,7 +60,7 @@ Canal YouTube da casa: hospeda o arquivo; o site só embute o player (CSP `youtu
 
 - Textos institucionais: `PublicHome.tsx`  
 - História completa: i18n `historia.*`  
-- **Logo oficial:** `frontend/public/portal/logo.png` e `logo.webp` (1024, fundo transparente fora do selo; o triângulo interno continua branco). Home, cabeçalho e favicon usam esse emblema. `logo-4k.*` é o arquivo de alta resolução com fundo branco e não entra na home.  
+- **Logo oficial:** `frontend/public/portal/logo-oficial.jpg` (arquivo enviado pela casa). `logo.png` e `logo.webp` são essa mesma imagem. Home, cabeçalho e favicon usam esse emblema, com o fundo branco do arquivo.  
 - Busca pessoas/auditoria: **FTS** (`websearch_to_tsquery` portuguese + GIN), não ILIKE aberto  
 - Token Chatwoot: `VITE_CHATWOOT_WEBSITE_TOKEN` no frontend  
 - ADR galeria: [`012-galeria-midia.md`](../decisions/012-galeria-midia.md)  

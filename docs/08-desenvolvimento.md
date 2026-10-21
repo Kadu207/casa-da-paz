@@ -84,7 +84,7 @@ Smoke prod galeria: `curl -s https://casadapaz.inovatitech.com.br/api/public/gal
 Álbuns públicos: `curl -s https://casadapaz.inovatitech.com.br/api/public/galeria/albuns`  
 Nossa história: `curl -s -o /dev/null -w '%{http_code}\n' https://casadapaz.inovatitech.com.br/public/historia`  
 Enciclopédia: `curl -s -o /dev/null -w '%{http_code}\n' https://casadapaz.inovatitech.com.br/public/ervas`  
-Emblema: `curl -sI "https://casadapaz.inovatitech.com.br/portal/logo.webp?v=20261021c"`
+Emblema: `curl -sI "https://casadapaz.inovatitech.com.br/portal/logo.webp?v=20261021d"`
 
 ## 8.6. Git dual
 
