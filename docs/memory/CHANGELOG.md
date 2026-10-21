@@ -25,7 +25,7 @@
 - **Auditoria F01–F10:** Remediado/Validado 2026-09-02 — smoke prod PASS; ver `docs/security-audit/ACHADOS.md`
 
 ### Documentação
-- **Refresh 2026-10-21:** docs 00–03/07–09, README, roadmap, playbook do portal, spec 027, agents e memória — enciclopédia `/public/ervas` (fotos creditadas) e emblema transparente (`9c65c5e`)
+- **Refresh 2026-10-21:** docs 00–03/07–09, README, roadmap, playbook do portal, spec 027, agents e memória — enciclopédia `/public/ervas` (fotos creditadas) e emblema transparente — **deploy VPS** `cdde7d4`
 - **Refresh 2026-09-04 (álbuns/PRIVADO):** ADR-012, spec 034, playbook portal, OpenAPI/RBAC, docs 01–07/09, agents, memória — alinhado a `MidiaAlbum` + `PRIVADO`
 - **Refresh 2026-09-04:** docs 00–09, README, roadmap, memória, playbook portal, OpenAPI/RBAC — Spec **034 Galeria** em produção
 - **Refresh 2026-09-02:** docs 00–09, README, roadmap, memória, ACHADOS F01–F10 GREEN, 033/delegações, CSP mapa OSM, smokes de auditoria

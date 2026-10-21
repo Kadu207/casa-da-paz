@@ -8,7 +8,7 @@
 |------|--------|
 | Fase | Pós-go-live estável: **enciclopédia de ervas** + emblema transparente + **Nossa história** + **034 Galeria** + 033 + 031 + 030 + F01–F10 GREEN |
 | Versão | 0.1.0-alpha |
-| Commit referência | `9c65c5e` emblema transparente — **deploy VPS** 2026-10-21 (enciclopédia `ce143fb` no mesmo dia) |
+| Commit referência | `cdde7d4` documentação alinhada — **deploy VPS** 2026-10-21 (app: emblema `9c65c5e`, enciclopédia `ce143fb`) |
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (Host `inovati`; **não** :22) |
 | Asaas (021) | **Dormant** — [`asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
