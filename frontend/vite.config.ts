@@ -39,6 +39,7 @@ export default defineConfig({
       workbox: {
         navigateFallback: '/index.html',
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,webp,ico}'],
+        globIgnores: ['**/portal/ervas/**'],
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,

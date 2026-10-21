@@ -345,7 +345,7 @@ export const erpEn: Record<ErpTranslationKey, string> = {
   'erp.marketing.contents': 'Bookstore content',
   'erp.marketing.studies': 'Study materials (herbs, baths…)',
   'erp.marketing.studiesHint':
-    'Visible at /public/estudos. The herbs image on the home page links here.',
+    'Visible at /public/estudos. The home herb image opens the encyclopedia at /public/ervas.',
   'erp.marketing.studyTitle': 'Title',
   'erp.marketing.studySummary': 'Summary (up to 400 chars)',
   'erp.marketing.studyBody': 'Full study text',

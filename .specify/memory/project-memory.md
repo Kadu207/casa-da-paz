@@ -1,6 +1,6 @@
 ﻿# Memória Viva — Casa da Paz
 
-**Última atualização:** 2026-09-29
+**Última atualização:** 2026-10-21
 
 ## Estado do projeto
 
@@ -16,6 +16,7 @@
 | Spec 033 delegações | ✅ Prod — migrate + seed funções + menu `/app/delegacoes` + N8N |
 | Spec 034 galeria | ✅ Prod — PUBLICO/PRIVADO, `MidiaAlbum`, YouTube, Marketing CRUD, ADR-012 |
 | Portal história | ✅ Prod — `/public/historia` (marcos 26/09/2015 · 11 anos / 10 anos registro em 2026) |
+| Enciclopédia de ervas | ✅ Código — `/public/ervas`, 100 fotos creditadas. Deploy logo após o push |
 | Logo oficial | Emblema no portal/ERP/favicon; home 4K (`logo-4k.webp`) |
 | Seed prod | Só flags idempotentes (`--estoque-casa-only`, `--funcoes-casa-only`, `--galeria-policies-034`). **Seed completo (destroy) não foi rodado** — exige `CONFIRM_SEED_DESTROY=yes` + backup |
 | Auditoria F01–F10 | ✅ **GREEN** — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |

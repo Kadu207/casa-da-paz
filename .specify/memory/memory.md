@@ -42,6 +42,7 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 033 delegacoes-casa | ✅ Prod (ADR-011) |
 | **034 galeria-midia** | ✅ Prod (ADR-012) — PUBLICO/PRIVADO + álbuns + YouTube |
 | Portal Nossa história | ✅ Prod — `/public/historia` (`b75f5c2`) |
+| Enciclopédia de ervas | ✅ Código — `/public/ervas` com fotos de referência e crédito (deploy na sequência deste push) |
 | 032 ingressos | 📋 Stub |
 | Auditoria F01–F10 | ✅ GREEN |
 

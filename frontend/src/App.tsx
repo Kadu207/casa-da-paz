@@ -32,6 +32,8 @@ import PublicEventoDetalhe from './pages/public/PublicEventoDetalhe';
 import PublicLivraria from './pages/public/PublicLivraria';
 import PublicEstudos from './pages/public/PublicEstudos';
 import PublicEstudoDetalhe from './pages/public/PublicEstudoDetalhe';
+import PublicErvas from './pages/public/PublicErvas';
+import PublicErvaDetalhe from './pages/public/PublicErvaDetalhe';
 import PublicGaleria from './pages/public/PublicGaleria';
 import PublicGaleriaDetalhe from './pages/public/PublicGaleriaDetalhe';
 import PublicTermos from './pages/public/PublicTermos';
@@ -74,6 +76,8 @@ export default function App() {
       <Route path="/public/livraria" element={<PublicLivraria />} />
       <Route path="/public/estudos" element={<PublicEstudos />} />
       <Route path="/public/estudos/:slug" element={<PublicEstudoDetalhe />} />
+      <Route path="/public/ervas" element={<PublicErvas />} />
+      <Route path="/public/ervas/:slug" element={<PublicErvaDetalhe />} />
       <Route path="/public/galeria" element={<PublicGaleria />} />
       <Route path="/public/galeria/:slug" element={<PublicGaleriaDetalhe />} />
       <Route path="/public/termos" element={<PublicTermos />} />
@@ -85,6 +89,8 @@ export default function App() {
       <Route path="/eventos/:id" element={<PublicEventoDetalhe />} />
       <Route path="/agendar" element={<Navigate to="/public/agendar" replace />} />
       <Route path="/livraria" element={<Navigate to="/public/livraria" replace />} />
+      <Route path="/ervas" element={<Navigate to="/public/ervas" replace />} />
+      <Route path="/ervas/:slug" element={<PublicErvaDetalhe />} />
       <Route path="/termos" element={<PublicTermos />} />
       <Route path="/acompanhar/:protocolo" element={<PublicAcompanhar />} />
       <Route path="/login" element={<LoginPage />} />

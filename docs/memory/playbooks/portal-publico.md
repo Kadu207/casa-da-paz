@@ -8,12 +8,21 @@
 | `/public/eventos` | Giras/oficinas abertas |
 | `/public/agendar` | Solicitação de consulta |
 | `/public/contato` | WhatsApp + Chatwoot |
-| `/public/estudos` | Materiais de estudo (ervas/banhos) |
+| `/public/estudos` | Materiais de estudo (ervas/banhos) editáveis pelo Marketing |
+| `/public/ervas` | Enciclopédia de estudo (100 espécies, estática) |
+| `/public/ervas/:slug` | Ficha da espécie |
 | `/public/galeria` | **Galeria** fotos e vídeos públicos (Spec 034) |
 | `/public/galeria/:slug` | Detalhe / player YouTube embutido |
 | `/public/historia` | **Nossa história** (marcos 2015/2026 + narrativa completa) |
 | `/public/livraria` | Checkout |
 | `/public/termos` | LGPD |
+
+## Enciclopédia de ervas
+
+1. Botão **Ervas, banhos e estudos** na home, o quadro de ervas da galeria e o rodapé **Ervas & banhos** abrem `/public/ervas`.
+2. Conteúdo em `frontend/src/data/enciclopedia-ervas.json` (100 fichas + fundamentos). Fotografias de referência em `frontend/public/portal/ervas/fotos/`, com autor e licença livre (Wikimedia Commons ou iNaturalist) em cada ficha.
+3. `/public/estudos` continua com os materiais editáveis pelo Marketing e aponta para a enciclopédia.
+4. Para trocar uma foto: `python scripts/fetch-ervas-fotos.py <slug>`. O extrator do `.docx` (`scripts/extract-enciclopedia-ervas.py`) recria só o texto e as ilustrações esquemáticas; não usar isso por cima das fotos já creditadas.
 
 ## Nossa história
 

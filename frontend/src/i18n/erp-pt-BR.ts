@@ -343,7 +343,7 @@ export const erpPtBR = {
   'erp.marketing.contents': 'Conteúdos da livraria',
   'erp.marketing.studies': 'Materiais de estudo (ervas, banhos…)',
   'erp.marketing.studiesHint':
-    'Visível em /public/estudos. A imagem de ervas na home aponta para essa página.',
+    'Visível em /public/estudos. A enciclopédia de ervas da home fica em /public/ervas.',
   'erp.marketing.studyTitle': 'Título',
   'erp.marketing.studySummary': 'Resumo (até 400 caracteres)',
   'erp.marketing.studyBody': 'Texto completo do material',

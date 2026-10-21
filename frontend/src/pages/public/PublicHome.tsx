@@ -37,7 +37,7 @@ export default function PublicHome() {
       src: portalAssets.ervas,
       label: t('home.cta.studies'),
       hint: t('home.gallery.ervasHint'),
-      to: '/public/estudos',
+      to: '/public/ervas',
       w: 1024,
       h: 768,
       className: 'col-span-2 sm:col-span-2 aspect-[16/9] sm:aspect-auto',
@@ -97,7 +97,7 @@ export default function PublicHome() {
 
       <section className="max-w-4xl mx-auto px-4 pb-10">
         <Link
-          to="/public/estudos"
+          to="/public/ervas"
           className="block rounded-2xl border border-primary/25 overflow-hidden bg-card shadow-xl grid md:grid-cols-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary group"
         >
           <div className="relative min-h-[200px] md:min-h-0">

@@ -60,6 +60,12 @@ export default function PublicEstudos() {
           <p className="text-xs uppercase tracking-[0.25em] text-primary/90">{t('studies.eyebrow')}</p>
           <h1 className="mt-3 font-serif text-3xl sm:text-4xl text-primary">{t('studies.title')}</h1>
           <p className="mt-4 text-foreground/85 leading-relaxed max-w-xl mx-auto">{t('studies.subtitle')}</p>
+          <Link
+            to="/public/ervas"
+            className="mt-6 min-h-11 inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground font-medium px-5"
+          >
+            {t('herbs.ctaFromStudies')}
+          </Link>
         </div>
       </section>
 
