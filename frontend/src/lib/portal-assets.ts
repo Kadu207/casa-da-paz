@@ -14,15 +14,22 @@ function lovable(path: string, localFile: string): string {
   return `${LOVABLE_BASE}${path}`;
 }
 
+/** Bust de cache quando o arquivo do emblema muda (Cloudflare guarda /portal/ por 24h). */
+const LOGO_VERSION = '20261021';
+
+function logoAsset(file: string): string {
+  return `/portal/${file}?v=${LOGO_VERSION}`;
+}
+
 export const portalAssets = {
-  /** Emblema oficial (sempre local — não usa CDN Lovable) */
-  logo: '/portal/logo.png',
-  /** Emblema oficial 4K (3840×3840) — home e displays de alta densidade */
-  logo4k: '/portal/logo-4k.webp',
-  logo4kJpg: '/portal/logo-4k.jpg',
-  logoWebp: '/portal/logo.webp',
-  logo192: '/portal/logo-192.png',
-  logo512: '/portal/logo-512.png',
+  /** Emblema oficial transparente (sempre local — não usa CDN Lovable) */
+  logo: logoAsset('logo.png'),
+  /** Emblema oficial 4K (3840×3840) — arquivo de arquivo; a home usa o WebP transparente */
+  logo4k: logoAsset('logo-4k.webp'),
+  logo4kJpg: logoAsset('logo-4k.jpg'),
+  logoWebp: logoAsset('logo.webp'),
+  logo192: logoAsset('logo-192.png'),
+  logo512: logoAsset('logo-512.png'),
   hero: lovable(
     '/__l5e/assets-v1/7a3cccb7-7e32-4ecb-b542-70930763ac21/hero-afroindigena.jpg',
     'hero.jpg'

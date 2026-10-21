@@ -31,9 +31,9 @@ export default defineConfig({
         lang: 'pt-BR',
         start_url: '/public',
         icons: [
-          { src: '/portal/logo-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-          { src: '/portal/logo-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-          { src: '/portal/logo-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: '/portal/logo-192.png?v=20261021', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/portal/logo-512.png?v=20261021', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/portal/logo-512.png?v=20261021', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
