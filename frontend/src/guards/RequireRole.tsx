@@ -16,6 +16,7 @@ const routeResources: Record<string, string> = {
   '/app/financeiro/cobrancas': 'cobrancas',
   '/app/financeiro/transparencia': 'transparencia',
   '/app/marketing': 'marketing',
+  '/app/pontos': 'marketing',
   '/app/recepcao': 'eventos',
   '/app/eventos': 'eventos',
   '/app/pessoas': 'pessoas',

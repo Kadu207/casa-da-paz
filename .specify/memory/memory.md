@@ -43,7 +43,8 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | **034 galeria-midia** | ✅ Prod (ADR-012) — PUBLICO/PRIVADO + álbuns + YouTube |
 | Portal Nossa história | ✅ Prod — `/public/historia` (`b75f5c2`) |
 | Enciclopédia de ervas | ✅ Prod — `/public/ervas`, 100 fotos creditadas (`ce143fb`, 2026-10-21) |
-| Logo oficial | ✅ Prod — emblema transparente, home/cabeçalho/favicon (`9c65c5e`, 2026-10-21) |
+| Logo oficial | ✅ Prod — arquivo enviado pela casa, fundo branco (`3a3d4fc`, 2026-10-21) |
+| Pontos cantados | ✅ Código — `/public/pontos` player Spotify, `/app/pontos`, Telegram e chat no contato |
 | 032 ingressos | 📋 Stub |
 | Auditoria F01–F10 | ✅ GREEN |
 

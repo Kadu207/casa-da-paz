@@ -11,6 +11,7 @@ export const en: Record<PortalTranslationKey, string> = {
   'nav.studyMaterials': 'Study materials',
   'nav.gallery': 'Gallery',
   'nav.history': 'Our story',
+  'nav.pontos': 'Chants',
   'site.documentTitle': 'Welcome to Casa da Paz',
   'home.title': 'Welcome to Casa da Paz',
   'home.subtitle':
@@ -25,6 +26,7 @@ export const en: Record<PortalTranslationKey, string> = {
   'home.cta.studies': 'Herbs, baths & study',
   'home.cta.studiesOpen': 'Open encyclopedia',
   'home.cta.history': 'Our story',
+  'home.cta.pontos': 'Sacred chants',
   'home.studies.text':
     'A study encyclopedia of 100 species: tradition, ritual classification, gentle baths and safety care.',
   'home.shop.title': 'Casa da Paz Bookstore',
@@ -291,4 +293,17 @@ export const en: Record<PortalTranslationKey, string> = {
   'herbs.next': 'Next',
   'herbs.ctaStudies': 'See materials published by communications',
   'herbs.ctaFromStudies': 'Open the encyclopedia of 100 species',
+  'pontos.title': 'Sacred chants',
+  'pontos.subtitle': 'Listen to the house playlist and each chant on this page.',
+  'pontos.empty': 'The repertoire is still being organized.',
+  'pontos.playlist': 'House playlist',
+  'pontos.list': 'Chants',
+  'pontos.play': 'Play',
+  'pontos.playing': 'Now playing',
+  'pontos.lyrics': 'Lyrics',
+  'contact.chat': 'House chat',
+  'contact.chatHint': 'Talk to reception without leaving the site',
+  'contact.chatWait': 'The chat is still opening. Tap again in a moment.',
+  'contact.telegram': 'Telegram',
+  'contact.telegramHint': 'Open the conversation on Telegram',
 };

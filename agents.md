@@ -47,6 +47,7 @@ Usuário → agent-orquestrador → agente-domínio → validador-integracao →
 | 034 | Galeria fotos/vídeos (PUBLICO/PRIVADO + álbuns) | **Não depende** |
 | — | Portal Nossa história (`/public/historia`) | **Não depende** |
 | — | Enciclopédia de ervas (`/public/ervas`, 100 fotos creditadas) | **Não depende** |
+| — | Pontos cantados (`/public/pontos`, player Spotify) + Telegram no contato | **Não depende** |
 
 Docs: [`docs/00-index.md`](docs/00-index.md)
 

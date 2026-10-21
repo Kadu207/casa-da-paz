@@ -7,7 +7,7 @@
 | `/public` | Home institucional |
 | `/public/eventos` | Giras/oficinas abertas |
 | `/public/agendar` | Solicitação de consulta |
-| `/public/contato` | WhatsApp + Chatwoot |
+| `/public/contato` | WhatsApp + chat Chatwoot + Telegram |
 | `/public/estudos` | Materiais de estudo (ervas/banhos) editáveis pelo Marketing |
 | `/public/ervas` | Enciclopédia de estudo (100 espécies, estática). Alias `/ervas` |
 | `/public/ervas/:slug` | Ficha da espécie. Alias `/ervas/:slug` |
@@ -60,7 +60,8 @@ Canal YouTube da casa: hospeda o arquivo; o site só embute o player (CSP `youtu
 
 - Textos institucionais: `PublicHome.tsx`  
 - História completa: i18n `historia.*`  
-- **Logo oficial:** `frontend/public/portal/logo-oficial.jpg` (arquivo enviado pela casa). `logo.png` e `logo.webp` são essa mesma imagem. Home, cabeçalho e favicon usam esse emblema, com o fundo branco do arquivo.  
+- **Logo oficial:** `frontend/public/portal/logo-oficial.jpg` (arquivo enviado pela casa). `logo.png` e `logo.webp` são essa mesma imagem. Home, cabeçalho e favicon usam esse emblema, com o fundo branco do arquivo.
+- **Pontos:** `/public/pontos` toca a playlist e cada ponto no player da página. Cadastro em `/app/pontos` (policy `marketing`). O Telegram público fica nessa mesma tela e aparece em `/public/contato`. A CSP do Nginx libera `open.spotify.com` e `casadapaz-chat.inovatitech.com.br`.  
 - Busca pessoas/auditoria: **FTS** (`websearch_to_tsquery` portuguese + GIN), não ILIKE aberto  
 - Token Chatwoot: `VITE_CHATWOOT_WEBSITE_TOKEN` no frontend  
 - ADR galeria: [`012-galeria-midia.md`](../decisions/012-galeria-midia.md)  

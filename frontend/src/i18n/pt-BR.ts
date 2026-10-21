@@ -9,6 +9,7 @@ export const ptBR = {
   'nav.studyMaterials': 'Materiais de estudo',
   'nav.gallery': 'Galeria',
   'nav.history': 'Nossa história',
+  'nav.pontos': 'Pontos',
   'site.documentTitle': 'Bem vindo a Casa da Paz',
   'home.title': 'Bem vindo a Casa da Paz',
   'home.subtitle':
@@ -23,6 +24,7 @@ export const ptBR = {
   'home.cta.studies': 'Ervas, banhos e estudos',
   'home.cta.studiesOpen': 'Abrir enciclopédia',
   'home.cta.history': 'Nossa história',
+  'home.cta.pontos': 'Pontos cantados',
   'home.studies.text':
     'Enciclopédia de estudo com 100 espécies: fundamentos da tradição, classificação ritual, banhos suaves e cuidados de segurança.',
   'home.shop.title': 'Livraria Casa da Paz',
@@ -289,6 +291,19 @@ export const ptBR = {
   'herbs.next': 'Próxima',
   'herbs.ctaStudies': 'Ver materiais publicados pela comunicação',
   'herbs.ctaFromStudies': 'Abrir a enciclopédia de 100 espécies',
+  'pontos.title': 'Pontos cantados',
+  'pontos.subtitle': 'Ouça a playlist da casa e cada ponto aqui na página.',
+  'pontos.empty': 'O repertório ainda está sendo organizado.',
+  'pontos.playlist': 'Playlist da casa',
+  'pontos.list': 'Pontos',
+  'pontos.play': 'Tocar',
+  'pontos.playing': 'Tocando agora',
+  'pontos.lyrics': 'Letra',
+  'contact.chat': 'Chat da casa',
+  'contact.chatHint': 'Fale com a recepção sem sair do site',
+  'contact.chatWait': 'O chat ainda está abrindo. Toque de novo em instantes.',
+  'contact.telegram': 'Telegram',
+  'contact.telegramHint': 'Abrir a conversa no Telegram',
 } as const;
 
 export type PortalTranslationKey = keyof typeof ptBR;

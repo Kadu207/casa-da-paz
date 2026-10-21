@@ -45,6 +45,6 @@ Material legado do protótipo Lovable/Supabase (não é a stack de produção):
 
 **Stack canônica:** React/Vite/TS + Express/Prisma/PostgreSQL + Python IA + Chatwoot/N8N + Docker/Nginx/Hetzner/Cloudflare  
 
-**Última atualização em prod (2026-10-21):** enciclopédia de ervas (`/public/ervas`, 100 fotos creditadas, `ce143fb`) e emblema oficial transparente na home/cabeçalho/favicon (`9c65c5e`). Antes: **Nossa história** (`b75f5c2`) e Spec **034 Galeria** (ADR-012).  
+**Última atualização em prod (2026-10-21):** pontos cantados com player Spotify (`/public/pontos`), chat Chatwoot e Telegram no contato; emblema oficial do arquivo enviado pela casa (`3a3d4fc`). Antes: enciclopédia de ervas (`ce143fb`).  
 
 **Endereço físico:** Rua Valério Eugênio, 570 — Bairro Areal — Conselheiro Lafaiete - MG

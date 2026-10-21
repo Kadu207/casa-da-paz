@@ -999,3 +999,30 @@ model MidiaPublicacao {
   @@index([albumId])
   @@map("midias_publicacao")
 }
+
+/// Playlist do Spotify, Telegram público e demais ajustes do portal (um registro).
+model CasaPortalConfig {
+  id              Int      @id @default(1)
+  playlistTitulo  String   @default("Pontos da Casa") @map("playlist_titulo") @db.VarChar(150)
+  playlistUrl     String?  @map("playlist_url") @db.VarChar(500)
+  telegramUrl     String?  @map("telegram_url") @db.VarChar(200)
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("casa_portal_config")
+}
+
+/// Ponto cantado publicado no portal, com faixa do Spotify.
+model PontoCantado {
+  id         Int      @id @default(autoincrement())
+  titulo     String   @db.VarChar(150)
+  linha      String   @db.VarChar(80)
+  letra      String?
+  spotifyUrl String   @map("spotify_url") @db.VarChar(500)
+  ordem      Int      @default(0)
+  publicado  Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([publicado, ordem])
+  @@map("pontos_cantados")
+}

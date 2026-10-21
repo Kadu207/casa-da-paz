@@ -13,7 +13,7 @@ Portal público no **mesmo frontend** (`/public/*`), sem autenticação:
 | `/public` | Home institucional |
 | `/public/eventos` | Lista eventos com status ABERTO |
 | `/public/agendar` | Formulário agendamento consulta |
-| `/public/contato` | WhatsApp (Chatwoot widget) + e-mail |
+| `/public/contato` | WhatsApp, chat do Chatwoot e Telegram |
 
 Backend:
 - `GET /api/public/eventos` — sem JWT

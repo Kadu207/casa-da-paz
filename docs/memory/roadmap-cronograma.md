@@ -23,7 +23,8 @@
 | **034 galeria mídia** | Fotos CF + vídeos YouTube, PUBLICO/PRIVADO + álbuns | ✅ Prod |
 | **Portal Nossa história** | `/public/historia` — marcos 2015/2026 + espaço narrativa | ✅ Prod |
 | Enciclopédia de ervas | `/public/ervas` — 100 espécies, fotos creditadas, fundamentos e banhos | ✅ Prod (`ce143fb`) |
-| Logo oficial | Emblema transparente na home, cabeçalho, ERP e favicon | ✅ Prod (`9c65c5e`) |
+| Logo oficial | Arquivo enviado pela casa, fundo branco, home/cabeçalho/favicon | ✅ Prod (`3a3d4fc`) |
+| Pontos cantados | `/public/pontos` player Spotify + `/app/pontos`; Telegram e chat no contato | ✅ Código — deploy nesta entrega |
 
 ## Sequência atual
 

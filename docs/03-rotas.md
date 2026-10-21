@@ -12,7 +12,7 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/public/eventos/:id` | Detalhe + inscrição |
 | `/public/agendar` | Agendamento de atendimento |
 | `/public/acompanhar/:protocolo` | Status do agendamento |
-| `/public/contato` | Contato |
+| `/public/contato` | Contato — WhatsApp, chat Chatwoot e Telegram |
 | `/public/livraria` | Catálogo / checkout (Asaas se configurado) |
 | `/public/estudos` | Materiais de estudo (ervas, banhos, defumação) |
 | `/public/estudos/:slug` | Detalhe do material |
@@ -21,6 +21,7 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/public/galeria` | Galeria pública de fotos e vídeos (Spec 034) |
 | `/public/galeria/:slug` | Detalhe da mídia pública |
 | `/public/historia` | Nossa história (marcos + narrativa completa) |
+| `/public/pontos` | Pontos cantados — player da playlist e de cada faixa do Spotify |
 | `/public/termos` | Termos / LGPD |
 
 ## 3.2. ERP (`/app`)
@@ -51,6 +52,7 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/app/estoque` | estoque_casa | Estoque primário da casa (insumos) |
 | `/app/ecommerce` | ecommerce | Pedidos |
 | `/app/marketing` | marketing | Marketing + materiais de estudo + galeria CRUD |
+| `/app/pontos` | marketing | Pontos cantados, playlist Spotify e link do Telegram |
 | `/app/galeria` | (autenticado) | Consumo fotos/vídeos públicos e privados (+ filtro álbum) |
 | `/app/usuarios` | usuarios | Usuários + policies (SUPERVISOR) |
 | `/app/auditoria` | auditoria | Auditoria / export |
@@ -77,6 +79,9 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | GET | `/api/galeria/albuns` | Álbuns com itens ao vivo (JWT) |
 | GET | `/api/public/galeria` | Galeria pública ao vivo |
 | GET | `/api/public/galeria/albuns` | Álbuns com itens públicos ao vivo |
+| GET | `/api/public/pontos` | Playlist e pontos publicados (sem JWT) |
+| GET | `/api/public/canais` | Link público do Telegram |
+| * | `/api/marketing/pontos` | CRUD dos pontos e da playlist (policy `marketing`) |
 | * | `/api/public/*` | Portal anônimo |
 
 Contrato parcial: [`docs/contracts/openapi.yaml`](./contracts/openapi.yaml).

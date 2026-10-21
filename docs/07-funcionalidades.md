@@ -8,6 +8,8 @@
 - **Enciclopédia de ervas** (`/public/ervas`): 100 fichas com fotografia de referência, crédito e licença, fundamentos, banhos suaves e segurança; o botão de ervas da home abre esta página  
 - **Galeria** (`/public/galeria`): fotos e vídeos YouTube estilo grade; público vs privado + álbuns (Spec 034)  
 - **Nossa história** (`/public/historia`): marcos 26/09/2015 e 26/09/2026 + espaço para narrativa completa  
+- **Pontos cantados** (`/public/pontos`): player na página para a playlist e para cada ponto do Spotify; cadastro em `/app/pontos`
+- **Contato** (`/public/contato`): WhatsApp, chat do Chatwoot (se o token estiver no build) e Telegram
 - Newsletter e consentimentos  
 
 ## 7.2. Cadastros (`/app/pessoas`)

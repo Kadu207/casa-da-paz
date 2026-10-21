@@ -1,13 +1,23 @@
+import { useEffect, useState } from 'react';
 import { PublicLayout } from '../../components/public/PublicLayout';
-import { isChatwootConfigured } from '../../components/public/ChatwootWidget';
+import { isChatwootConfigured, openChatwoot } from '../../components/public/ChatwootWidget';
 import { SafeImage } from '../../components/public/SafeImage';
 import { ADDRESS, WHATSAPP_NUMBER, portalAssets } from '../../lib/portal-assets';
+import { api } from '../../lib/api';
 import { useI18n } from '../../i18n/I18nContext';
 import { DPO_EMAIL, DATA_PROTECTION_CONTACTS, formatContactList, whatsappDsarUrl } from '../../lib/lgpd-contact';
 import { Link } from 'react-router-dom';
 
 export default function PublicContato() {
   const { t, locale } = useI18n();
+  const [telegramUrl, setTelegramUrl] = useState<string | null>(null);
+  const [chatAviso, setChatAviso] = useState('');
+
+  useEffect(() => {
+    api<{ telegramUrl: string | null }>('/public/canais')
+      .then((canais) => setTelegramUrl(canais.telegramUrl))
+      .catch(() => setTelegramUrl(null));
+  }, []);
 
   const whatsapp = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(t('contact.whatsapp.prefill'))}`;
   const waDsar = whatsappDsarUrl(locale);
@@ -49,6 +59,32 @@ export default function PublicContato() {
             </div>
           </div>
         </a>
+
+        {isChatwootConfigured() ? (
+          <button
+            type="button"
+            onClick={() => {
+              if (!openChatwoot()) setChatAviso(t('contact.chatWait'));
+              else setChatAviso('');
+            }}
+            className="w-full text-left rounded-2xl bg-card border border-primary/40 p-5 sm:p-6 hover:border-primary transition-colors"
+          >
+            <p className="font-serif text-lg text-primary">{t('contact.chat')}</p>
+            <p className="text-foreground/80">{chatAviso || t('contact.chatHint')}</p>
+          </button>
+        ) : null}
+
+        {telegramUrl ? (
+          <a
+            href={telegramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-2xl bg-card border border-border/60 p-5 sm:p-6 hover:border-primary/40 transition-colors"
+          >
+            <p className="font-serif text-lg text-primary">{t('contact.telegram')}</p>
+            <p className="text-foreground/80">{t('contact.telegramHint')}</p>
+          </a>
+        ) : null}
 
         <a
           href="https://instagram.com/umbandacasadapaz"
@@ -102,14 +138,6 @@ export default function PublicContato() {
             {ADDRESS.line2}
           </p>
         </div>
-
-        {isChatwootConfigured() ? (
-          <p className="text-xs text-foreground/55 text-center">{t('contact.chat.online')}</p>
-        ) : (
-          <div className="rounded-2xl border border-dashed border-border/60 p-5 sm:p-6 text-sm text-foreground/55 text-center">
-            {t('contact.chat.soon')}
-          </div>
-        )}
       </section>
     </PublicLayout>
   );

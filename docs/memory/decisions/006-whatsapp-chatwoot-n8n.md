@@ -11,6 +11,7 @@ Arquitetura de mensageria MVP:
 ```
 Backend ──webhook──► N8N ──API──► Chatwoot ──► WhatsApp Business
 Portal ──widget──► Chatwoot (atendimento humano recepção)
+Telegram ──bot──► Chatwoot (mesma inbox da recepção)
 ```
 
 ### Chatwoot (self-hosted no Docker)

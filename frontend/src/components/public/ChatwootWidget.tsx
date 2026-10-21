@@ -13,6 +13,9 @@ declare global {
     chatwootSDK?: {
       run: (config: { websiteToken: string; baseUrl: string }) => void;
     };
+    $chatwoot?: {
+      toggle: (state?: 'open' | 'close') => void;
+    };
   }
 }
 
@@ -52,4 +55,10 @@ export function ChatwootWidget({ locale = 'pt_BR' }: { locale?: string }) {
 
 export function isChatwootConfigured(): boolean {
   return Boolean(WEBSITE_TOKEN && BASE_URL);
+}
+
+export function openChatwoot(): boolean {
+  if (!isChatwootConfigured() || !window.$chatwoot) return false;
+  window.$chatwoot.toggle('open');
+  return true;
 }

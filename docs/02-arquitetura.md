@@ -52,7 +52,7 @@ flowchart LR
 | Cloudflare Images | Upload de fotos (portal + galeria Marketing) |
 | YouTube | Embeds de vídeo na galeria (preferencial — ADR-012) |
 | Álbuns de mídia | `MidiaAlbum` — referência temática (Batizado 2026, etc.) |
-| Portal institucional | Home, enciclopédia de ervas, estudos, galeria, **Nossa história**, termos LGPD |
+| Portal institucional | Home, enciclopédia de ervas, pontos cantados, estudos, galeria, **Nossa história**, termos LGPD |
 
 ## 2.3. Princípios (constitution)
 
