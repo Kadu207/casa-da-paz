@@ -18,7 +18,7 @@
 | Portal história | ✅ Prod — `/public/historia` (marcos 26/09/2015 · 11 anos / 10 anos registro em 2026) |
 | Enciclopédia de ervas | ✅ Prod — `/public/ervas`, 100 fotos creditadas — **deploy VPS** `ce143fb` 2026-10-21 |
 | Logo oficial | ✅ Prod `3a3d4fc` — arquivo enviado pela casa, com o fundo branco (`?v=20261021d`) |
-| Pontos e contato | ✅ Código — `/public/pontos` (player Spotify), `/app/pontos`, chat Chatwoot e Telegram em `/public/contato`. Deploy ainda não feito |
+| Pontos e contato | ✅ Prod `490ed7e` — `/public/pontos` (player Spotify), `/app/pontos`, chat Chatwoot e Telegram em `/public/contato` |
 | Seed prod | Só flags idempotentes (`--estoque-casa-only`, `--funcoes-casa-only`, `--galeria-policies-034`). **Seed completo (destroy) não foi rodado** — exige `CONFIRM_SEED_DESTROY=yes` + backup |
 | Auditoria F01–F10 | ✅ **GREEN** — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
 | Mapa portal | ✅ Google Maps embed + CSP (fallback estático) |

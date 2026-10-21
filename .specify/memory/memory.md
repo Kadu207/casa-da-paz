@@ -44,7 +44,7 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | Portal Nossa história | ✅ Prod — `/public/historia` (`b75f5c2`) |
 | Enciclopédia de ervas | ✅ Prod — `/public/ervas`, 100 fotos creditadas (`ce143fb`, 2026-10-21) |
 | Logo oficial | ✅ Prod — arquivo enviado pela casa, fundo branco (`3a3d4fc`, 2026-10-21) |
-| Pontos cantados | ✅ Código — `/public/pontos` player Spotify, `/app/pontos`, Telegram e chat no contato |
+| Pontos cantados | ✅ Prod — `/public/pontos` player Spotify, `/app/pontos`, Telegram e chat no contato (`490ed7e`, 2026-10-21) |
 | 032 ingressos | 📋 Stub |
 | Auditoria F01–F10 | ✅ GREEN |
 

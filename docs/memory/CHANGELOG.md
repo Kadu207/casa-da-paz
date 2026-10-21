@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Adicionado
-- **Pontos cantados:** página `/public/pontos` com player do Spotify (playlist e cada ponto na própria página) e cadastro em `/app/pontos`. Contato ganha o chat do Chatwoot e o link do Telegram, além do WhatsApp.
+- **Pontos cantados:** página `/public/pontos` com player do Spotify (playlist e cada ponto na própria página) e cadastro em `/app/pontos`. Contato ganha o chat do Chatwoot e o link do Telegram, além do WhatsApp — **deploy VPS** `490ed7e` 2026-10-21
 - **Logo:** o site passou a usar o arquivo enviado pela casa (`logo-oficial.jpg`), com o fundo branco. O recorte transparente saiu — **deploy VPS** `3a3d4fc` 2026-10-21 (`logo.webp?v=20261021d`)
 - **Enciclopédia de ervas — fotos:** 100 fotografias de referência (licença livre, autoria na ficha) em `/public/ervas`; ilustrações esquemáticas saíram do catálogo — **deploy VPS** `ce143fb` 2026-10-21
 - **Enciclopédia de ervas:** portal `/public/ervas` com 100 fichas, fundamentos, banhos suaves e filtros; home (botão e galeria) e rodapé apontam para ela. Materiais do Marketing seguem em `/public/estudos`.

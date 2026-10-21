@@ -20,7 +20,7 @@
 | Set/2026 | Portal **Nossa história** (`/public/historia`) — marcos 2015/2026 · deploy `b75f5c2` |
 | Out/2026 | Enciclopédia de ervas (`/public/ervas`, 100 fotos com crédito) · deploy `ce143fb` |
 | Out/2026 | Emblema do arquivo enviado pela casa, com fundo branco · deploy `3a3d4fc` |
-| Out/2026 | Pontos cantados com player Spotify, chat Chatwoot e Telegram no contato |
+| Out/2026 | Pontos cantados com player Spotify, chat Chatwoot e Telegram no contato · deploy `490ed7e` |
 
 ## 9.2. Estado atual
 

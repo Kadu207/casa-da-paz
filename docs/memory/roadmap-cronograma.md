@@ -24,7 +24,7 @@
 | **Portal Nossa história** | `/public/historia` — marcos 2015/2026 + espaço narrativa | ✅ Prod |
 | Enciclopédia de ervas | `/public/ervas` — 100 espécies, fotos creditadas, fundamentos e banhos | ✅ Prod (`ce143fb`) |
 | Logo oficial | Arquivo enviado pela casa, fundo branco, home/cabeçalho/favicon | ✅ Prod (`3a3d4fc`) |
-| Pontos cantados | `/public/pontos` player Spotify + `/app/pontos`; Telegram e chat no contato | ✅ Código — deploy nesta entrega |
+| Pontos cantados | `/public/pontos` player Spotify + `/app/pontos`; Telegram e chat no contato | ✅ Prod (`490ed7e`) |
 
 ## Sequência atual
 
