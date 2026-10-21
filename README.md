@@ -64,6 +64,8 @@ npm run dev
 - **Delegações / funções da casa (033)** — `/app/delegacoes`  
 - **Galeria de mídia (034)** — `/public/galeria` + `/app/galeria` (YouTube + fotos, PUBLICO/PRIVADO, álbuns)  
 - **Nossa história** — `/public/historia` (marcos 26/09/2015 · 11/10 anos em 2026; texto em i18n)  
+- **Enciclopédia de ervas** — `/public/ervas` (100 espécies, foto de referência com crédito e licença)  
+- **Logo** — emblema oficial transparente na home, no cabeçalho e no favicon  
 - Policies de acesso definidas **no cadastro** do usuário  
 - Asaas 021 opcional (dormant)  
 - Auditoria de segurança F01–F10 **GREEN**  

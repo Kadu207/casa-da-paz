@@ -16,8 +16,8 @@ API: prefixo `/api` no Express (`backend/src/index.ts`).
 | `/public/livraria` | Catálogo / checkout (Asaas se configurado) |
 | `/public/estudos` | Materiais de estudo (ervas, banhos, defumação) |
 | `/public/estudos/:slug` | Detalhe do material |
-| `/public/ervas` | Enciclopédia de estudo — 100 espécies (fundamentos, banhos, fichas) |
-| `/public/ervas/:slug` | Ficha da espécie |
+| `/public/ervas` | Enciclopédia de estudo — 100 espécies com foto, crédito e licença (fundamentos, banhos, fichas). Alias `/ervas` redireciona para cá |
+| `/public/ervas/:slug` | Ficha da espécie. Alias `/ervas/:slug` abre a mesma ficha |
 | `/public/galeria` | Galeria pública de fotos e vídeos (Spec 034) |
 | `/public/galeria/:slug` | Detalhe da mídia pública |
 | `/public/historia` | Nossa história (marcos + narrativa completa) |

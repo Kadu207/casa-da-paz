@@ -6,9 +6,9 @@
 
 | Item | Status |
 |------|--------|
-| Fase | Pós-go-live estável: **Nossa história** + **034 Galeria** + 033 Delegações + 031 Estoque + 030 Security + F01–F10 GREEN |
+| Fase | Pós-go-live estável: **enciclopédia de ervas** + emblema transparente + **Nossa história** + **034 Galeria** + 033 + 031 + 030 + F01–F10 GREEN |
 | Versão | 0.1.0-alpha |
-| Commit referência | `ce143fb` enciclopédia de ervas com fotos — **deploy VPS** 2026-10-21 |
+| Commit referência | `9c65c5e` emblema transparente — **deploy VPS** 2026-10-21 (enciclopédia `ce143fb` no mesmo dia) |
 | Produção | https://casadapaz.inovatitech.com.br |
 | SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (Host `inovati`; **não** :22) |
 | Asaas (021) | **Dormant** — [`asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
@@ -17,7 +17,7 @@
 | Spec 034 galeria | ✅ Prod — PUBLICO/PRIVADO, `MidiaAlbum`, YouTube, Marketing CRUD, ADR-012 |
 | Portal história | ✅ Prod — `/public/historia` (marcos 26/09/2015 · 11 anos / 10 anos registro em 2026) |
 | Enciclopédia de ervas | ✅ Prod — `/public/ervas`, 100 fotos creditadas — **deploy VPS** `ce143fb` 2026-10-21 |
-| Logo oficial | Emblema transparente no portal/ERP/favicon (triângulo interno branco). Home não usa o 4K de fundo branco |
+| Logo oficial | ✅ Prod `9c65c5e` — emblema transparente no portal/ERP/favicon (triângulo interno branco). Home não usa o 4K de fundo branco |
 | Seed prod | Só flags idempotentes (`--estoque-casa-only`, `--funcoes-casa-only`, `--galeria-policies-034`). **Seed completo (destroy) não foi rodado** — exige `CONFIRM_SEED_DESTROY=yes` + backup |
 | Auditoria F01–F10 | ✅ **GREEN** — [`ACHADOS.md`](../../docs/security-audit/ACHADOS.md) |
 | Mapa portal | ✅ Google Maps embed + CSP (fallback estático) |

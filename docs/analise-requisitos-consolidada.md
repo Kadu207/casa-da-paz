@@ -103,8 +103,10 @@ Isolamento MEDIUM: `WHERE pessoa_id = :currentUserPessoaId` em todas as queries 
 2. **Eventos** — giras e oficinas abertas (somente leitura)
 3. **Agendar consulta** — formulário: nome, telefone, data preferida, observação
 4. **Contato** — botão WhatsApp (Chatwoot widget ou link wa.me)
-5. **Estudos / Galeria / Livraria / Termos** — entregues além do MVP original
-6. **Nossa história** (`/public/historia`) — marcos 26/09/2015 e aniversário 2026; narrativa completa via i18n
+5. **Enciclopédia de ervas** (`/public/ervas`) — 100 espécies com fotografia de referência, crédito e licença; o botão de ervas da home abre esta página
+6. **Estudos** (`/public/estudos`) — materiais editáveis pelo Marketing (ervas, banhos, defumação), com atalho para a enciclopédia
+7. **Galeria / Livraria / Termos** — entregues além do MVP original
+8. **Nossa história** (`/public/historia`) — marcos 26/09/2015 e aniversário 2026; narrativa completa via i18n
 
 ### Fluxo agendamento
 1. Consulentes preenchem formulário público

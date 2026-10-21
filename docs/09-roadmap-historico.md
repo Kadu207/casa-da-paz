@@ -18,6 +18,8 @@
 | Set/2026 | CSP mapa OSM no portal (“Onde nos encontrar”) |
 | Set/2026 | **034 Galeria de mídia** (YouTube + fotos, PUBLICO/PRIVADO + álbuns) — ADR-012 |
 | Set/2026 | Portal **Nossa história** (`/public/historia`) — marcos 2015/2026 · deploy `b75f5c2` |
+| Out/2026 | Enciclopédia de ervas (`/public/ervas`, 100 fotos com crédito) · deploy `ce143fb` |
+| Out/2026 | Emblema oficial sem o quadrado branco (home, cabeçalho, favicon) · deploy `9c65c5e` |
 
 ## 9.2. Estado atual
 

@@ -9,8 +9,8 @@
 | `/public/agendar` | Solicitação de consulta |
 | `/public/contato` | WhatsApp + Chatwoot |
 | `/public/estudos` | Materiais de estudo (ervas/banhos) editáveis pelo Marketing |
-| `/public/ervas` | Enciclopédia de estudo (100 espécies, estática) |
-| `/public/ervas/:slug` | Ficha da espécie |
+| `/public/ervas` | Enciclopédia de estudo (100 espécies, estática). Alias `/ervas` |
+| `/public/ervas/:slug` | Ficha da espécie. Alias `/ervas/:slug` |
 | `/public/galeria` | **Galeria** fotos e vídeos públicos (Spec 034) |
 | `/public/galeria/:slug` | Detalhe / player YouTube embutido |
 | `/public/historia` | **Nossa história** (marcos 2015/2026 + narrativa completa) |
@@ -23,6 +23,8 @@
 2. Conteúdo em `frontend/src/data/enciclopedia-ervas.json` (100 fichas + fundamentos). Fotografias de referência em `frontend/public/portal/ervas/fotos/`, com autor e licença livre (Wikimedia Commons ou iNaturalist) em cada ficha.
 3. `/public/estudos` continua com os materiais editáveis pelo Marketing e aponta para a enciclopédia.
 4. Para trocar uma foto: `python scripts/fetch-ervas-fotos.py <slug>`. O extrator do `.docx` (`scripts/extract-enciclopedia-ervas.py`) recria só o texto e as ilustrações esquemáticas; não usar isso por cima das fotos já creditadas.
+5. A jurema-branca usa fotografia de *Piptadenia retusa*: o GBIF trata *Piptadenia stipulacea* como sinônimo, e a ficha traz essa nota.
+6. As fotos não entram no precache do PWA (`globIgnores` em `frontend/vite.config.ts`). A URL do emblema leva `?v=20261021` para não reaproveitar o arquivo antigo no cache da Cloudflare.
 
 ## Nossa história
 

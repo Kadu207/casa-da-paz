@@ -42,7 +42,8 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | 033 delegacoes-casa | ✅ Prod (ADR-011) |
 | **034 galeria-midia** | ✅ Prod (ADR-012) — PUBLICO/PRIVADO + álbuns + YouTube |
 | Portal Nossa história | ✅ Prod — `/public/historia` (`b75f5c2`) |
-| Enciclopédia de ervas | ✅ Prod — `/public/ervas` com fotos de referência e crédito (`ce143fb`) |
+| Enciclopédia de ervas | ✅ Prod — `/public/ervas`, 100 fotos creditadas (`ce143fb`, 2026-10-21) |
+| Logo oficial | ✅ Prod — emblema transparente, home/cabeçalho/favicon (`9c65c5e`, 2026-10-21) |
 | 032 ingressos | 📋 Stub |
 | Auditoria F01–F10 | ✅ GREEN |
 

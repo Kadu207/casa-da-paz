@@ -51,7 +51,7 @@ Campo opcional **e-mail** (`Pessoa.email`) — usado em alertas de delegações.
 | **Estoque** | Almoxarifado **primário** (`/app/estoque`): itens, mínimo/alertas, grupos de limpeza, checklist, relatório |
 | Livraria | PDV e estoque de **venda** (produtos) |
 | Ecommerce | Pedidos |
-| Marketing | Conteúdo, materiais de estudo e **galeria** (fotos/vídeos YouTube, Público/Privado, álbuns) |
+| Marketing | Materiais em `/public/estudos` e **galeria** (fotos/vídeos YouTube, Público/Privado, álbuns). A enciclopédia `/public/ervas` é estática e não passa por este CRUD |
 | Usuários | SUPERVISOR: criar com policies no ato |
 | Auditoria | Filtros + export CSV/PDF |
 
@@ -81,4 +81,6 @@ Campo opcional **e-mail** (`Pessoa.email`) — usado em alertas de delegações.
 | **033 Delegações / funções da casa** | ✅ |
 | **034 Galeria de mídia** | ✅ (YouTube; PUBLICO/PRIVADO + álbuns — ADR-012) |
 | Portal **Nossa história** | ✅ `/public/historia` (`b75f5c2`) |
+| Enciclopédia de ervas | ✅ `/public/ervas` — 100 fotos creditadas (`ce143fb`, 2026-10-21) |
+| Logo oficial | ✅ emblema transparente na home, cabeçalho, ERP e favicon (`9c65c5e`, 2026-10-21) |
 | Auditoria F01–F10 | ✅ GREEN |

@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Adicionado
-- **Logo:** emblema oficial de novo com fundo transparente fora do selo (o quadrado branco saiu da home, do cabeçalho e do favicon).
+- **Logo:** emblema oficial de novo com fundo transparente fora do selo (o quadrado branco saiu da home, do cabeçalho e do favicon) — **deploy VPS** `9c65c5e` 2026-10-21
 - **Enciclopédia de ervas — fotos:** 100 fotografias de referência (licença livre, autoria na ficha) em `/public/ervas`; ilustrações esquemáticas saíram do catálogo — **deploy VPS** `ce143fb` 2026-10-21
 - **Enciclopédia de ervas:** portal `/public/ervas` com 100 fichas, fundamentos, banhos suaves e filtros; home (botão e galeria) e rodapé apontam para ela. Materiais do Marketing seguem em `/public/estudos`.
 - **Retry + FTS + idempotência:** backoff N8N/Asaas/CF/Excel; `websearch_to_tsquery` em pessoas e auditoria (GIN); webhook Asaas insert-first sem `Date.now`; PIX `updateMany` condicional; dedup telefone indexado + 409 por nome — **deploy VPS** `4416502` 2026-09-29
@@ -25,7 +25,7 @@
 - **Auditoria F01–F10:** Remediado/Validado 2026-09-02 — smoke prod PASS; ver `docs/security-audit/ACHADOS.md`
 
 ### Documentação
-- **Refresh 2026-09-17:** docs 00–03/07–09, README, roadmap, playbook portal, agents, memória — **Nossa história** em produção
+- **Refresh 2026-10-21:** docs 00–03/07–09, README, roadmap, playbook do portal, spec 027, agents e memória — enciclopédia `/public/ervas` (fotos creditadas) e emblema transparente (`9c65c5e`)
 - **Refresh 2026-09-04 (álbuns/PRIVADO):** ADR-012, spec 034, playbook portal, OpenAPI/RBAC, docs 01–07/09, agents, memória — alinhado a `MidiaAlbum` + `PRIVADO`
 - **Refresh 2026-09-04:** docs 00–09, README, roadmap, memória, playbook portal, OpenAPI/RBAC — Spec **034 Galeria** em produção
 - **Refresh 2026-09-02:** docs 00–09, README, roadmap, memória, ACHADOS F01–F10 GREEN, 033/delegações, CSP mapa OSM, smokes de auditoria

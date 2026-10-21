@@ -1,6 +1,6 @@
 # Cronograma — Casa da Paz
 
-**Atualizado:** 2026-09-17
+**Atualizado:** 2026-10-21
 
 ## Concluído
 
@@ -22,10 +22,13 @@
 | **033 delegações** | Funções da casa + tarefas + N8N | ✅ Prod |
 | **034 galeria mídia** | Fotos CF + vídeos YouTube, PUBLICO/PRIVADO + álbuns | ✅ Prod |
 | **Portal Nossa história** | `/public/historia` — marcos 2015/2026 + espaço narrativa | ✅ Prod |
+| Enciclopédia de ervas | `/public/ervas` — 100 espécies, fotos creditadas, fundamentos e banhos | ✅ Prod (`ce143fb`) |
+| Logo oficial | Emblema transparente na home, cabeçalho, ERP e favicon | ✅ Prod (`9c65c5e`) |
 
 ## Sequência atual
 
 ```
+✅ Enciclopédia de ervas e emblema transparente em produção (ce143fb, 9c65c5e)
 ✅ Nossa história em produção (b75f5c2)
 ✅ 034 Galeria em produção
 ✅ 033 Delegações em produção
