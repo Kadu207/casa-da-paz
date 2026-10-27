@@ -3,7 +3,8 @@
 ## [Unreleased]
 
 ### Adicionado
-- **032 Ingressos / lotes (ADR-013):** `IngressoLote`, reserva pública com código, check-in por código na recepção, pagamento manual no ERP; workflow N8N `ingresso_oficina` com SMTP + Chatwoot (sem secrets). Runbook mensageria: SMTP, WhatsApp Meta, Telegram inbox, diagnóstico Chatwoot 000/502. **Deploy VPS pendente**
+- **032 Ingressos / lotes (ADR-013):** `IngressoLote`, reserva pública com código, check-in por código na recepção, pagamento manual no ERP; workflow N8N `ingresso_oficina` com SMTP + Chatwoot (sem secrets) — **deploy VPS** `6d4bda4` 2026-10-27 (migrate + rebuild + reimport N8N)
+- **Chatwoot público:** `CHATWOOT_BIND=0.0.0.0` — `https://casadapaz-chat.inovatitech.com.br` voltou **200** (antes 502 por bind só em `127.0.0.1`)
 - **Pontos cantados:** página `/public/pontos` com player do Spotify (playlist e cada ponto na própria página) e cadastro em `/app/pontos`. Contato ganha o chat do Chatwoot e o link do Telegram, além do WhatsApp — **deploy VPS** `490ed7e` 2026-10-21
 - **Logo:** o site passou a usar o arquivo enviado pela casa (`logo-oficial.jpg`), com o fundo branco. O recorte transparente saiu — **deploy VPS** `3a3d4fc` 2026-10-21 (`logo.webp?v=20261021d`)
 - **Enciclopédia de ervas — fotos:** 100 fotografias de referência (licença livre, autoria na ficha) em `/public/ervas`; ilustrações esquemáticas saíram do catálogo — **deploy VPS** `ce143fb` 2026-10-21

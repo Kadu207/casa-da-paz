@@ -6,13 +6,13 @@
 
 | Item | Status |
 |------|--------|
-| Fase | Pós-go-live: **032 ingressos (código local)** + mensageria runbook; prod ainda em pontos/ervas (2026-10-21) |
+| Fase | Pós-go-live: **032 ingressos em prod** + Chatwoot público 200 |
 | Versão | 0.1.0-alpha |
-| Commit referência | Prod: `490ed7e` pontos/contato — **032 ainda sem deploy VPS** |
+| Commit referência | Prod: `6d4bda4` — 032 ingressos + Chatwoot bind `0.0.0.0` (2026-10-27) |
 | Produção | https://casadapaz.inovatitech.com.br |
-| SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (Host `inovati`; **não** :22) |
+| SSH VPS | `ssh -p 65025 gestaoti@128.140.77.31` (Host `inovati`; IdentityFile `id_ed25519_inova`) |
 | Asaas (021) | **Dormant** — [`asaas-dormant.md`](../../docs/memory/runbooks/asaas-dormant.md) |
-| Spec 032 ingressos | ✅ Código local — lotes + reserva pública + check-in por código (ADR-013). **Deploy VPS pendente** |
+| Spec 032 ingressos | ✅ Prod — lotes + reserva pública + check-in por código (ADR-013) — deploy `6d4bda4` |
 | Spec 033 delegações | ✅ Prod — migrate + seed funções + menu `/app/delegacoes` + N8N |
 | Spec 034 galeria | ✅ Prod — PUBLICO/PRIVADO, `MidiaAlbum`, YouTube, Marketing CRUD, ADR-012 |
 | Portal história | ✅ Prod — `/public/historia` |
@@ -21,15 +21,15 @@
 | Pontos e contato | ✅ Prod — `/public/pontos`, Telegram link, Chatwoot widget |
 | Seed prod | Só flags idempotentes. Seed completo destroy exige `CONFIRM_SEED_DESTROY=yes` + backup |
 | Auditoria F01–F10 | ✅ **GREEN** |
-| Mensageria | Runbook SMTP/WhatsApp/Telegram pronto; Chatwoot público **HTTP 000** (diagnóstico SSH gate humano) |
+| Mensageria | Chatwoot `casadapaz-chat` **200** (bind corrigido `0.0.0.0:3001`); SMTP/WhatsApp/Telegram **gates credencial humana** |
 | CSP mídia | ✅ YouTube / youtube-nocookie / Vimeo |
 
 ## Pendências operacionais (próxima onda)
 
 | Prioridade | Item | Notas |
 |------------|------|-------|
-| 1 | Deploy 032 | Confirmar migrate `20261027120000_ingressos_lotes_032` + rebuild FE/BE + reimport N8N `ingresso-oficina` |
-| 2 | Mensageria polish | SMTP N8N; inbox WhatsApp Meta; Telegram BotFather; Chatwoot `casadapaz-chat` 502/000 |
+| 1 | Mensageria credenciais | SMTP N8N `SMTP Casa da Paz`; inbox WhatsApp Meta; Telegram BotFather |
+| 2 | Smoke 032 prod | Criar lote + reserva portal + check-in código em produção |
 | 3 | Asaas | Sandbox/prod com chave + confirmação |
 | 4 | SSH allowlist :65025 | Opcional |
 | Ops | Conteúdo galeria | Canal YouTube + 1º item via Marketing |
