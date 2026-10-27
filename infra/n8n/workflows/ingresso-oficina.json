@@ -12,7 +12,7 @@
       "name": "Webhook Ingresso",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [240, 300],
+      "position": [200, 300],
       "webhookId": "casadapaz-ingresso-oficina"
     },
     {
@@ -20,27 +20,201 @@
         "assignments": {
           "assignments": [
             {
-              "id": "log1",
+              "id": "a1",
               "name": "evento",
               "value": "ingresso_oficina",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "nome",
+              "value": "={{ $json.nome || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "telefone",
+              "value": "={{ $json.telefone || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "email",
+              "value": "={{ $json.email || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "codigo",
+              "value": "={{ $json.codigo || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "eventoNome",
+              "value": "={{ $json.eventoNome || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a7",
+              "name": "lote",
+              "value": "={{ $json.lote || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a8",
+              "name": "valor",
+              "value": "={{ $json.valor ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a9",
+              "name": "statusPagamento",
+              "value": "={{ $json.statusPagamento || 'PENDENTE' }}",
+              "type": "string"
+            },
+            {
+              "id": "a10",
+              "name": "mensagem",
+              "value": "={{ 'Casa da Paz — ingresso ' + ($json.eventoNome || '') + '\\nCódigo: ' + ($json.codigo || '') + '\\nLote: ' + ($json.lote || '-') + '\\nValor: R$ ' + ($json.valor ?? '') + '\\nStatus: ' + ($json.statusPagamento || 'PENDENTE') + '\\nGuarde o código para o check-in.' }}",
               "type": "string"
             }
           ]
         },
         "options": {}
       },
-      "id": "f2-set-ingresso",
-      "name": "Registrar evento",
+      "id": "f2-normalize",
+      "name": "Normalizar payload",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [480, 300]
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.telefone }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "f3-if-phone",
+      "name": "Tem telefone?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.email }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "f4-if-email",
+      "name": "Tem e-mail?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 420]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.CHATWOOT_INTERNAL_URL || 'http://chatwoot:3000').replace(/\\/$/, '') + '/api/v1/accounts/' + ($env.CHATWOOT_ACCOUNT_ID || '1') + '/conversations' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api_access_token",
+              "value": "={{ $env.CHATWOOT_API_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"source_id\": \"{{ $json.telefone }}\",\n  \"inbox_id\": {{ Number($env.CHATWOOT_INBOX_ID || 1) }},\n  \"message\": { \"content\": \"{{ $json.mensagem }}\" }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "f5-chatwoot",
+      "name": "Chatwoot enviar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 120],
+      "notes": "Usa CHATWOOT_API_TOKEN + inbox (WhatsApp ou Telegram). Sem secrets no JSON."
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.SMTP_FROM || 'noreply@casadapaz.inovatitech.com.br' }}",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ '[Casa da Paz] Ingresso — ' + ($json.eventoNome || '') + ' — ' + ($json.codigo || '') }}",
+        "emailType": "text",
+        "message": "={{ $json.mensagem }}",
+        "options": {}
+      },
+      "id": "f6-email",
+      "name": "Send Email SMTP",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [940, 420],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-casadapaz",
+          "name": "SMTP Casa da Paz"
+        }
+      },
+      "notes": "Credencial N8N 'SMTP Casa da Paz' (host/user/pass fora do repo). Defina SMTP_FROM no .env.production."
+    },
+    {
+      "parameters": {},
+      "id": "f7-noop",
+      "name": "Sem canal",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [940, 300]
     }
   ],
   "connections": {
     "Webhook Ingresso": {
-      "main": [[{ "node": "Registrar evento", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Normalizar payload", "type": "main", "index": 0 }]]
+    },
+    "Normalizar payload": {
+      "main": [
+        [
+          { "node": "Tem telefone?", "type": "main", "index": 0 },
+          { "node": "Tem e-mail?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Tem telefone?": {
+      "main": [
+        [{ "node": "Chatwoot enviar", "type": "main", "index": 0 }],
+        [{ "node": "Sem canal", "type": "main", "index": 0 }]
+      ]
+    },
+    "Tem e-mail?": {
+      "main": [
+        [{ "node": "Send Email SMTP", "type": "main", "index": 0 }],
+        [{ "node": "Sem canal", "type": "main", "index": 0 }]
+      ]
     }
   },
   "active": true,
-  "settings": { "executionOrder": "v1" }
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": true }
 }

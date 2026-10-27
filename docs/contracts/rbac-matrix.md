@@ -47,6 +47,8 @@
 
 **Delegações (`delegacoes`):** quadro de funções da casa (ADR-011). Write: SUPERVISOR, ADMIN, DIRETORIA. Read: todos os setores operacionais (+ MEDIUM). Toggle de tarefa exige apenas `read`.
 
+**Ingressos / lotes (Spec 032, ADR-013):** CRUD de `IngressoLote`, cancelamento de inscrição PENDENTE e confirmação de pagamento usam resource `eventos` (write). Check-in por **código** de ingresso usa `checkin` write (mesma policy do check-in por pessoa). Reserva pública (`POST /api/public/eventos/:id/reservas`) é anônima com Turnstile + LGPD — sem JWT. Estoque secundário: não compartilha saldo com `estoque_casa` nem livraria.
+
 **TESOURARIA** = setor operacional dos logins `tesouraria01`–`04` (mesma matriz financeira que FINANCEIRO; FINANCEIRO permanece por compatibilidade).
 
 **SUPERVISOR** gerencia usuários operacionais e define `usuario_policies.grants` **no ato do cadastro** (snapshot do setor + overrides). Edição posterior via UI Políticas.

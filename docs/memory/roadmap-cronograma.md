@@ -1,6 +1,6 @@
 # Cronograma — Casa da Paz
 
-**Atualizado:** 2026-10-21
+**Atualizado:** 2026-10-27
 
 ## Concluído
 
@@ -25,19 +25,16 @@
 | Enciclopédia de ervas | `/public/ervas` — 100 espécies, fotos creditadas, fundamentos e banhos | ✅ Prod (`ce143fb`) |
 | Logo oficial | Arquivo enviado pela casa, fundo branco, home/cabeçalho/favicon | ✅ Prod (`3a3d4fc`) |
 | Pontos cantados | `/public/pontos` player Spotify + `/app/pontos`; Telegram e chat no contato | ✅ Prod (`490ed7e`) |
+| **032 Ingressos** | Lotes + reserva portal + código + check-in (ADR-013) | ✅ Código local — **deploy pendente** |
 
 ## Sequência atual
 
 ```
-✅ Enciclopédia de ervas e emblema transparente em produção (ce143fb, 9c65c5e)
-✅ Nossa história em produção (b75f5c2)
-✅ 034 Galeria em produção
-✅ 033 Delegações em produção
-✅ Auditoria F01–F10 GREEN
+✅ Enciclopédia / história / 034 / 033 / F01–F10 GREEN (prod)
+✅ 032 Ingressos implementado localmente (migration + API + UI + N8N)
     ↓
-🔧 Mensageria polish (SMTP + WhatsApp Meta + Chatwoot 502)
-    ↓
-📋 032 Ingressos/eventos (stub — aguarda abertura)
+🔧 Deploy 032 (gate humano) + Mensageria polish
+   (SMTP N8N; WhatsApp Meta; Telegram BotFather; Chatwoot casadapaz-chat 000/502)
     ↓
 021 Asaas — dormant até chave + confirmação
     ↓
@@ -48,8 +45,8 @@
 
 | Prioridade | Item | Notas |
 |------------|------|-------|
-| **1** | Chatwoot/N8N polish | Credencial SMTP N8N; inbox WhatsApp; corrigir 502 `casadapaz-chat` |
-| **2** | Spec 032 detalhada | Só quando priorizar ingressos |
+| **1** | Deploy 032 | migrate + rebuild + reimport N8N ingresso |
+| **2** | Chatwoot/N8N polish | SMTP; WhatsApp Meta; Telegram inbox; diagnosticar `casadapaz-chat` |
 | **3** | Asaas sandbox | `asaas-dormant.md` gate |
 | **4** | SSH allowlist :65025 | Opcional |
 | Ops | Conteúdo galeria | Canal YouTube + 1º item via Marketing |

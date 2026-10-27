@@ -16,7 +16,21 @@ interface Inscricao {
   statusPagamento: string;
   adimplencia: string;
   vencimento: string | null;
+  codigo: string | null;
+  canceladaEm: string | null;
+  ingressoLoteId: number | null;
   pessoa: Pessoa;
+  ingressoLote?: { id: number; nome: string } | null;
+}
+
+interface IngressoLote {
+  id: number;
+  nome: string;
+  quantidade: number;
+  valor: string | number;
+  ativo: boolean;
+  ocupadas: number;
+  vagasRestantes: number;
 }
 
 interface Evento {
@@ -28,6 +42,7 @@ interface Evento {
   capacidadeMax: number | null;
   _count: { presencas: number; inscricoes: number };
   inscricoes?: Inscricao[];
+  ingressoLotes?: IngressoLote[];
 }
 
 const emptyForm = {
@@ -49,14 +64,20 @@ export default function EventosPage() {
   const { user } = useAuth();
   const canWrite = hasPermission(user, 'eventos', 'write');
 
-  const [aba, setAba] = useState<'cadastro' | 'inscricoes'>('cadastro');
+  const [aba, setAba] = useState<'cadastro' | 'inscricoes' | 'lotes'>('cadastro');
   const [filtroStatus, setFiltroStatus] = useState<'ABERTO' | 'ENCERRADO' | ''>('ABERTO');
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [eventoId, setEventoId] = useState<number | null>(null);
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [formEvento, setFormEvento] = useState(emptyForm);
   const [editId, setEditId] = useState<number | null>(null);
-  const [formInscricao, setFormInscricao] = useState({ pessoaId: '', valor: '', vencimento: '' });
+  const [formInscricao, setFormInscricao] = useState({
+    pessoaId: '',
+    valor: '',
+    vencimento: '',
+    ingressoLoteId: '',
+  });
+  const [formLote, setFormLote] = useState({ nome: '', quantidade: '', valor: '' });
   const [erro, setErro] = useState('');
   const [msg, setMsg] = useState('');
 
@@ -184,11 +205,14 @@ export default function EventosPage() {
         method: 'POST',
         body: JSON.stringify({
           pessoaId: Number(formInscricao.pessoaId),
-          valor: Number(formInscricao.valor),
+          valor: formInscricao.valor ? Number(formInscricao.valor) : undefined,
           vencimento: formInscricao.vencimento,
+          ingressoLoteId: formInscricao.ingressoLoteId
+            ? Number(formInscricao.ingressoLoteId)
+            : undefined,
         }),
       });
-      setFormInscricao({ pessoaId: '', valor: '', vencimento: '' });
+      setFormInscricao({ pessoaId: '', valor: '', vencimento: '', ingressoLoteId: '' });
       await carregarDetalhe(eventoId);
       await carregarLista();
     } catch (err) {
@@ -205,6 +229,65 @@ export default function EventosPage() {
     await carregarDetalhe(eventoId);
   };
 
+  const cancelarInscricao = async (inscricaoId: number) => {
+    if (!eventoId || !canWrite) return;
+    if (!window.confirm(t('erp.eventos.cancelConfirm'))) return;
+    setErro('');
+    try {
+      await api(`/eventos/${eventoId}/inscricoes/${inscricaoId}/cancelar`, { method: 'POST' });
+      await carregarDetalhe(eventoId);
+      await carregarLista();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.eventos.registerError'));
+    }
+  };
+
+  const criarLote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!eventoId || !canWrite) return;
+    setErro('');
+    try {
+      await api(`/eventos/${eventoId}/lotes`, {
+        method: 'POST',
+        body: JSON.stringify({
+          nome: formLote.nome,
+          quantidade: Number(formLote.quantidade),
+          valor: Number(formLote.valor),
+        }),
+      });
+      setFormLote({ nome: '', quantidade: '', valor: '' });
+      await carregarDetalhe(eventoId);
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.eventos.loteError'));
+    }
+  };
+
+  const toggleLoteAtivo = async (lote: IngressoLote) => {
+    if (!eventoId || !canWrite) return;
+    setErro('');
+    try {
+      await api(`/eventos/${eventoId}/lotes/${lote.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ ativo: !lote.ativo }),
+      });
+      await carregarDetalhe(eventoId);
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.eventos.loteError'));
+    }
+  };
+
+  const excluirLote = async (lote: IngressoLote) => {
+    if (!eventoId || !canWrite) return;
+    if (!window.confirm(t('erp.eventos.loteDelete'))) return;
+    setErro('');
+    try {
+      await api(`/eventos/${eventoId}/lotes/${lote.id}`, { method: 'DELETE' });
+      await carregarDetalhe(eventoId);
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.eventos.loteError'));
+    }
+  };
+
   const vagasRestantes =
     evento?.capacidadeMax != null
       ? Math.max(0, evento.capacidadeMax - evento._count.inscricoes)
@@ -216,7 +299,7 @@ export default function EventosPage() {
       <MediaUploadPanel />
 
       <div className="flex flex-wrap gap-2">
-        {(['cadastro', 'inscricoes'] as const).map((tab) => (
+        {(['cadastro', 'inscricoes', 'lotes'] as const).map((tab) => (
           <button
             key={tab}
             type="button"
@@ -225,7 +308,11 @@ export default function EventosPage() {
               aba === tab ? 'bg-[var(--color-accent)] text-black' : 'bg-white/10'
             }`}
           >
-            {tab === 'cadastro' ? t('erp.eventos.tabCadastro') : t('erp.eventos.tabInscricoes')}
+            {tab === 'cadastro'
+              ? t('erp.eventos.tabCadastro')
+              : tab === 'inscricoes'
+                ? t('erp.eventos.tabInscricoes')
+                : t('erp.eventos.tabLotes')}
           </button>
         ))}
       </div>
@@ -442,6 +529,35 @@ export default function EventosPage() {
                   </option>
                 ))}
               </select>
+              {(evento.ingressoLotes?.length ?? 0) > 0 && (
+                <select
+                  value={formInscricao.ingressoLoteId}
+                  onChange={(e) => {
+                    const loteId = e.target.value;
+                    const lote = evento.ingressoLotes?.find((l) => String(l.id) === loteId);
+                    setFormInscricao({
+                      ...formInscricao,
+                      ingressoLoteId: loteId,
+                      valor: lote ? String(lote.valor) : formInscricao.valor,
+                    });
+                  }}
+                  className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
+                >
+                  <option value="">{t('erp.eventos.loteNone')}</option>
+                  {(evento.ingressoLotes ?? [])
+                    .filter((l) => l.ativo)
+                    .map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.nome} — {formatMoney(locale, Number(l.valor))} (
+                        {t('erp.eventos.loteSpots', {
+                          restantes: l.vagasRestantes,
+                          total: l.quantidade,
+                        })}
+                        )
+                      </option>
+                    ))}
+                </select>
+              )}
               <input
                 type="number"
                 step="0.01"
@@ -450,7 +566,7 @@ export default function EventosPage() {
                 onChange={(e) => setFormInscricao({ ...formInscricao, valor: e.target.value })}
                 placeholder={t('erp.common.value')}
                 className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
-                required
+                required={!formInscricao.ingressoLoteId}
               />
               <input
                 type="date"
@@ -470,6 +586,8 @@ export default function EventosPage() {
               <thead>
                 <tr className="text-left border-b border-white/20">
                   <th className="p-2">{t('erp.common.person')}</th>
+                  <th className="p-2">{t('erp.eventos.lote')}</th>
+                  <th className="p-2">{t('erp.eventos.code')}</th>
                   <th className="p-2">{t('erp.common.value')}</th>
                   <th className="p-2">{t('erp.common.dueDate')}</th>
                   <th className="p-2">{t('erp.financeiro.colCompliance')}</th>
@@ -478,32 +596,163 @@ export default function EventosPage() {
               </thead>
               <tbody>
                 {(evento?.inscricoes ?? []).map((i) => (
-                  <tr key={i.id} className="border-b border-white/10">
+                  <tr
+                    key={i.id}
+                    className={`border-b border-white/10 ${i.canceladaEm ? 'opacity-50' : ''}`}
+                  >
                     <td className="p-2">{i.pessoa.nomeCompleto}</td>
+                    <td className="p-2">{i.ingressoLote?.nome ?? t('erp.eventos.loteNone')}</td>
+                    <td className="p-2 font-mono text-xs">{i.codigo ?? t('erp.common.emptyDash')}</td>
                     <td className="p-2">{formatMoney(locale, Number(i.valor))}</td>
                     <td className="p-2">
                       {i.vencimento
                         ? new Date(i.vencimento).toLocaleDateString(dateLocale)
                         : t('erp.common.emptyDash')}
                     </td>
-                    <td className="p-2">{labelEnum(t, 'adimplencia', i.adimplencia)}</td>
                     <td className="p-2">
-                      {i.statusPagamento === 'PENDENTE' && canWrite && (
-                        <button
-                          type="button"
-                          onClick={() => confirmarPagamento(i.id)}
-                          className="text-[var(--color-accent)] hover:underline text-xs"
-                        >
-                          {t('erp.eventos.confirmPayment')}
-                        </button>
-                      )}
+                      {i.canceladaEm
+                        ? t('erp.eventos.cancelled')
+                        : labelEnum(t, 'adimplencia', i.adimplencia)}
+                    </td>
+                    <td className="p-2">
+                      <div className="flex flex-wrap gap-2">
+                        {!i.canceladaEm && i.statusPagamento === 'PENDENTE' && canWrite && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => confirmarPagamento(i.id)}
+                              className="text-[var(--color-accent)] hover:underline text-xs"
+                            >
+                              {t('erp.eventos.confirmPayment')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => cancelarInscricao(i.id)}
+                              className="text-[var(--color-danger)] hover:underline text-xs"
+                            >
+                              {t('erp.eventos.cancelRegistration')}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
                 {(evento?.inscricoes?.length ?? 0) === 0 && (
                   <tr>
-                    <td colSpan={5} className="p-4 text-center text-white/50">
+                    <td colSpan={7} className="p-4 text-center text-white/50">
                       {t('erp.eventos.empty')}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {aba === 'lotes' && (
+        <>
+          <select
+            value={eventoId ?? ''}
+            onChange={(e) => setEventoId(Number(e.target.value) || null)}
+            className="w-full max-w-md px-3 py-2 rounded bg-black/30 border border-white/20"
+          >
+            {eventos.length === 0 && <option value="">{t('erp.eventos.emptyList')}</option>}
+            {eventos.map((ev) => (
+              <option key={ev.id} value={ev.id}>
+                {ev.nomeEvento}
+                {ev.capacidadeMax ? ` / ${ev.capacidadeMax}` : ''}
+              </option>
+            ))}
+          </select>
+
+          {canWrite && evento && (
+            <form onSubmit={criarLote} className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3 max-w-md">
+              <h3 className="font-medium text-[var(--color-accent)]">{t('erp.eventos.lotesTitle')}</h3>
+              <input
+                value={formLote.nome}
+                onChange={(e) => setFormLote({ ...formLote, nome: e.target.value })}
+                placeholder={t('erp.eventos.loteName')}
+                className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
+                required
+              />
+              <input
+                type="number"
+                min="1"
+                value={formLote.quantidade}
+                onChange={(e) => setFormLote({ ...formLote, quantidade: e.target.value })}
+                placeholder={t('erp.eventos.loteQty')}
+                className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
+                required
+              />
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={formLote.valor}
+                onChange={(e) => setFormLote({ ...formLote, valor: e.target.value })}
+                placeholder={t('erp.common.value')}
+                className="w-full px-3 py-2 rounded bg-black/30 border border-white/20"
+                required
+              />
+              <button type="submit" className="px-4 py-2 bg-[var(--color-accent)] text-black rounded text-sm">
+                {t('erp.eventos.loteCreate')}
+              </button>
+            </form>
+          )}
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left border-b border-white/20">
+                  <th className="p-2">{t('erp.eventos.loteName')}</th>
+                  <th className="p-2">{t('erp.common.value')}</th>
+                  <th className="p-2">{t('erp.eventos.loteQty')}</th>
+                  <th className="p-2">{t('erp.usuarios.colStatus')}</th>
+                  {canWrite && <th className="p-2">{t('erp.common.actions')}</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {(evento?.ingressoLotes ?? []).map((lote) => (
+                  <tr key={lote.id} className="border-b border-white/10">
+                    <td className="p-2">{lote.nome}</td>
+                    <td className="p-2">{formatMoney(locale, Number(lote.valor))}</td>
+                    <td className="p-2">
+                      {t('erp.eventos.loteSpots', {
+                        restantes: lote.vagasRestantes,
+                        total: lote.quantidade,
+                      })}
+                    </td>
+                    <td className="p-2">
+                      {lote.ativo ? t('erp.eventos.statusOpen') : t('erp.eventos.statusClosed')}
+                    </td>
+                    {canWrite && (
+                      <td className="p-2">
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => toggleLoteAtivo(lote)}
+                            className="text-xs text-[var(--color-accent)] hover:underline"
+                          >
+                            {lote.ativo ? t('erp.eventos.loteDeactivate') : t('erp.eventos.loteActivate')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => excluirLote(lote)}
+                            className="text-xs text-[var(--color-danger)] hover:underline"
+                          >
+                            {t('erp.common.delete')}
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+                {(evento?.ingressoLotes?.length ?? 0) === 0 && (
+                  <tr>
+                    <td colSpan={canWrite ? 5 : 4} className="p-4 text-center text-white/50">
+                      {t('erp.eventos.loteEmpty')}
                     </td>
                   </tr>
                 )}

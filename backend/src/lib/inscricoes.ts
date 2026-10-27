@@ -3,6 +3,14 @@ export function eventoLotado(capacidadeMax: number | null | undefined, inscricoe
   return inscricoesAtivas >= capacidadeMax;
 }
 
+/** Conta só inscrições não canceladas (vaga ocupada). */
+export function inscricoesAtivasWhere(eventoId?: number) {
+  return {
+    ...(eventoId != null ? { eventoId } : {}),
+    canceladaEm: null,
+  } as const;
+}
+
 export function podeInscrever(input: {
   eventoStatus: 'ABERTO' | 'ENCERRADO';
   capacidadeMax: number | null | undefined;

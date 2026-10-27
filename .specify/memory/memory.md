@@ -45,16 +45,16 @@ Atualizar `project-memory.md` ao encerrar cada tarefa.
 | Enciclopédia de ervas | ✅ Prod — `/public/ervas`, 100 fotos creditadas (`ce143fb`, 2026-10-21) |
 | Logo oficial | ✅ Prod — arquivo enviado pela casa, fundo branco (`3a3d4fc`, 2026-10-21) |
 | Pontos cantados | ✅ Prod — `/public/pontos` player Spotify, `/app/pontos`, Telegram e chat no contato (`490ed7e`, 2026-10-21) |
-| 032 ingressos | 📋 Stub |
+| **032 ingressos** | ✅ Código local (ADR-013) — lotes, reserva pública, check-in por código; **deploy pendente** |
 | Auditoria F01–F10 | ✅ GREEN |
 
 ## ADRs
 
-001–012 em `docs/memory/decisions/` — **012 galeria mídia** (PUBLICO/PRIVADO + álbuns + YouTube).
+001–013 em `docs/memory/decisions/` — **013 ingressos lotes**; 012 galeria.
 
 ## Pendências vivas
 
-Ver `project-memory.md` e `docs/memory/roadmap-cronograma.md` (mensageria SMTP/WhatsApp, 032, Asaas).
+Ver `project-memory.md` e `docs/memory/roadmap-cronograma.md` (deploy 032, mensageria SMTP/WhatsApp/Telegram, Asaas).
 
 ## Regras
 

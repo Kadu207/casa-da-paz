@@ -241,3 +241,37 @@ Ambos devem retornar **200** ou **302** antes de configurar Cloudflare.
 3. Service URL: `http://172.17.0.1:3001` (nao `127.0.0.1` no inovati-server)
 
 ADR: `docs/memory/decisions/006-whatsapp-chatwoot-n8n.md`
+## 9. Gates humanos — SMTP, WhatsApp, Telegram (2026-10-27)
+
+Nenhum secret no repositório. Credenciais só no N8N / painel Chatwoot / `.env.production` na VPS.
+
+### SMTP
+1. N8N UI → Credentials → SMTP com nome **exato** `SMTP Casa da Paz`
+2. `SMTP_FROM` em `infra/.env.production`
+3. Workflows `ingresso_oficina` e `tarefa_delegacao` usam essa credencial
+
+### WhatsApp (Meta) — Spec 012 T8
+1. Meta Business: Phone Number ID, WABA ID, Permanent Access Token
+2. Chatwoot → Inboxes → WhatsApp (colar token só no painel)
+3. Opcional: `CHATWOOT_API_TOKEN`, `CHATWOOT_INBOX_ID`, `CHATWOOT_ACCOUNT_ID` no `.env.production`
+
+### Telegram (envio + recebimento via Chatwoot)
+1. BotFather → token do bot
+2. Chatwoot → Inboxes → Telegram → colar token (webhook apontando ao Chatwoot)
+3. Recebimento na inbox da recepção; envio pelo mesmo nó N8N Chatwoot (ADR-006)
+4. Atalho público `t.me` permanece em `/public/contato` (config `/app/pontos`)
+
+### Diagnóstico `casadapaz-chat` 502 / HTTP 000
+Observado 2026-10-27: hostname público sem resposta; app principal OK.
+
+**Gate SSH:** só diagnosticar após confirmação do usuário. Não rodar `deploy.sh` nem restart sem autorização.
+
+```bash
+ssh -p 65025 gestaoti@128.140.77.31
+docker ps --filter name=chatwoot
+docker logs infra-chatwoot-1 --tail 80
+curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3001
+curl -s -o /dev/null -w "%{http_code}\n" https://casadapaz-chat.inovatitech.com.br
+```
+
+Playbook completo: `docs/memory/playbooks/chatwoot-n8n.md`

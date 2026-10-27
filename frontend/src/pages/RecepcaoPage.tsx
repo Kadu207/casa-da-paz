@@ -40,6 +40,7 @@ export default function RecepcaoPage() {
   const [selecionada, setSelecionada] = useState<Pessoa | null>(null);
   const [tipoPresenca, setTipoPresenca] = useState<'CONSULENTE' | 'MEDIUM'>('CONSULENTE');
   const [nomeResponsavel, setNomeResponsavel] = useState('');
+  const [codigoIngresso, setCodigoIngresso] = useState('');
   const [erro, setErro] = useState('');
   const [msg, setMsg] = useState('');
   const [novoEvento, setNovoEvento] = useState({ nomeEvento: '', dataEvento: '', capacidadeMax: '' });
@@ -87,6 +88,39 @@ export default function RecepcaoPage() {
       setTelefone('');
       setPessoas([]);
       setNomeResponsavel('');
+      await carregarEventos();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : t('erp.recepcao.checkinError'));
+    }
+  };
+
+  const checkinPorCodigo = async () => {
+    if (!eventoId || !codigoIngresso.trim()) return;
+    setErro('');
+    setMsg('');
+    try {
+      const result = await api<{
+        pessoa: { nomeCompleto: string };
+        inscricao: { statusPagamento: string };
+      }>(`/eventos/${eventoId}/checkin-codigo`, {
+        method: 'POST',
+        body: JSON.stringify({
+          codigo: codigoIngresso.trim(),
+          tipoPresenca,
+          nomeResponsavel: nomeResponsavel.trim() || undefined,
+        }),
+      });
+      const payment =
+        result.inscricao.statusPagamento === 'CONCLUIDO'
+          ? t('erp.recepcao.paymentPaid')
+          : t('erp.recepcao.paymentPending');
+      setMsg(
+        t('erp.recepcao.checkinCodeSuccess', {
+          name: result.pessoa.nomeCompleto,
+          payment,
+        })
+      );
+      setCodigoIngresso('');
       await carregarEventos();
     } catch (err) {
       setErro(err instanceof Error ? err.message : t('erp.recepcao.checkinError'));
@@ -203,6 +237,29 @@ export default function RecepcaoPage() {
             </button>
           </div>
         )}
+      </section>
+
+      <section className="bg-[var(--color-surface)] p-4 rounded-xl space-y-3">
+        <h3 className="font-medium">{t('erp.recepcao.checkinByCode')}</h3>
+        {erro && <p className="text-[var(--color-danger)] text-sm">{erro}</p>}
+        {msg && <p className="text-[var(--color-success)] text-sm">{msg}</p>}
+        <div className="flex gap-2 flex-wrap">
+          <input
+            value={codigoIngresso}
+            onChange={(e) => setCodigoIngresso(e.target.value.toUpperCase())}
+            placeholder={t('erp.recepcao.codePlaceholder')}
+            className="px-3 py-2 rounded bg-black/30 border border-white/20 flex-1 min-w-[200px] font-mono tracking-wider"
+            autoComplete="off"
+          />
+          <button
+            type="button"
+            onClick={checkinPorCodigo}
+            disabled={!eventoId || !codigoIngresso.trim()}
+            className="px-4 py-2 bg-[var(--color-accent)] text-black rounded disabled:opacity-50"
+          >
+            {t('erp.recepcao.confirmCheckin')}
+          </button>
+        </div>
       </section>
 
       <section className="space-y-3">

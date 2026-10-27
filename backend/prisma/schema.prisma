@@ -522,9 +522,27 @@ model Evento {
   visualizacoes Int           @default(0)
   presencas     Presenca[]
   inscricoes    Inscricao[]
+  ingressoLotes IngressoLote[]
 
   @@index([tipo, status, dataEvento])
   @@map("eventos")
+}
+
+/// Lote de ingressos por evento (estoque secundário — ADR-013)
+model IngressoLote {
+  id         Int         @id @default(autoincrement())
+  eventoId   Int         @map("evento_id")
+  nome       String      @db.VarChar(100)
+  quantidade Int
+  valor      Decimal     @db.Decimal(10, 2)
+  ativo      Boolean     @default(true)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  evento     Evento      @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  inscricoes Inscricao[]
+
+  @@index([eventoId, ativo])
+  @@map("ingresso_lotes")
 }
 
 model Presenca {
@@ -606,14 +624,19 @@ model Inscricao {
   id              Int             @id @default(autoincrement())
   eventoId        Int             @map("evento_id")
   pessoaId        Int             @map("pessoa_id")
+  ingressoLoteId  Int?            @map("ingresso_lote_id")
+  codigo          String?         @unique @db.VarChar(16)
+  canceladaEm     DateTime?       @map("cancelada_em")
   valor           Decimal         @db.Decimal(10, 2)
   statusPagamento StatusTransacao @map("status_pagamento")
   vencimento      DateTime?       @db.Date
   evento          Evento          @relation(fields: [eventoId], references: [id])
   pessoa          Pessoa          @relation(fields: [pessoaId], references: [id])
+  ingressoLote    IngressoLote?   @relation(fields: [ingressoLoteId], references: [id], onDelete: SetNull)
   asaasCobrancas  AsaasCobranca[]
 
   @@unique([eventoId, pessoaId])
+  @@index([ingressoLoteId, canceladaEm])
   @@map("inscricoes")
 }
 
